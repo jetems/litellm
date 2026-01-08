@@ -37,6 +37,7 @@ import { getProviderLogoAndName } from "./provider_info_helpers";
 import NumericalInput from "./shared/numerical_input";
 import { Tag } from "./tag_management/types";
 import { getDisplayModelName } from "./view_model/model_name_display";
+import { useTranslate } from "@/i18n";
 
 interface ModelInfoViewProps {
   modelId: string;
@@ -65,6 +66,7 @@ export default function ModelInfoView({
   onModelUpdate,
   modelAccessGroups,
 }: ModelInfoViewProps) {
+  const t = useTranslate();
   const [form] = Form.useForm();
   const [localModelData, setLocalModelData] = useState<any>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -348,7 +350,7 @@ export default function ModelInfoView({
       <div className="flex justify-between items-center mb-6">
         <div>
           <TremorButton icon={ArrowLeftIcon} variant="light" onClick={onClose} className="mb-4">
-            Back to Models
+            {t("Back to Models")}
           </TremorButton>
           <Title>Public Model Name: {getDisplayModelName(modelData)}</Title>
           <div className="flex items-center cursor-pointer">
@@ -358,11 +360,10 @@ export default function ModelInfoView({
               size="small"
               icon={copiedStates["model-id"] ? <CheckIcon size={12} /> : <CopyIcon size={12} />}
               onClick={() => copyToClipboard(modelData.model_info.id, "model-id")}
-              className={`left-2 z-10 transition-all duration-200 ${
-                copiedStates["model-id"]
+              className={`left-2 z-10 transition-all duration-200 ${copiedStates["model-id"]
                   ? "text-green-600 bg-green-50 border-green-200"
                   : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-              }`}
+                }`}
             />
           </div>
         </div>
@@ -374,7 +375,7 @@ export default function ModelInfoView({
             className="flex items-center gap-2"
             data-testid="test-connection-button"
           >
-            Test Connection
+            {t("Test Connection")}
           </TremorButton>
 
           <TremorButton
@@ -385,7 +386,7 @@ export default function ModelInfoView({
             disabled={!isAdmin}
             data-testid="reuse-credentials-button"
           >
-            Re-use Credentials
+            {t("Re-use Credentials")}
           </TremorButton>
           <TremorButton
             icon={TrashIcon}
@@ -395,14 +396,14 @@ export default function ModelInfoView({
             disabled={!canEditModel}
             data-testid="delete-model-button"
           >
-            Delete Model
+            {t("Delete Model")}
           </TremorButton>
         </div>
       </div>
 
       <TabGroup>
         <TabList className="mb-6">
-          <Tab>Overview</Tab>
+          <Tab>{t("Overview")}</Tab>
           <Tab>Raw JSON</Tab>
         </TabList>
 
@@ -473,10 +474,10 @@ export default function ModelInfoView({
                 Created At{" "}
                 {modelData.model_info.created_at
                   ? new Date(modelData.model_info.created_at).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })
                   : "Not Set"}
               </div>
               <div className="flex items-center gap-x-2">

@@ -282,5 +282,12 @@
     "UI Settings": "UI Settings",
     "Add SSO": "Add SSO",
     "Allowed IPs": "Allowed IPs",
-    "UI Access Control": "UI Access Control"
+    "UI Access Control": "UI Access Control",
+    "Back to Models": "Back to Models",
+    "Test Connection": "Test Connection",
+    "Re-use Credentials": "Re-use Credentials",
+    "Delete Model": "Delete Model",
+    "Overview": "Overview",
+    "Model Settings": "Model Settings",
+    "Edit Settings": "Edit Settings"
 }
