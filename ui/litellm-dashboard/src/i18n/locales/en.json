@@ -304,5 +304,9 @@
     "Add New Prompt": "Add New Prompt",
     "Delete Prompt": "Delete Prompt",
     "Pass Through Endpoints": "Pass Through Endpoints",
-    "Configure and manage your pass-through endpoints": "Configure and manage your pass-through endpoints"
+    "Configure and manage your pass-through endpoints": "Configure and manage your pass-through endpoints",
+    "Logo Customization": "Logo Customization",
+    "Customize your LiteLLM admin dashboard with a custom logo.": "Customize your LiteLLM admin dashboard with a custom logo.",
+    "Save Changes": "Save Changes",
+    "Reset to Default": "Reset to Default"
 }

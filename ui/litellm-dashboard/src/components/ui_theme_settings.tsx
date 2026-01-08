@@ -3,6 +3,7 @@ import { Card, Title, Text, TextInput, Button } from "@tremor/react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { getProxyBaseUrl } from "@/components/networking";
 import NotificationsManager from "./molecules/notifications_manager";
+import { useTranslate } from "@/i18n";
 
 interface UIThemeSettingsProps {
   userID: string | null;
@@ -11,6 +12,7 @@ interface UIThemeSettingsProps {
 }
 
 const UIThemeSettings: React.FC<UIThemeSettingsProps> = ({ userID, userRole, accessToken }) => {
+  const t = useTranslate();
   const { logoUrl, setLogoUrl } = useTheme();
   const [logoUrlInput, setLogoUrlInput] = useState<string>("");
   const [loading, setLoading] = useState(false);
@@ -115,8 +117,8 @@ const UIThemeSettings: React.FC<UIThemeSettingsProps> = ({ userID, userRole, acc
   return (
     <div className="w-full mx-auto max-w-4xl px-6 py-8">
       <div className="mb-8">
-        <Title className="text-2xl font-bold mb-2">Logo Customization</Title>
-        <Text className="text-gray-600">Customize your LiteLLM admin dashboard with a custom logo.</Text>
+        <Title className="text-2xl font-bold mb-2">{t("Logo Customization")}</Title>
+        <Text className="text-gray-600">{t("Customize your LiteLLM admin dashboard with a custom logo.")}</Text>
       </div>
 
       <Card className="shadow-sm p-6">
@@ -165,10 +167,10 @@ const UIThemeSettings: React.FC<UIThemeSettingsProps> = ({ userID, userRole, acc
           {/* Action Buttons */}
           <div className="flex gap-3 pt-4">
             <Button onClick={handleSave} loading={loading} disabled={loading} color="indigo">
-              Save Changes
+              {t("Save Changes")}
             </Button>
             <Button onClick={handleReset} loading={loading} disabled={loading} variant="secondary" color="gray">
-              Reset to Default
+              {t("Reset to Default")}
             </Button>
           </div>
         </div>

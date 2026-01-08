@@ -304,5 +304,9 @@
     "Add New Prompt": "添加新提示词",
     "Delete Prompt": "删除提示词",
     "Pass Through Endpoints": "透传端点",
-    "Configure and manage your pass-through endpoints": "配置和管理您的透传端点"
+    "Configure and manage your pass-through endpoints": "配置和管理您的透传端点",
+    "Logo Customization": "Logo 定制",
+    "Customize your LiteLLM admin dashboard with a custom logo.": "使用自定义 Logo 个性化您的 LiteLLM 管理仪表板。",
+    "Save Changes": "保存更改",
+    "Reset to Default": "重置为默认"
 }
