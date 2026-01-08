@@ -319,5 +319,12 @@
     "Request Logs": "请求日志",
     "Audit Logs": "审计日志",
     "Live Tail": "实时追踪",
-    "Refresh": "刷新"
+    "Refresh": "刷新",
+    "Test Key": "测试密钥",
+    "Clear Chat": "清空对话",
+    "Get Code": "获取代码",
+    "Select Model": "选择模型",
+    "Endpoint Type": "端点类型",
+    "Voice": "声音",
+    "Send": "发送"
 }

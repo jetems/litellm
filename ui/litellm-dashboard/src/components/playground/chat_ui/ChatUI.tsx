@@ -23,6 +23,7 @@ import {
 import { Card, Text, TextInput, Title, Button as TremorButton } from "@tremor/react";
 import { Button, Input, Modal, Popover, Select, Spin, Tooltip, Typography, Upload } from "antd";
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslate } from "@/i18n";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { coy } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -92,6 +93,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
   disabledPersonalKeyCreation,
   proxySettings,
 }) => {
+  const t = useTranslate();
   const [isMCPToolsModalVisible, setIsMCPToolsModalVisible] = useState(false);
   const [mcpTools, setMCPTools] = useState<MCPTool[]>([]);
   const [selectedMCPTools, setSelectedMCPTools] = useState<string[]>(() => {
@@ -200,7 +202,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
   const [temperature, setTemperature] = useState<number>(1.0);
   const [maxTokens, setMaxTokens] = useState<number>(2048);
   const [useAdvancedParams, setUseAdvancedParams] = useState<boolean>(false);
-  
+
   // Code Interpreter state (using custom hook)
   const codeInterpreter = useCodeInterpreter();
 
@@ -1127,7 +1129,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
                     try {
                       sessionStorage.removeItem("selectedModel");
                       sessionStorage.removeItem("selectedAgent");
-                    } catch {}
+                    } catch { }
                   }}
                   className="mb-4"
                 />
@@ -1413,7 +1415,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
                     enabled={codeInterpreter.enabled}
                     onEnabledChange={codeInterpreter.setEnabled}
                     selectedContainerId={null}
-                    onContainerChange={() => {}}
+                    onContainerChange={() => { }}
                     selectedModel={selectedModel || ""}
                   />
                 </div>
@@ -1424,21 +1426,21 @@ const ChatUI: React.FC<ChatUIProps> = ({
           {/* Main Chat Area */}
           <div className="w-3/4 flex flex-col bg-white">
             <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-              <Title className="text-xl font-semibold mb-0">Test Key</Title>
+              <Title className="text-xl font-semibold mb-0">{t("Test Key")}</Title>
               <div className="flex gap-2">
                 <TremorButton
                   onClick={clearChatHistory}
                   className="bg-gray-100 hover:bg-gray-200 text-gray-700 border-gray-300"
                   icon={ClearOutlined}
                 >
-                  Clear Chat
+                  {t("Clear Chat")}
                 </TremorButton>
                 <TremorButton
                   onClick={() => setIsGetCodeModalVisible(true)}
                   className="bg-gray-100 hover:bg-gray-200 text-gray-700 border-gray-300"
                   icon={CodeOutlined}
                 >
-                  Get Code
+                  {t("Get Code")}
                 </TremorButton>
               </div>
             </div>
@@ -1903,11 +1905,10 @@ const ChatUI: React.FC<ChatUIProps> = ({
                     {endpointType === EndpointType.RESPONSES && (
                       <Tooltip title={codeInterpreter.enabled ? "Code Interpreter enabled (click to disable)" : "Enable Code Interpreter"}>
                         <button
-                          className={`p-1.5 rounded-md transition-colors ${
-                            codeInterpreter.enabled
+                          className={`p-1.5 rounded-md transition-colors ${codeInterpreter.enabled
                               ? "bg-blue-100 text-blue-600"
                               : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"
-                          }`}
+                            }`}
                           onClick={() => {
                             codeInterpreter.toggle();
                             if (!codeInterpreter.enabled) {
@@ -1928,9 +1929,9 @@ const ChatUI: React.FC<ChatUIProps> = ({
                     onKeyDown={handleKeyDown}
                     placeholder={
                       endpointType === EndpointType.CHAT ||
-                      endpointType === EndpointType.EMBEDDINGS ||
-                      endpointType === EndpointType.RESPONSES ||
-                      endpointType === EndpointType.ANTHROPIC_MESSAGES
+                        endpointType === EndpointType.EMBEDDINGS ||
+                        endpointType === EndpointType.RESPONSES ||
+                        endpointType === EndpointType.ANTHROPIC_MESSAGES
                         ? "Type your message... (Shift+Enter for new line)"
                         : endpointType === EndpointType.A2A_AGENTS
                           ? "Send a message to the A2A agent..."

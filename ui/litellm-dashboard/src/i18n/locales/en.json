@@ -319,5 +319,12 @@
     "Request Logs": "Request Logs",
     "Audit Logs": "Audit Logs",
     "Live Tail": "Live Tail",
-    "Refresh": "Refresh"
+    "Refresh": "Refresh",
+    "Test Key": "Test Key",
+    "Clear Chat": "Clear Chat",
+    "Get Code": "Get Code",
+    "Select Model": "Select Model",
+    "Endpoint Type": "Endpoint Type",
+    "Voice": "Voice",
+    "Send": "Send"
 }
