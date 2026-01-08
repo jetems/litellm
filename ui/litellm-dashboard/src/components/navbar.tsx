@@ -15,6 +15,7 @@ import {
 import { clearTokenCookies } from "@/utils/cookieUtils";
 import { fetchProxySettings } from "@/utils/proxyUtils";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useI18n, type Locale } from "@/i18n";
 
 interface NavbarProps {
   userID: string | null;
@@ -45,6 +46,15 @@ const Navbar: React.FC<NavbarProps> = ({
   const [logoutUrl, setLogoutUrl] = useState("");
   const [version, setVersion] = useState("");
   const { logoUrl } = useTheme();
+  const { locale, setLocale } = useI18n();
+
+  // Language options
+  const languageOptions: { key: Locale; label: string; flag: string }[] = [
+    { key: "en", label: "English", flag: "🇺🇸" },
+    { key: "zh-CN", label: "中文", flag: "🇨🇳" },
+  ];
+
+  const currentLanguage = languageOptions.find((lang) => lang.key === locale) || languageOptions[0];
 
   // Simple logo URL: use custom logo if available, otherwise default
   const imageUrl = logoUrl || `${baseUrl}/get_image`;
@@ -144,6 +154,23 @@ const Navbar: React.FC<NavbarProps> = ({
     },
   ];
 
+  const languageItems: MenuProps["items"] = languageOptions.map((lang) => ({
+    key: lang.key,
+    label: (
+      <div
+        className={`flex items-center py-2 px-3 hover:bg-gray-50 rounded-md mx-1 my-1 cursor-pointer ${locale === lang.key ? "bg-blue-50" : ""
+          }`}
+        onClick={() => setLocale(lang.key)}
+      >
+        <span className="mr-2">{lang.flag}</span>
+        <span className={`text-gray-800 ${locale === lang.key ? "font-medium text-blue-600" : ""}`}>
+          {lang.label}
+        </span>
+        {locale === lang.key && <span className="ml-auto text-blue-600">✓</span>}
+      </div>
+    ),
+  }));
+
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-10">
       <div className="w-full">
@@ -167,7 +194,7 @@ const Navbar: React.FC<NavbarProps> = ({
               <Link href="/" className="flex items-center">
                 <div className="relative">
                   <img src={imageUrl} alt="LiteLLM Brand" className="h-10 w-auto" />
-                  <span 
+                  <span
                     className="absolute -top-1 -right-2 text-lg animate-bounce"
                     style={{ animationDuration: '2s' }}
                     title="Happy Holidays!"
@@ -198,6 +225,28 @@ const Navbar: React.FC<NavbarProps> = ({
             >
               Docs
             </a>
+
+            {/* Language Switcher */}
+            <Dropdown
+              menu={{
+                items: languageItems,
+                className: "min-w-[140px]",
+                style: {
+                  padding: "4px",
+                  marginTop: "8px",
+                  borderRadius: "8px",
+                  boxShadow: "0 4px 16px rgba(0, 0, 0, 0.08)",
+                },
+              }}
+            >
+              <button className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                <span className="mr-1">{currentLanguage.flag}</span>
+                {currentLanguage.label}
+                <svg className="ml-1 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            </Dropdown>
 
             {!isPublicPage && (
               <Dropdown

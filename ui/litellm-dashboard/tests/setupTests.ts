@@ -17,6 +17,17 @@ vi.mock("@/components/molecules/notifications_manager", () => ({
   },
 }));
 
+// Mock i18n to avoid needing I18nProvider in every test
+// Returns the original text for translations (pass-through behavior)
+vi.mock("@/i18n", () => ({
+  I18nProvider: ({ children }: { children: React.ReactNode }) => children,
+  useI18n: () => ({ locale: "en", setLocale: vi.fn() }),
+  useTranslate: () => (text: string) => text,
+  T: ({ children }: { children: string }) => children,
+  translate: (text: string) => text,
+  createTranslator: () => (text: string) => text,
+}));
+
 vi.mock("@tremor/react", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@tremor/react")>();
   return {
@@ -25,7 +36,7 @@ vi.mock("@tremor/react", async (importOriginal) => {
       // Render as a native button to avoid Tremor-specific behaviors in tests
       React.createElement("button", { ...props, ref }, children),
     ),
-    Tooltip: ({ children, ..._props }: { children?: React.ReactNode; [key: string]: unknown }) => {
+    Tooltip: ({ children, ..._props }: { children?: React.ReactNode;[key: string]: unknown }) => {
       // Return children directly without tooltip functionality to prevent flaky tests
       // This avoids issues with hover states, positioning, and DOM queries in tests
       return React.createElement(React.Fragment, null, children);
@@ -80,7 +91,7 @@ if (!document.getAnimations) {
 // Mock ResizeObserver for components that use it (e.g., Tremor UI components)
 // This prevents "ResizeObserver is not defined" errors in JSDOM
 global.ResizeObserver = class ResizeObserver {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
+  observe() { }
+  unobserve() { }
+  disconnect() { }
 };
