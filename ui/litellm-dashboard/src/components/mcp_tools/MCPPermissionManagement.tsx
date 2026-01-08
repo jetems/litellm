@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { Form, Select, Tooltip, Collapse, Input, Space, Button } from "antd";
 import { InfoCircleOutlined, MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { MCPServer } from "./types";
+import { useTranslate } from "@/i18n";
 const { Panel } = Collapse;
 
 interface MCPPermissionManagementProps {
@@ -22,6 +23,7 @@ const MCPPermissionManagement: React.FC<MCPPermissionManagementProps> = ({
   setSearchValue,
   getAccessGroupOptions,
 }) => {
+  const t = useTranslate();
   const form = Form.useFormInstance();
 
   // Set initial values when mcpServer changes
@@ -48,9 +50,9 @@ const MCPPermissionManagement: React.FC<MCPPermissionManagementProps> = ({
           <div className="flex items-center">
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-              <h3 className="text-lg font-semibold text-gray-900">Permission Management / Access Control</h3>
+              <h3 className="text-lg font-semibold text-gray-900">{t("Permission Management / Access Control")}</h3>
             </div>
-            <p className="text-sm text-gray-600 ml-4">Configure access permissions and security settings (Optional)</p>
+            <p className="text-sm text-gray-600 ml-4">{t("Configure access permissions and security settings (Optional)")}</p>
           </div>
         }
         key="permissions"
@@ -60,8 +62,8 @@ const MCPPermissionManagement: React.FC<MCPPermissionManagementProps> = ({
           <Form.Item
             label={
               <span className="text-sm font-medium text-gray-700 flex items-center">
-                MCP Access Groups
-                <Tooltip title="Specify access groups for this MCP server. Users must be in at least one of these groups to access the server.">
+                {t("MCP Access Groups")}
+                <Tooltip title={t("Specify access groups for this MCP server. Users must be in at least one of these groups to access the server.")}>
                   <InfoCircleOutlined className="ml-2 text-blue-400 hover:text-blue-600 cursor-help" />
                 </Tooltip>
               </span>
@@ -72,7 +74,7 @@ const MCPPermissionManagement: React.FC<MCPPermissionManagementProps> = ({
             <Select
               mode="tags"
               showSearch
-              placeholder="Select existing groups or type to create new ones"
+              placeholder={t("Select existing groups or type to create new ones")}
               optionFilterProp="value"
               filterOption={(input, option) => (option?.value ?? "").toLowerCase().includes(input.toLowerCase())}
               onSearch={(value) => setSearchValue(value)}
@@ -86,13 +88,13 @@ const MCPPermissionManagement: React.FC<MCPPermissionManagementProps> = ({
           <Form.Item
             label={
               <span className="text-sm font-medium text-gray-700 flex items-center">
-                Extra Headers
-                <Tooltip title="Forward custom headers from incoming requests to this MCP server (e.g., Authorization, X-Custom-Header, User-Agent)">
+                {t("Extra Headers")}
+                <Tooltip title={t("Forward custom headers from incoming requests to this MCP server (e.g., Authorization, X-Custom-Header, User-Agent)")}>
                   <InfoCircleOutlined className="ml-2 text-blue-400 hover:text-blue-600 cursor-help" />
                 </Tooltip>
                 {mcpServer?.extra_headers && mcpServer.extra_headers.length > 0 && (
                   <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
-                    {mcpServer.extra_headers.length} configured
+                    {mcpServer.extra_headers.length} {t("configured")}
                   </span>
                 )}
               </span>
@@ -103,8 +105,8 @@ const MCPPermissionManagement: React.FC<MCPPermissionManagementProps> = ({
               mode="tags"
               placeholder={
                 mcpServer?.extra_headers && mcpServer.extra_headers.length > 0
-                  ? `Currently: ${mcpServer.extra_headers.join(", ")}`
-                  : "Enter header names (e.g., Authorization, X-Custom-Header)"
+                  ? `${t("Currently")}: ${mcpServer.extra_headers.join(", ")}`
+                  : t("Enter header names (e.g., Authorization, X-Custom-Header)")
               }
               className="rounded-lg"
               size="large"
@@ -116,8 +118,8 @@ const MCPPermissionManagement: React.FC<MCPPermissionManagementProps> = ({
           <Form.Item
             label={
               <span className="text-sm font-medium text-gray-700 flex items-center">
-                Static Headers
-                <Tooltip title="Send these key-value headers with every request to this MCP server.">
+                {t("Static Headers")}
+                <Tooltip title={t("Send these key-value headers with every request to this MCP server.")}>
                   <InfoCircleOutlined className="ml-2 text-blue-400 hover:text-blue-600 cursor-help" />
                 </Tooltip>
               </span>
@@ -133,26 +135,26 @@ const MCPPermissionManagement: React.FC<MCPPermissionManagementProps> = ({
                         {...restField}
                         name={[name, "header"]}
                         className="flex-1"
-                        rules={[{ required: true, message: "Header name is required" }]}
+                        rules={[{ required: true, message: t("Header name is required") }]}
                       >
                         <Input
                           size="large"
                           allowClear
                           className="rounded-lg"
-                          placeholder="Header name (e.g., X-API-Key)"
+                          placeholder={t("Header name (e.g., X-API-Key)")}
                         />
                       </Form.Item>
                       <Form.Item
                         {...restField}
                         name={[name, "value"]}
                         className="flex-1"
-                        rules={[{ required: true, message: "Header value is required" }]}
+                        rules={[{ required: true, message: t("Header value is required") }]}
                       >
                         <Input
                           size="large"
                           allowClear
                           className="rounded-lg"
-                          placeholder="Header value"
+                          placeholder={t("Header value")}
                         />
                       </Form.Item>
                       <MinusCircleOutlined
@@ -162,7 +164,7 @@ const MCPPermissionManagement: React.FC<MCPPermissionManagementProps> = ({
                     </Space>
                   ))}
                   <Button type="dashed" onClick={() => add()} icon={<PlusOutlined />} block>
-                    Add Static Header
+                    {t("Add Static Header")}
                   </Button>
                 </div>
               )}

@@ -3,6 +3,7 @@ import { Modal, Tooltip, Form, Select, Input } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { Button, TextInput } from "@tremor/react";
 import { createMCPServer } from "../networking";
+import { useTranslate } from "@/i18n";
 import { AUTH_TYPE, MCPServer, MCPServerCostInfo } from "./types";
 import MCPServerCostConfig from "./mcp_server_cost_config";
 import MCPConnectionStatus from "./mcp_connection_status";
@@ -38,6 +39,7 @@ const CreateMCPServer: React.FC<CreateMCPServerProps> = ({
   setModalVisible,
   availableAccessGroups,
 }) => {
+  const t = useTranslate();
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
   const [costConfig, setCostConfig] = useState<MCPServerCostInfo>({});
@@ -93,13 +95,13 @@ const CreateMCPServer: React.FC<CreateMCPServerProps> = ({
       }
       const staticHeaders = Array.isArray(values.static_headers)
         ? values.static_headers.reduce((acc: Record<string, string>, entry: Record<string, string>) => {
-            const header = entry?.header?.trim();
-            if (!header) {
-              return acc;
-            }
-            acc[header] = entry?.value ?? "";
+          const header = entry?.header?.trim();
+          if (!header) {
             return acc;
-          }, {})
+          }
+          acc[header] = entry?.value ?? "";
+          return acc;
+        }, {})
         : ({} as Record<string, string>);
 
       return {
@@ -193,33 +195,33 @@ const CreateMCPServer: React.FC<CreateMCPServerProps> = ({
 
       const staticHeaders = Array.isArray(staticHeadersList)
         ? staticHeadersList.reduce((acc: Record<string, string>, entry: Record<string, string>) => {
-            const header = entry?.header?.trim();
-            if (!header) {
-              return acc;
-            }
-            acc[header] = entry?.value ?? "";
+          const header = entry?.header?.trim();
+          if (!header) {
             return acc;
-          }, {})
+          }
+          acc[header] = entry?.value ?? "";
+          return acc;
+        }, {})
         : ({} as Record<string, string>);
 
       const credentialsPayload =
         credentialValues && typeof credentialValues === "object"
           ? Object.entries(credentialValues).reduce((acc: Record<string, any>, [key, value]) => {
-              if (value === undefined || value === null || value === "") {
-                return acc;
-              }
-              if (key === "scopes") {
-                if (Array.isArray(value)) {
-                  const filteredScopes = value.filter((scope) => scope != null && scope !== "");
-                  if (filteredScopes.length > 0) {
-                    acc[key] = filteredScopes;
-                  }
-                }
-              } else {
-                acc[key] = value;
-              }
+            if (value === undefined || value === null || value === "") {
               return acc;
-            }, {})
+            }
+            if (key === "scopes") {
+              if (Array.isArray(value)) {
+                const filteredScopes = value.filter((scope) => scope != null && scope !== "");
+                if (filteredScopes.length > 0) {
+                  acc[key] = filteredScopes;
+                }
+              }
+            } else {
+              acc[key] = value;
+            }
+            return acc;
+          }, {})
           : undefined;
 
       // Process stdio configuration if present
@@ -290,7 +292,7 @@ const CreateMCPServer: React.FC<CreateMCPServerProps> = ({
       if (accessToken != null) {
         const response = await createMCPServer(accessToken, payload);
 
-        NotificationsManager.success("MCP Server created successfully");
+        NotificationsManager.success(t("MCP Server created successfully"));
         form.resetFields();
         setCostConfig({});
         setTools([]);
@@ -300,7 +302,7 @@ const CreateMCPServer: React.FC<CreateMCPServerProps> = ({
         onCreateSuccess(response);
       }
     } catch (error) {
-      NotificationsManager.fromBackend("Error creating MCP Server: " + error);
+      NotificationsManager.fromBackend(t("Error creating MCP Server: ") + error);
     } finally {
       setIsLoading(false);
     }
@@ -394,7 +396,7 @@ const CreateMCPServer: React.FC<CreateMCPServerProps> = ({
               objectFit: "contain",
             }}
           />
-          <h2 className="text-xl font-semibold text-gray-900">Add New MCP Server</h2>
+          <h2 className="text-xl font-semibold text-gray-900">{t("Add New MCP Server")}</h2>
         </div>
       }
       open={isModalVisible}
@@ -419,15 +421,15 @@ const CreateMCPServer: React.FC<CreateMCPServerProps> = ({
             <Form.Item
               label={
                 <span className="text-sm font-medium text-gray-700 flex items-center">
-                  MCP Server Name
-                  <Tooltip title="Best practice: Use a descriptive name that indicates the server's purpose (e.g., 'GitHub_MCP', 'Email_Service'). Hyphens '-' are not allowed; use underscores '_' instead.">
+                  {t("MCP Server Name")}
+                  <Tooltip title={t("Best practice: Use a descriptive name that indicates the server's purpose (e.g., 'GitHub_MCP', 'Email_Service'). Hyphens '-' are not allowed; use underscores '_' instead.")}>
                     <InfoCircleOutlined className="ml-2 text-blue-400 hover:text-blue-600 cursor-help" />
                   </Tooltip>
                 </span>
               }
               name="server_name"
               rules={[
-                { required: false, message: "Please enter a server name" },
+                { required: false, message: t("Please enter a server name") },
                 { validator: (_, value) => validateMCPServerName(value) },
               ]}
             >
@@ -440,8 +442,8 @@ const CreateMCPServer: React.FC<CreateMCPServerProps> = ({
             <Form.Item
               label={
                 <span className="text-sm font-medium text-gray-700 flex items-center">
-                  Alias
-                  <Tooltip title="A short, unique identifier for this server. Defaults to the server name with spaces replaced by underscores.">
+                  {t("Alias")}
+                  <Tooltip title={t("A short, unique identifier for this server. Defaults to the server name with spaces replaced by underscores.")}>
                     <InfoCircleOutlined className="ml-2 text-blue-400 hover:text-blue-600 cursor-help" />
                   </Tooltip>
                 </span>
@@ -452,7 +454,7 @@ const CreateMCPServer: React.FC<CreateMCPServerProps> = ({
                 {
                   validator: (_, value) =>
                     value && value.includes("-")
-                      ? Promise.reject("Alias cannot contain '-' (hyphen). Please use '_' (underscore) instead.")
+                      ? Promise.reject(t("Alias cannot contain '-' (hyphen). Please use '_' (underscore) instead."))
                       : Promise.resolve(),
                 },
               ]}
@@ -465,28 +467,28 @@ const CreateMCPServer: React.FC<CreateMCPServerProps> = ({
             </Form.Item>
 
             <Form.Item
-              label={<span className="text-sm font-medium text-gray-700">Description</span>}
+              label={<span className="text-sm font-medium text-gray-700">{t("Description")}</span>}
               name="description"
               rules={[
                 {
                   required: false,
-                  message: "Please enter a server description!!!!!!!!!",
+                  message: t("Please enter a server description"),
                 },
               ]}
             >
               <TextInput
-                placeholder="Brief description of what this server does"
+                placeholder={t("Brief description of what this server does")}
                 className="rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500"
               />
             </Form.Item>
 
             <Form.Item
-              label={<span className="text-sm font-medium text-gray-700">Transport Type</span>}
+              label={<span className="text-sm font-medium text-gray-700">{t("Transport Type")}</span>}
               name="transport"
-              rules={[{ required: true, message: "Please select a transport type" }]}
+              rules={[{ required: true, message: t("Please select a transport type") }]}
             >
               <Select
-                placeholder="Select transport"
+                placeholder={t("Select transport")}
                 className="rounded-lg"
                 size="large"
                 onChange={handleTransportChange}
@@ -501,10 +503,10 @@ const CreateMCPServer: React.FC<CreateMCPServerProps> = ({
             {/* URL field - only show for HTTP and SSE */}
             {transportType !== "stdio" && (
               <Form.Item
-                label={<span className="text-sm font-medium text-gray-700">MCP Server URL</span>}
+                label={<span className="text-sm font-medium text-gray-700">{t("MCP Server URL")}</span>}
                 name="url"
                 rules={[
-                  { required: true, message: "Please enter a server URL" },
+                  { required: true, message: t("Please enter a server URL") },
                   { validator: (_, value) => validateMCPServerUrl(value) },
                 ]}
               >
@@ -518,11 +520,11 @@ const CreateMCPServer: React.FC<CreateMCPServerProps> = ({
             {/* Authentication - only show for HTTP and SSE */}
             {transportType !== "stdio" && (
               <Form.Item
-                label={<span className="text-sm font-medium text-gray-700">Authentication</span>}
+                label={<span className="text-sm font-medium text-gray-700">{t("Authentication")}</span>}
                 name="auth_type"
-                rules={[{ required: true, message: "Please select an auth type" }]}
+                rules={[{ required: true, message: t("Please select an auth type") }]}
               >
-                <Select placeholder="Select auth type" className="rounded-lg" size="large">
+                <Select placeholder={t("Select auth type")} className="rounded-lg" size="large">
                   <Select.Option value="none">None</Select.Option>
                   <Select.Option value="api_key">API Key</Select.Option>
                   <Select.Option value="bearer_token">Bearer Token</Select.Option>
@@ -536,18 +538,18 @@ const CreateMCPServer: React.FC<CreateMCPServerProps> = ({
               <Form.Item
                 label={
                   <span className="text-sm font-medium text-gray-700 flex items-center">
-                    Authentication Value
-                    <Tooltip title="Token, password, or header value to send with each request for the selected auth type.">
+                    {t("Authentication Value")}
+                    <Tooltip title={t("Token, password, or header value to send with each request for the selected auth type.")}>
                       <InfoCircleOutlined className="ml-2 text-blue-400 hover:text-blue-600 cursor-help" />
                     </Tooltip>
                   </span>
                 }
                 name={["credentials", "auth_value"]}
-                rules={[{ required: true, message: "Please enter the authentication value" }]}
+                rules={[{ required: true, message: t("Please enter the authentication value") }]}
               >
                 <TextInput
                   type="password"
-                  placeholder="Enter token or secret"
+                  placeholder={t("Enter token or secret")}
                   className="rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                 />
               </Form.Item>
@@ -558,8 +560,8 @@ const CreateMCPServer: React.FC<CreateMCPServerProps> = ({
                 <Form.Item
                   label={
                     <span className="text-sm font-medium text-gray-700 flex items-center">
-                      OAuth Client ID (optional)
-                      <Tooltip title="Provide only if your MCP server cannot handle dynamic client registration.">
+                      {t("OAuth Client ID (optional)")}
+                      <Tooltip title={t("Provide only if your MCP server cannot handle dynamic client registration.")}>
                         <InfoCircleOutlined className="ml-2 text-blue-400 hover:text-blue-600 cursor-help" />
                       </Tooltip>
                     </span>
@@ -568,15 +570,15 @@ const CreateMCPServer: React.FC<CreateMCPServerProps> = ({
                 >
                   <TextInput
                     type="password"
-                    placeholder="Enter OAuth client ID"
+                    placeholder={t("Enter OAuth client ID")}
                     className="rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                   />
                 </Form.Item>
                 <Form.Item
                   label={
                     <span className="text-sm font-medium text-gray-700 flex items-center">
-                      OAuth Client Secret (optional)
-                      <Tooltip title="Provide only if your MCP server cannot handle dynamic client registration.">
+                      {t("OAuth Client Secret (optional)")}
+                      <Tooltip title={t("Provide only if your MCP server cannot handle dynamic client registration.")}>
                         <InfoCircleOutlined className="ml-2 text-blue-400 hover:text-blue-600 cursor-help" />
                       </Tooltip>
                     </span>
@@ -585,15 +587,15 @@ const CreateMCPServer: React.FC<CreateMCPServerProps> = ({
                 >
                   <TextInput
                     type="password"
-                    placeholder="Enter OAuth client secret"
+                    placeholder={t("Enter OAuth client secret")}
                     className="rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                   />
                 </Form.Item>
                 <Form.Item
                   label={
                     <span className="text-sm font-medium text-gray-700 flex items-center">
-                      OAuth Scopes (optional)
-                      <Tooltip title="Optional scopes requested during token exchange. Separate multiple scopes with enter or commas.">
+                      {t("OAuth Scopes (optional)")}
+                      <Tooltip title={t("Optional scopes requested during token exchange. Separate multiple scopes with enter or commas.")}>
                         <InfoCircleOutlined className="ml-2 text-blue-400 hover:text-blue-600 cursor-help" />
                       </Tooltip>
                     </span>
@@ -603,14 +605,14 @@ const CreateMCPServer: React.FC<CreateMCPServerProps> = ({
                   <Select
                     mode="tags"
                     tokenSeparators={[","]}
-                    placeholder="Add scopes"
+                    placeholder={t("Add scopes")}
                     className="rounded-lg"
                     size="large"
                   />
                 </Form.Item>
                 <div className="rounded-lg border border-dashed border-gray-300 p-4 space-y-2">
                   <p className="text-sm text-gray-600">
-                    Complete the OAuth authorization flow to fetch an access token and store it as the authentication value.
+                    {t("Complete the OAuth authorization flow to fetch an access token and store it as the authentication value.")}
                   </p>
                   <Button
                     variant="secondary"
@@ -618,15 +620,15 @@ const CreateMCPServer: React.FC<CreateMCPServerProps> = ({
                     disabled={oauthStatus === "authorizing" || oauthStatus === "exchanging"}
                   >
                     {oauthStatus === "authorizing"
-                      ? "Waiting for authorization..."
+                      ? t("Waiting for authorization...")
                       : oauthStatus === "exchanging"
-                        ? "Exchanging authorization code..."
-                        : "Authorize & Fetch Token"}
+                        ? t("Exchanging authorization code...")
+                        : t("Authorize & Fetch Token")}
                   </Button>
                   {oauthError && <p className="text-sm text-red-500">{oauthError}</p>}
                   {oauthStatus === "success" && oauthTokenResponse?.access_token && (
                     <p className="text-sm text-green-600">
-                      Token fetched. Expires in {oauthTokenResponse.expires_in ?? "?"} seconds.
+                      {t("Token fetched. Expires in")} {oauthTokenResponse.expires_in ?? "?"} {t("seconds")}
                     </p>
                   )}
                 </div>
@@ -682,10 +684,10 @@ const CreateMCPServer: React.FC<CreateMCPServerProps> = ({
 
           <div className="flex items-center justify-end space-x-3 pt-6 border-t border-gray-100">
             <Button variant="secondary" onClick={handleCancel}>
-              Cancel
+              {t("Cancel")}
             </Button>
             <Button variant="primary" loading={isLoading}>
-              {isLoading ? "Creating..." : "Add MCP Server"}
+              {isLoading ? t("Creating...") : t("Add MCP Server")}
             </Button>
           </div>
         </Form>
