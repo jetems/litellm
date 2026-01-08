@@ -277,5 +277,10 @@
     "In Config": "配置中",
     "Not Set": "未设置",
     "Update": "更新",
-    "Reset": "重置"
+    "Reset": "重置",
+    "Security Settings": "安全设置",
+    "UI Settings": "界面设置",
+    "Add SSO": "添加 SSO",
+    "Allowed IPs": "允许的 IP",
+    "UI Access Control": "界面访问控制"
 }

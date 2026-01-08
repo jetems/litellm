@@ -277,5 +277,10 @@
     "In Config": "In Config",
     "Not Set": "Not Set",
     "Update": "Update",
-    "Reset": "Reset"
+    "Reset": "Reset",
+    "Security Settings": "Security Settings",
+    "UI Settings": "UI Settings",
+    "Add SSO": "Add SSO",
+    "Allowed IPs": "Allowed IPs",
+    "UI Access Control": "UI Access Control"
 }

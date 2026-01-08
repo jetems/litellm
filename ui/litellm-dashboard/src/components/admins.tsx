@@ -55,6 +55,7 @@ import {
   getSSOSettings,
 } from "./networking";
 import UISettings from "./Settings/AdminSettings/UISettings/UISettings";
+import { useTranslate } from "@/i18n";
 
 const AdminPanel: React.FC<AdminPanelProps> = ({
   searchParams,
@@ -65,6 +66,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   proxySettings,
   userRole,
 }) => {
+  const t = useTranslate();
   const [form] = Form.useForm();
   const [memberForm] = Form.useForm();
   const { Title, Paragraph } = Typography;
@@ -90,7 +92,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
 
   const isLocal = process.env.NODE_ENV === "development";
   if (isLocal != true) {
-    console.log = function () {};
+    console.log = function () { };
   }
 
   const baseUrl = useBaseUrl();
@@ -496,9 +498,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
       <Paragraph>Go to &apos;Internal Users&apos; page to add other admins.</Paragraph>
       <TabGroup>
         <TabList>
-          <Tab>Security Settings</Tab>
+          <Tab>{t("Security Settings")}</Tab>
           <Tab>SCIM</Tab>
-          <Tab>UI Settings</Tab>
+          <Tab>{t("UI Settings")}</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
