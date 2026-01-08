@@ -27,6 +27,7 @@ import {
 } from "./networking";
 import PublicModelHub from "./public_model_hub";
 import UsefulLinksManagement from "./useful_links_management";
+import { useTranslate } from "@/i18n";
 
 interface ModelHubTableProps {
   accessToken: string | null;
@@ -55,6 +56,7 @@ interface ModelGroupInfo {
 }
 
 const ModelHubTable: React.FC<ModelHubTableProps> = ({ accessToken, publicPage, premiumUser, userRole }) => {
+  const t = useTranslate();
   const [publicPageAllowed, setPublicPageAllowed] = useState<boolean>(false);
   const [modelHubData, setModelHubData] = useState<ModelGroupInfo[] | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -379,9 +381,9 @@ const ModelHubTable: React.FC<ModelHubTableProps> = ({ accessToken, publicPage, 
           {/* Tab System for Model Hub, Agent Hub, and MCP Hub */}
           <TabGroup>
             <TabList className="mb-4">
-              <Tab>Model Hub</Tab>
-              <Tab>Agent Hub</Tab>
-              <Tab>MCP Hub</Tab>
+              <Tab>{t("Model Hub")}</Tab>
+              <Tab>{t("Agent Hub")}</Tab>
+              <Tab>{t("MCP Hub")}</Tab>
             </TabList>
 
             <TabPanels>
@@ -392,7 +394,7 @@ const ModelHubTable: React.FC<ModelHubTableProps> = ({ accessToken, publicPage, 
                   {/* Header with Make Public Button */}
                   {publicPage == false && isAdminRole(userRole || "") && (
                     <div className="flex justify-end mb-4">
-                      <Button onClick={() => handleMakePublicPage()}>Select Models to Make Public</Button>
+                      <Button onClick={() => handleMakePublicPage()}>{t("Select Models to Make Public")}</Button>
                     </div>
                   )}
 
@@ -422,7 +424,7 @@ const ModelHubTable: React.FC<ModelHubTableProps> = ({ accessToken, publicPage, 
                   {/* Header with Make Public Button */}
                   {publicPage == false && isAdminRole(userRole || "") && (
                     <div className="flex justify-end mb-4">
-                      <Button onClick={() => handleMakeAgentPublicPage()}>Select Agents to Make Public</Button>
+                      <Button onClick={() => handleMakeAgentPublicPage()}>{t("Select Agents to Make Public")}</Button>
                     </div>
                   )}
 
@@ -449,7 +451,7 @@ const ModelHubTable: React.FC<ModelHubTableProps> = ({ accessToken, publicPage, 
                   {/* Header with Make Public Button */}
                   {publicPage == false && isAdminRole(userRole || "") && (
                     <div className="flex justify-end mb-4">
-                      <Button onClick={() => handleMakeMcpPublicPage()}>Select MCP Servers to Make Public</Button>
+                      <Button onClick={() => handleMakeMcpPublicPage()}>{t("Select MCP Servers to Make Public")}</Button>
                     </div>
                   )}
 

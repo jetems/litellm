@@ -254,11 +254,20 @@
     "Team Based Usage": "Team Based Usage",
     "Customer Usage": "Customer Usage",
     "Tag Based Usage": "Tag Based Usage",
-    "Cost": "Cost",
     "Monthly Spend": "Monthly Spend",
     "Top Virtual Keys": "Top Virtual Keys",
     "Top Models": "Top Models",
     "Spend by Provider": "Spend by Provider",
     "Total Spend Per Team": "Total Spend Per Team",
-    "Daily Spend Per Team": "Daily Spend Per Team"
+    "Daily Spend Per Team": "Daily Spend Per Team",
+    "Model Hub": "Model Hub",
+    "Agent Hub": "Agent Hub",
+    "MCP Hub": "MCP Hub",
+    "Select Models to Make Public": "Select Models to Make Public",
+    "Select Agents to Make Public": "Select Agents to Make Public",
+    "Select MCP Servers to Make Public": "Select MCP Servers to Make Public",
+    "Logging Callbacks": "Logging Callbacks",
+    "Alerting Types": "Alerting Types",
+    "Alerting Settings": "Alerting Settings",
+    "Email Alerts": "Email Alerts"
 }

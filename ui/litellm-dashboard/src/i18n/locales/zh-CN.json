@@ -254,11 +254,20 @@
     "Team Based Usage": "按团队统计",
     "Customer Usage": "按客户统计",
     "Tag Based Usage": "按标签统计",
-    "Cost": "成本",
     "Monthly Spend": "月度支出",
     "Top Virtual Keys": "虚拟密钥排行",
     "Top Models": "模型排行",
     "Spend by Provider": "按供应商支出",
     "Total Spend Per Team": "团队总支出",
-    "Daily Spend Per Team": "团队日支出"
+    "Daily Spend Per Team": "团队日支出",
+    "Model Hub": "模型中心",
+    "Agent Hub": "代理中心",
+    "MCP Hub": "MCP 中心",
+    "Select Models to Make Public": "选择公开的模型",
+    "Select Agents to Make Public": "选择公开的代理",
+    "Select MCP Servers to Make Public": "选择公开的 MCP 服务器",
+    "Logging Callbacks": "日志回调",
+    "Alerting Types": "告警类型",
+    "Alerting Settings": "告警设置",
+    "Email Alerts": "邮件告警"
 }

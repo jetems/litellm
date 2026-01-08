@@ -39,6 +39,7 @@ import { LoggingCallbacksTable } from "./Settings/LoggingAndAlerts/LoggingCallba
 import { AlertingObject } from "./Settings/LoggingAndAlerts/LoggingCallbacks/types";
 import { parseErrorMessage } from "./shared/errorUtils";
 import DeleteResourceModal from "./common_components/DeleteResourceModal";
+import { useTranslate } from "@/i18n";
 interface SettingsPageProps {
   accessToken: string | null;
   userRole: string | null;
@@ -83,11 +84,11 @@ const DynamicParamsFields: React.FC<DynamicParamsFieldsProps> = ({ params, callb
             rules={
               isRequired
                 ? [
-                    {
-                      required: true,
-                      message: `Please enter the ${fieldLabel.toLowerCase()}`,
-                    },
-                  ]
+                  {
+                    required: true,
+                    message: `Please enter the ${fieldLabel.toLowerCase()}`,
+                  },
+                ]
                 : undefined
             }
           >
@@ -213,6 +214,7 @@ const buildCallbackPayload = (formValues: Record<string, any>, callbackName: str
 };
 
 const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, premiumUser }) => {
+  const t = useTranslate();
   const [callbacks, setCallbacks] = useState<AlertingObject[]>([]);
   const [alerts, setAlerts] = useState<any[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -567,10 +569,10 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
       <Grid numItems={1} className="gap-2 p-8 w-full mt-2">
         <TabGroup>
           <TabList variant="line" defaultValue="1">
-            <Tab value="1">Logging Callbacks</Tab>
-            <Tab value="2">Alerting Types</Tab>
-            <Tab value="3">Alerting Settings</Tab>
-            <Tab value="4">Email Alerts</Tab>
+            <Tab value="1">{t("Logging Callbacks")}</Tab>
+            <Tab value="2">{t("Alerting Types")}</Tab>
+            <Tab value="3">{t("Alerting Settings")}</Tab>
+            <Tab value="4">{t("Email Alerts")}</Tab>
           </TabList>
           <TabPanels>
             <TabPanel>
@@ -657,7 +659,7 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
                   </TableBody>
                 </Table>
                 <Button size="xs" className="mt-2" onClick={handleSaveAlerts}>
-                  Save Changes
+                  {t("Save Changes")}
                 </Button>
 
                 <Button
@@ -769,7 +771,7 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
               <CallbackSelector
                 callbackConfigs={callbackConfigs}
                 selectedCallback={selectedEditCallback.name}
-                onCallbackChange={() => {}}
+                onCallbackChange={() => { }}
                 disabled={true}
               />
 
