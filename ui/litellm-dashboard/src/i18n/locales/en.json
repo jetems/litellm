@@ -308,5 +308,12 @@
     "Logo Customization": "Logo Customization",
     "Customize your LiteLLM admin dashboard with a custom logo.": "Customize your LiteLLM admin dashboard with a custom logo.",
     "Save Changes": "Save Changes",
-    "Reset to Default": "Reset to Default"
+    "Reset to Default": "Reset to Default",
+    "Create Budget": "Create Budget",
+    "Budget ID": "Budget ID",
+    "Max Budget": "Max Budget",
+    "Add New MCP Server": "Add New MCP Server",
+    "All Servers": "All Servers",
+    "Connect": "Connect",
+    "MCP Servers": "MCP Servers"
 }

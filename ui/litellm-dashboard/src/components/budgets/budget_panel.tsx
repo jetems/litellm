@@ -28,6 +28,7 @@ import NotificationsManager from "../molecules/notifications_manager";
 import { budgetDeleteCall, getBudgetList } from "../networking";
 import BudgetModal from "./budget_modal";
 import EditBudgetModal from "./edit_budget_modal";
+import { useTranslate } from "@/i18n";
 
 interface BudgetSettingsPageProps {
   accessToken: string | null;
@@ -42,6 +43,7 @@ export interface budgetItem {
 }
 
 const BudgetPanel: React.FC<BudgetSettingsPageProps> = ({ accessToken }) => {
+  const t = useTranslate();
   const [isCreateModelVisible, setIsCreateModelVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [selectedBudget, setSelectedBudget] = useState<budgetItem | null>(null);
@@ -109,7 +111,7 @@ const BudgetPanel: React.FC<BudgetSettingsPageProps> = ({ accessToken }) => {
   return (
     <div className="w-full mx-auto flex-auto overflow-y-auto m-8 p-2">
       <Button size="sm" variant="primary" className="mb-2" onClick={() => setIsCreateModelVisible(true)}>
-        + Create Budget
+        + {t("Create Budget")}
       </Button>
       <BudgetModal
         accessToken={accessToken}

@@ -12,6 +12,7 @@ import MCPConnect from "./mcp_connect";
 import { mcpServerColumns } from "./mcp_server_columns";
 import { MCPServerView } from "./mcp_server_view";
 import { MCPServer, MCPServerProps, Team } from "./types";
+import { useTranslate } from "@/i18n";
 
 const { Text: AntdText, Title: AntdTitle } = Typography;
 const EDIT_OAUTH_UI_STATE_KEY = "litellm-mcp-oauth-edit-state";
@@ -19,6 +20,7 @@ const EDIT_OAUTH_UI_STATE_KEY = "litellm-mcp-oauth-edit-state";
 const { Option } = Select;
 
 const MCPServers: React.FC<MCPServerProps> = ({ accessToken, userRole, userID }) => {
+  const t = useTranslate();
   const {
     data: mcpServers,
     isLoading: isLoadingServers,
@@ -357,14 +359,14 @@ const MCPServers: React.FC<MCPServerProps> = ({ accessToken, userRole, userID })
       <Text className="text-tremor-content mt-2">Configure and manage your MCP servers</Text>
       {isAdminRole(userRole) && (
         <Button className="mt-4 mb-4" onClick={() => setModalVisible(true)}>
-          + Add New MCP Server
+          + {t("Add New MCP Server")}
         </Button>
       )}
       <TabGroup className="w-full h-full">
         <TabList className="flex justify-between mt-2 w-full items-center">
           <div className="flex">
-            <Tab>All Servers</Tab>
-            <Tab>Connect</Tab>
+            <Tab>{t("All Servers")}</Tab>
+            <Tab>{t("Connect")}</Tab>
           </div>
         </TabList>
         <TabPanels>
