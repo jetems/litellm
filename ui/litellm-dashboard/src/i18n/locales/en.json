@@ -300,5 +300,9 @@
     "Cache Health": "Cache Health",
     "Cache Settings": "Cache Settings",
     "Cache Hit Ratio": "Cache Hit Ratio",
-    "Cache Hits": "Cache Hits"
+    "Cache Hits": "Cache Hits",
+    "Add New Prompt": "Add New Prompt",
+    "Delete Prompt": "Delete Prompt",
+    "Pass Through Endpoints": "Pass Through Endpoints",
+    "Configure and manage your pass-through endpoints": "Configure and manage your pass-through endpoints"
 }

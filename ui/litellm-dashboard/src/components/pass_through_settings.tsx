@@ -9,6 +9,7 @@ import { DataTable } from "./view_logs/table";
 import { ColumnDef } from "@tanstack/react-table";
 import { Eye, EyeOff } from "lucide-react";
 import NotificationsManager from "./molecules/notifications_manager";
+import { useTranslate } from "@/i18n";
 
 interface GeneralSettingsPageProps {
   accessToken: string | null;
@@ -58,6 +59,7 @@ const PasswordField: React.FC<{ value: object }> = ({ value }) => {
 };
 
 const PassThroughSettings: React.FC<GeneralSettingsPageProps> = ({ accessToken, userRole, userID, modelData, premiumUser }) => {
+  const t = useTranslate();
   const [generalSettings, setGeneralSettings] = useState<passThroughItem[]>([]);
   const [selectedEndpointId, setSelectedEndpointId] = useState<string | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -216,8 +218,8 @@ const PassThroughSettings: React.FC<GeneralSettingsPageProps> = ({ accessToken, 
   return (
     <div>
       <div>
-        <Title>Pass Through Endpoints</Title>
-        <Text className="text-tremor-content">Configure and manage your pass-through endpoints</Text>
+        <Title>{t("Pass Through Endpoints")}</Title>
+        <Text className="text-tremor-content">{t("Configure and manage your pass-through endpoints")}</Text>
       </div>
 
       <AddPassThroughEndpoint

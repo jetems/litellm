@@ -9,6 +9,7 @@ import AddPromptForm from "./prompts/add_prompt_form";
 import PromptEditorView from "./prompts/prompt_editor_view";
 import NotificationsManager from "./molecules/notifications_manager";
 import { isAdminRole } from "@/utils/roles";
+import { useTranslate } from "@/i18n";
 
 interface PromptsProps {
   accessToken: string | null;
@@ -16,6 +17,7 @@ interface PromptsProps {
 }
 
 const PromptsPanel: React.FC<PromptsProps> = ({ accessToken, userRole }) => {
+  const t = useTranslate();
   const [promptsList, setPromptsList] = useState<PromptSpec[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPromptId, setSelectedPromptId] = useState<string | null>(null);
@@ -135,9 +137,9 @@ const PromptsPanel: React.FC<PromptsProps> = ({ accessToken, userRole }) => {
         <>
           <div className="flex justify-between items-center mb-4">
             <div className="flex gap-2">
-            <Button onClick={handleAddPrompt} disabled={!accessToken}>
-              + Add New Prompt
-            </Button>
+              <Button onClick={handleAddPrompt} disabled={!accessToken}>
+                + {t("Add New Prompt")}
+              </Button>
               <Button onClick={handleAddPromptFromFile} disabled={!accessToken} variant="secondary">
                 Upload .prompt File
               </Button>

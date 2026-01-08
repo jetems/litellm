@@ -300,5 +300,9 @@
     "Cache Health": "缓存健康",
     "Cache Settings": "缓存设置",
     "Cache Hit Ratio": "缓存命中率",
-    "Cache Hits": "缓存命中"
+    "Cache Hits": "缓存命中",
+    "Add New Prompt": "添加新提示词",
+    "Delete Prompt": "删除提示词",
+    "Pass Through Endpoints": "透传端点",
+    "Configure and manage your pass-through endpoints": "配置和管理您的透传端点"
 }
