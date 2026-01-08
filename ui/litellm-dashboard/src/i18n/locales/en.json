@@ -237,5 +237,18 @@
     "per hour": "per hour",
     "per day": "per day",
     "per month": "per month",
-    "Unlimited": "Unlimited"
+    "Unlimited": "Unlimited",
+    "Create New Team": "Create New Team",
+    "Your Teams": "Your Teams",
+    "Available Teams": "Available Teams",
+    "Default Team Settings": "Default Team Settings",
+    "Last Refreshed": "Last Refreshed",
+    "Filters": "Filters",
+    "Reset Filters": "Reset Filters",
+    "No Teams": "No Teams",
+    "Members": "Members",
+    "Create New Organization": "Create New Organization",
+    "Your Organizations": "Your Organizations",
+    "Limits": "Limits",
+    "No limit": "No limit"
 }

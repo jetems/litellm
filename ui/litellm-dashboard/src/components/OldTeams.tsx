@@ -49,6 +49,7 @@ import NotificationsManager from "./molecules/notifications_manager";
 import { Organization, fetchMCPAccessGroups, getGuardrailsList, teamDeleteCall } from "./networking";
 import NumericalInput from "./shared/numerical_input";
 import VectorStoreSelector from "./vector_store_management/VectorStoreSelector";
+import { useTranslate } from "@/i18n";
 
 interface TeamProps {
   teams: Team[] | null;
@@ -160,6 +161,7 @@ const Teams: React.FC<TeamProps> = ({
   organizations,
   premiumUser = false,
 }) => {
+  const t = useTranslate();
   console.log(`organizations: ${JSON.stringify(organizations)}`);
   const [lastRefreshed, setLastRefreshed] = useState("");
   const [currentOrg, setCurrentOrg] = useState<Organization | null>(null);
@@ -586,7 +588,7 @@ const Teams: React.FC<TeamProps> = ({
         <Col numColSpan={1} className="flex flex-col gap-2">
           {canCreateOrManageTeams(userRole, userID, organizations) && (
             <Button className="w-fit" onClick={() => setIsTeamModalVisible(true)}>
-              + Create New Team
+              + {t("Create New Team")}
             </Button>
           )}
           {selectedTeamId ? (
@@ -624,12 +626,12 @@ const Teams: React.FC<TeamProps> = ({
             <TabGroup className="gap-2 h-[75vh] w-full">
               <TabList className="flex justify-between mt-2 w-full items-center">
                 <div className="flex">
-                  <Tab>Your Teams</Tab>
-                  <Tab>Available Teams</Tab>
-                  {isProxyAdminRole(userRole || "") && <Tab>Default Team Settings</Tab>}
+                  <Tab>{t("Your Teams")}</Tab>
+                  <Tab>{t("Available Teams")}</Tab>
+                  {isProxyAdminRole(userRole || "") && <Tab>{t("Default Team Settings")}</Tab>}
                 </div>
                 <div className="flex items-center space-x-2">
-                  {lastRefreshed && <Text>Last Refreshed: {lastRefreshed}</Text>}
+                  {lastRefreshed && <Text>{t("Last Refreshed")}: {lastRefreshed}</Text>}
                   <Icon
                     icon={RefreshIcon} // Modify as necessary for correct icon name
                     variant="shadow"
@@ -688,7 +690,7 @@ const Teams: React.FC<TeamProps> = ({
                                     d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
                                   />
                                 </svg>
-                                Filters
+                                {t("Filters")}
                                 {(filters.team_id || filters.team_alias || filters.organization_id) && (
                                   <span className="w-2 h-2 rounded-full bg-blue-500"></span>
                                 )}
@@ -707,7 +709,7 @@ const Teams: React.FC<TeamProps> = ({
                                     d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                                   />
                                 </svg>
-                                Reset Filters
+                                {t("Reset Filters")}
                               </button>
                             </div>
 
@@ -759,15 +761,15 @@ const Teams: React.FC<TeamProps> = ({
                         <Table>
                           <TableHead>
                             <TableRow>
-                              <TableHeaderCell>Team Name</TableHeaderCell>
-                              <TableHeaderCell>Team ID</TableHeaderCell>
-                              <TableHeaderCell>Created</TableHeaderCell>
-                              <TableHeaderCell>Spend (USD)</TableHeaderCell>
-                              <TableHeaderCell>Budget (USD)</TableHeaderCell>
-                              <TableHeaderCell>Models</TableHeaderCell>
-                              <TableHeaderCell>Organization</TableHeaderCell>
-                              <TableHeaderCell>Info</TableHeaderCell>
-                              <TableHeaderCell>Actions</TableHeaderCell>
+                              <TableHeaderCell>{t("Team Name")}</TableHeaderCell>
+                              <TableHeaderCell>{t("Team ID")}</TableHeaderCell>
+                              <TableHeaderCell>{t("Created")}</TableHeaderCell>
+                              <TableHeaderCell>{t("Spend")} (USD)</TableHeaderCell>
+                              <TableHeaderCell>{t("Budget")} (USD)</TableHeaderCell>
+                              <TableHeaderCell>{t("Models")}</TableHeaderCell>
+                              <TableHeaderCell>{t("Organization")}</TableHeaderCell>
+                              <TableHeaderCell>{t("Info")}</TableHeaderCell>
+                              <TableHeaderCell>{t("Actions")}</TableHeaderCell>
                             </TableRow>
                           </TableHead>
 
@@ -1086,11 +1088,11 @@ const Teams: React.FC<TeamProps> = ({
                           rules={
                             isOrgAdmin
                               ? [
-                                  {
-                                    required: true,
-                                    message: "Please select an organization",
-                                  },
-                                ]
+                                {
+                                  required: true,
+                                  message: "Please select an organization",
+                                },
+                              ]
                               : []
                           }
                           help={

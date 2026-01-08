@@ -237,5 +237,18 @@
     "per hour": "每小时",
     "per day": "每天",
     "per month": "每月",
-    "Unlimited": "无限制"
+    "Unlimited": "无限制",
+    "Create New Team": "创建新团队",
+    "Your Teams": "我的团队",
+    "Available Teams": "可用团队",
+    "Default Team Settings": "默认团队设置",
+    "Last Refreshed": "最后刷新",
+    "Filters": "筛选",
+    "Reset Filters": "重置筛选",
+    "No Teams": "暂无团队",
+    "Members": "成员",
+    "Create New Organization": "创建新组织",
+    "Your Organizations": "我的组织",
+    "Limits": "限制",
+    "No limit": "无限制"
 }

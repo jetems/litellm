@@ -33,6 +33,7 @@ import MCPServerSelector from "./mcp_server_management/MCPServerSelector";
 import { formatNumberWithCommas } from "../utils/dataUtils";
 import NotificationsManager from "./molecules/notifications_manager";
 import DeleteResourceModal from "./common_components/DeleteResourceModal";
+import { useTranslate } from "@/i18n";
 
 interface OrganizationsTableProps {
   organizations: Organization[];
@@ -67,6 +68,7 @@ const OrganizationsTable: React.FC<OrganizationsTableProps> = ({
   setOrganizations,
   premiumUser,
 }) => {
+  const t = useTranslate();
   const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null);
   const [editOrg, setEditOrg] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -178,7 +180,7 @@ const OrganizationsTable: React.FC<OrganizationsTableProps> = ({
         <Col numColSpan={1} className="flex flex-col gap-2">
           {(userRole === "Admin" || userRole === "Org Admin") && (
             <Button className="w-fit" onClick={() => setIsOrgModalVisible(true)}>
-              + Create New Organization
+              + {t("Create New Organization")}
             </Button>
           )}
           {selectedOrgId ? (
@@ -198,10 +200,10 @@ const OrganizationsTable: React.FC<OrganizationsTableProps> = ({
             <TabGroup className="gap-2 h-[75vh] w-full">
               <TabList className="flex justify-between mt-2 w-full items-center">
                 <div className="flex">
-                  <Tab>Your Organizations</Tab>
+                  <Tab>{t("Your Organizations")}</Tab>
                 </div>
                 <div className="flex items-center space-x-2">
-                  {lastRefreshed && <Text>Last Refreshed: {lastRefreshed}</Text>}
+                  {lastRefreshed && <Text>{t("Last Refreshed")}: {lastRefreshed}</Text>}
                   <Icon
                     icon={RefreshIcon}
                     variant="shadow"
@@ -220,187 +222,187 @@ const OrganizationsTable: React.FC<OrganizationsTableProps> = ({
                         <Table>
                           <TableHead>
                             <TableRow>
-                              <TableHeaderCell>Organization ID</TableHeaderCell>
-                              <TableHeaderCell>Organization Name</TableHeaderCell>
-                              <TableHeaderCell>Created</TableHeaderCell>
-                              <TableHeaderCell>Spend (USD)</TableHeaderCell>
-                              <TableHeaderCell>Budget (USD)</TableHeaderCell>
-                              <TableHeaderCell>Models</TableHeaderCell>
-                              <TableHeaderCell>TPM / RPM Limits</TableHeaderCell>
-                              <TableHeaderCell>Info</TableHeaderCell>
-                              <TableHeaderCell>Actions</TableHeaderCell>
+                              <TableHeaderCell>{t("Organization ID")}</TableHeaderCell>
+                              <TableHeaderCell>{t("Organization Name")}</TableHeaderCell>
+                              <TableHeaderCell>{t("Created")}</TableHeaderCell>
+                              <TableHeaderCell>{t("Spend")} (USD)</TableHeaderCell>
+                              <TableHeaderCell>{t("Budget")} (USD)</TableHeaderCell>
+                              <TableHeaderCell>{t("Models")}</TableHeaderCell>
+                              <TableHeaderCell>TPM / RPM {t("Limits")}</TableHeaderCell>
+                              <TableHeaderCell>{t("Info")}</TableHeaderCell>
+                              <TableHeaderCell>{t("Actions")}</TableHeaderCell>
                             </TableRow>
                           </TableHead>
 
                           <TableBody>
                             {organizations && organizations.length > 0
                               ? organizations
-                                  .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-                                  .map((org: Organization) => (
-                                    <TableRow key={org.organization_id}>
-                                      <TableCell>
-                                        <div className="overflow-hidden">
-                                          <Tooltip title={org.organization_id}>
-                                            <Button
-                                              size="xs"
-                                              variant="light"
-                                              className="font-mono text-blue-500 bg-blue-50 hover:bg-blue-100 text-xs font-normal px-2 py-0.5 text-left overflow-hidden truncate max-w-[200px]"
-                                              onClick={() => setSelectedOrgId(org.organization_id)}
-                                            >
-                                              {org.organization_id?.slice(0, 7)}
-                                              ...
-                                            </Button>
-                                          </Tooltip>
-                                        </div>
-                                      </TableCell>
-                                      <TableCell>{org.organization_alias}</TableCell>
-                                      <TableCell>
-                                        {org.created_at ? new Date(org.created_at).toLocaleDateString() : "N/A"}
-                                      </TableCell>
-                                      <TableCell>{formatNumberWithCommas(org.spend, 4)}</TableCell>
-                                      <TableCell>
-                                        {org.litellm_budget_table?.max_budget !== null &&
+                                .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                                .map((org: Organization) => (
+                                  <TableRow key={org.organization_id}>
+                                    <TableCell>
+                                      <div className="overflow-hidden">
+                                        <Tooltip title={org.organization_id}>
+                                          <Button
+                                            size="xs"
+                                            variant="light"
+                                            className="font-mono text-blue-500 bg-blue-50 hover:bg-blue-100 text-xs font-normal px-2 py-0.5 text-left overflow-hidden truncate max-w-[200px]"
+                                            onClick={() => setSelectedOrgId(org.organization_id)}
+                                          >
+                                            {org.organization_id?.slice(0, 7)}
+                                            ...
+                                          </Button>
+                                        </Tooltip>
+                                      </div>
+                                    </TableCell>
+                                    <TableCell>{org.organization_alias}</TableCell>
+                                    <TableCell>
+                                      {org.created_at ? new Date(org.created_at).toLocaleDateString() : "N/A"}
+                                    </TableCell>
+                                    <TableCell>{formatNumberWithCommas(org.spend, 4)}</TableCell>
+                                    <TableCell>
+                                      {org.litellm_budget_table?.max_budget !== null &&
                                         org.litellm_budget_table?.max_budget !== undefined
-                                          ? org.litellm_budget_table?.max_budget
-                                          : "No limit"}
-                                      </TableCell>
-                                      <TableCell
-                                        style={{
-                                          maxWidth: "8-x",
-                                          whiteSpace: "pre-wrap",
-                                          overflow: "hidden",
-                                        }}
-                                        className={org.models.length > 3 ? "px-0" : ""}
-                                      >
-                                        <div className="flex flex-col">
-                                          {Array.isArray(org.models) ? (
-                                            <div className="flex flex-col">
-                                              {org.models.length === 0 ? (
-                                                <Badge size={"xs"} className="mb-1" color="red">
-                                                  <Text>All Proxy Models</Text>
-                                                </Badge>
-                                              ) : (
-                                                <>
-                                                  <div className="flex items-start">
-                                                    {org.models.length > 3 && (
-                                                      <div>
-                                                        <Icon
-                                                          icon={
-                                                            expandedAccordions[org.organization_id || ""]
-                                                              ? ChevronDownIcon
-                                                              : ChevronRightIcon
-                                                          }
-                                                          className="cursor-pointer"
-                                                          size="xs"
-                                                          onClick={() => {
-                                                            setExpandedAccordions((prev) => ({
-                                                              ...prev,
-                                                              [org.organization_id || ""]:
-                                                                !prev[org.organization_id || ""],
-                                                            }));
-                                                          }}
-                                                        />
+                                        ? org.litellm_budget_table?.max_budget
+                                        : "No limit"}
+                                    </TableCell>
+                                    <TableCell
+                                      style={{
+                                        maxWidth: "8-x",
+                                        whiteSpace: "pre-wrap",
+                                        overflow: "hidden",
+                                      }}
+                                      className={org.models.length > 3 ? "px-0" : ""}
+                                    >
+                                      <div className="flex flex-col">
+                                        {Array.isArray(org.models) ? (
+                                          <div className="flex flex-col">
+                                            {org.models.length === 0 ? (
+                                              <Badge size={"xs"} className="mb-1" color="red">
+                                                <Text>All Proxy Models</Text>
+                                              </Badge>
+                                            ) : (
+                                              <>
+                                                <div className="flex items-start">
+                                                  {org.models.length > 3 && (
+                                                    <div>
+                                                      <Icon
+                                                        icon={
+                                                          expandedAccordions[org.organization_id || ""]
+                                                            ? ChevronDownIcon
+                                                            : ChevronRightIcon
+                                                        }
+                                                        className="cursor-pointer"
+                                                        size="xs"
+                                                        onClick={() => {
+                                                          setExpandedAccordions((prev) => ({
+                                                            ...prev,
+                                                            [org.organization_id || ""]:
+                                                              !prev[org.organization_id || ""],
+                                                          }));
+                                                        }}
+                                                      />
+                                                    </div>
+                                                  )}
+                                                  <div className="flex flex-wrap gap-1">
+                                                    {org.models.slice(0, 3).map((model, index) =>
+                                                      model === "all-proxy-models" ? (
+                                                        <Badge key={index} size={"xs"} color="red">
+                                                          <Text>All Proxy Models</Text>
+                                                        </Badge>
+                                                      ) : (
+                                                        <Badge key={index} size={"xs"} color="blue">
+                                                          <Text>
+                                                            {model.length > 30
+                                                              ? `${getModelDisplayName(model).slice(0, 30)}...`
+                                                              : getModelDisplayName(model)}
+                                                          </Text>
+                                                        </Badge>
+                                                      ),
+                                                    )}
+                                                    {org.models.length > 3 &&
+                                                      !expandedAccordions[org.organization_id || ""] && (
+                                                        <Badge size={"xs"} color="gray" className="cursor-pointer">
+                                                          <Text>
+                                                            +{org.models.length - 3}{" "}
+                                                            {org.models.length - 3 === 1
+                                                              ? "more model"
+                                                              : "more models"}
+                                                          </Text>
+                                                        </Badge>
+                                                      )}
+                                                    {expandedAccordions[org.organization_id || ""] && (
+                                                      <div className="flex flex-wrap gap-1">
+                                                        {org.models.slice(3).map((model, index) =>
+                                                          model === "all-proxy-models" ? (
+                                                            <Badge key={index + 3} size={"xs"} color="red">
+                                                              <Text>All Proxy Models</Text>
+                                                            </Badge>
+                                                          ) : (
+                                                            <Badge key={index + 3} size={"xs"} color="blue">
+                                                              <Text>
+                                                                {model.length > 30
+                                                                  ? `${getModelDisplayName(model).slice(0, 30)}...`
+                                                                  : getModelDisplayName(model)}
+                                                              </Text>
+                                                            </Badge>
+                                                          ),
+                                                        )}
                                                       </div>
                                                     )}
-                                                    <div className="flex flex-wrap gap-1">
-                                                      {org.models.slice(0, 3).map((model, index) =>
-                                                        model === "all-proxy-models" ? (
-                                                          <Badge key={index} size={"xs"} color="red">
-                                                            <Text>All Proxy Models</Text>
-                                                          </Badge>
-                                                        ) : (
-                                                          <Badge key={index} size={"xs"} color="blue">
-                                                            <Text>
-                                                              {model.length > 30
-                                                                ? `${getModelDisplayName(model).slice(0, 30)}...`
-                                                                : getModelDisplayName(model)}
-                                                            </Text>
-                                                          </Badge>
-                                                        ),
-                                                      )}
-                                                      {org.models.length > 3 &&
-                                                        !expandedAccordions[org.organization_id || ""] && (
-                                                          <Badge size={"xs"} color="gray" className="cursor-pointer">
-                                                            <Text>
-                                                              +{org.models.length - 3}{" "}
-                                                              {org.models.length - 3 === 1
-                                                                ? "more model"
-                                                                : "more models"}
-                                                            </Text>
-                                                          </Badge>
-                                                        )}
-                                                      {expandedAccordions[org.organization_id || ""] && (
-                                                        <div className="flex flex-wrap gap-1">
-                                                          {org.models.slice(3).map((model, index) =>
-                                                            model === "all-proxy-models" ? (
-                                                              <Badge key={index + 3} size={"xs"} color="red">
-                                                                <Text>All Proxy Models</Text>
-                                                              </Badge>
-                                                            ) : (
-                                                              <Badge key={index + 3} size={"xs"} color="blue">
-                                                                <Text>
-                                                                  {model.length > 30
-                                                                    ? `${getModelDisplayName(model).slice(0, 30)}...`
-                                                                    : getModelDisplayName(model)}
-                                                                </Text>
-                                                              </Badge>
-                                                            ),
-                                                          )}
-                                                        </div>
-                                                      )}
-                                                    </div>
                                                   </div>
-                                                </>
-                                              )}
-                                            </div>
-                                          ) : null}
-                                        </div>
-                                      </TableCell>
-                                      <TableCell>
-                                        <Text>
-                                          TPM:{" "}
-                                          {org.litellm_budget_table?.tpm_limit
-                                            ? org.litellm_budget_table?.tpm_limit
-                                            : "Unlimited"}
-                                          <br />
-                                          RPM:{" "}
-                                          {org.litellm_budget_table?.rpm_limit
-                                            ? org.litellm_budget_table?.rpm_limit
-                                            : "Unlimited"}
-                                        </Text>
-                                      </TableCell>
-                                      <TableCell>
-                                        <Text>{org.members?.length || 0} Members</Text>
-                                      </TableCell>
-                                      <TableCell>
-                                        {userRole === "Admin" && (
-                                          <>
-                                            <Tooltip title="Edit organization">
-                                              {" "}
-                                              <Icon
-                                                icon={PencilAltIcon}
-                                                size="sm"
-                                                className="cursor-pointer hover:text-blue-600"
-                                                onClick={() => {
-                                                  setSelectedOrgId(org.organization_id);
-                                                  setEditOrg(true);
-                                                }}
-                                              />
-                                            </Tooltip>
-                                            <Tooltip title="Delete organization">
-                                              {" "}
-                                              <Icon
-                                                onClick={() => handleDelete(org.organization_id)}
-                                                icon={TrashIcon}
-                                                size="sm"
-                                                className="cursor-pointer hover:text-red-600"
-                                              />
-                                            </Tooltip>
-                                          </>
-                                        )}
-                                      </TableCell>
-                                    </TableRow>
-                                  ))
+                                                </div>
+                                              </>
+                                            )}
+                                          </div>
+                                        ) : null}
+                                      </div>
+                                    </TableCell>
+                                    <TableCell>
+                                      <Text>
+                                        TPM:{" "}
+                                        {org.litellm_budget_table?.tpm_limit
+                                          ? org.litellm_budget_table?.tpm_limit
+                                          : "Unlimited"}
+                                        <br />
+                                        RPM:{" "}
+                                        {org.litellm_budget_table?.rpm_limit
+                                          ? org.litellm_budget_table?.rpm_limit
+                                          : "Unlimited"}
+                                      </Text>
+                                    </TableCell>
+                                    <TableCell>
+                                      <Text>{org.members?.length || 0} Members</Text>
+                                    </TableCell>
+                                    <TableCell>
+                                      {userRole === "Admin" && (
+                                        <>
+                                          <Tooltip title="Edit organization">
+                                            {" "}
+                                            <Icon
+                                              icon={PencilAltIcon}
+                                              size="sm"
+                                              className="cursor-pointer hover:text-blue-600"
+                                              onClick={() => {
+                                                setSelectedOrgId(org.organization_id);
+                                                setEditOrg(true);
+                                              }}
+                                            />
+                                          </Tooltip>
+                                          <Tooltip title="Delete organization">
+                                            {" "}
+                                            <Icon
+                                              onClick={() => handleDelete(org.organization_id)}
+                                              icon={TrashIcon}
+                                              size="sm"
+                                              className="cursor-pointer hover:text-red-600"
+                                            />
+                                          </Tooltip>
+                                        </>
+                                      )}
+                                    </TableCell>
+                                  </TableRow>
+                                ))
                               : null}
                           </TableBody>
                         </Table>
@@ -413,7 +415,7 @@ const OrganizationsTable: React.FC<OrganizationsTableProps> = ({
           )}
         </Col>
       </Grid>
-      <Modal title="Create Organization" visible={isOrgModalVisible} width={800} footer={null} onCancel={handleCancel}>
+      <Modal title={t("Create Organization")} visible={isOrgModalVisible} width={800} footer={null} onCancel={handleCancel}>
         <Form form={form} onFinish={handleCreate} labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} labelAlign="left">
           <Form.Item
             label="Organization Name"
@@ -506,17 +508,17 @@ const OrganizationsTable: React.FC<OrganizationsTableProps> = ({
           </Form.Item>
 
           <div style={{ textAlign: "right", marginTop: "10px" }}>
-            <Button type="submit">Create Organization</Button>
+            <Button type="submit">{t("Create Organization")}</Button>
           </div>
         </Form>
       </Modal>
 
       <DeleteResourceModal
         isOpen={isDeleteModalOpen}
-        title="Delete Organization?"
-        message="Are you sure you want to delete this organization? This action cannot be undone."
-        resourceInformationTitle="Organization Information"
-        resourceInformation={[{ label: "Organization ID", value: orgToDelete, code: true }]}
+        title={t("Delete Organization") + "?"}
+        message={t("Are you sure?") + " " + t("This action cannot be undone") + "."}
+        resourceInformationTitle={t("Organization") + " " + t("Info")}
+        resourceInformation={[{ label: t("Organization ID"), value: orgToDelete, code: true }]}
         onCancel={cancelDelete}
         onOk={confirmDelete}
         confirmLoading={isDeleting}
