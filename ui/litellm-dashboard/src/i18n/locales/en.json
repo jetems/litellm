@@ -315,5 +315,9 @@
     "Add New MCP Server": "Add New MCP Server",
     "All Servers": "All Servers",
     "Connect": "Connect",
-    "MCP Servers": "MCP Servers"
+    "MCP Servers": "MCP Servers",
+    "Request Logs": "Request Logs",
+    "Audit Logs": "Audit Logs",
+    "Live Tail": "Live Tail",
+    "Refresh": "Refresh"
 }

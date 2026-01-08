@@ -24,6 +24,7 @@ import { useLogFilterLogic } from "./log_filter_logic";
 import { fetchAllKeyAliases } from "../key_team_helpers/filter_helpers";
 import { Tab, TabGroup, TabList, TabPanels, TabPanel, Switch } from "@tremor/react";
 import AuditLogs from "./audit_logs";
+import { useTranslate } from "@/i18n";
 import { getTimeRangeDisplay } from "./logs_utils";
 import { formatNumberWithCommas } from "@/utils/dataUtils";
 import { truncateString } from "@/utils/textUtils";
@@ -58,6 +59,7 @@ export default function SpendLogsTable({
   allTeams,
   premiumUser,
 }: SpendLogsTableProps) {
+  const t = useTranslate();
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [showColumnDropdown, setShowColumnDropdown] = useState(false);
@@ -354,7 +356,7 @@ export default function SpendLogsTable({
     sessionLogs.data?.data?.map((log) => ({
       ...log,
       onKeyHashClick: (keyHash: string) => setSelectedKeyIdInfoView(keyHash),
-      onSessionClick: (sessionId: string) => {},
+      onSessionClick: (sessionId: string) => { },
     })) || [];
 
   // Add this function to handle manual refresh
@@ -473,8 +475,8 @@ export default function SpendLogsTable({
     <div className="w-full max-w-screen p-6 overflow-x-hidden box-border">
       <TabGroup defaultIndex={0} onIndexChange={(index) => setActiveTab(index === 0 ? "request logs" : "audit logs")}>
         <TabList>
-          <Tab>Request Logs</Tab>
-          <Tab>Audit Logs</Tab>
+          <Tab>{t("Request Logs")}</Tab>
+          <Tab>{t("Audit Logs")}</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
@@ -514,7 +516,7 @@ export default function SpendLogsTable({
                   data={sessionData}
                   renderSubComponent={RequestViewer}
                   getRowCanExpand={() => true}
-                  // Optionally: add session-specific row expansion state
+                // Optionally: add session-specific row expansion state
                 />
               </div>
             ) : (
@@ -574,9 +576,8 @@ export default function SpendLogsTable({
                                   {quickSelectOptions.map((option) => (
                                     <button
                                       key={option.label}
-                                      className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 rounded-md ${
-                                        displayLabel === option.label ? "bg-blue-50 text-blue-600" : ""
-                                      }`}
+                                      className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 rounded-md ${displayLabel === option.label ? "bg-blue-50 text-blue-600" : ""
+                                        }`}
                                       onClick={() => {
                                         setEndTime(moment().format("YYYY-MM-DDTHH:mm"));
                                         setStartTime(
@@ -594,9 +595,8 @@ export default function SpendLogsTable({
                                   ))}
                                   <div className="border-t my-2" />
                                   <button
-                                    className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 rounded-md ${
-                                      isCustomDate ? "bg-blue-50 text-blue-600" : ""
-                                    }`}
+                                    className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 rounded-md ${isCustomDate ? "bg-blue-50 text-blue-600" : ""
+                                      }`}
                                     onClick={() => setIsCustomDate(!isCustomDate)}
                                   >
                                     Custom Range
@@ -909,11 +909,10 @@ export function RequestViewer({ row }: { row: Row<LogEntry> }) {
             <div className="flex">
               <span className="font-medium w-1/3">Status:</span>
               <span
-                className={`px-2 py-1 rounded-md text-xs font-medium inline-block text-center w-16 ${
-                  (row.original.metadata?.status || "Success").toLowerCase() !== "failure"
+                className={`px-2 py-1 rounded-md text-xs font-medium inline-block text-center w-16 ${(row.original.metadata?.status || "Success").toLowerCase() !== "failure"
                     ? "bg-green-100 text-green-800"
                     : "bg-red-100 text-red-800"
-                }`}
+                  }`}
               >
                 {(row.original.metadata?.status || "Success").toLowerCase() !== "failure" ? "Success" : "Failure"}
               </span>

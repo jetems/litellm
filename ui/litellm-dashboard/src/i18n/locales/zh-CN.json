@@ -315,5 +315,9 @@
     "Add New MCP Server": "添加新 MCP 服务器",
     "All Servers": "所有服务器",
     "Connect": "连接",
-    "MCP Servers": "MCP 服务器"
+    "MCP Servers": "MCP 服务器",
+    "Request Logs": "请求日志",
+    "Audit Logs": "审计日志",
+    "Live Tail": "实时追踪",
+    "Refresh": "刷新"
 }
