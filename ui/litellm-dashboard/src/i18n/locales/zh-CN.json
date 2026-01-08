@@ -269,5 +269,13 @@
     "Logging Callbacks": "日志回调",
     "Alerting Types": "告警类型",
     "Alerting Settings": "告警设置",
-    "Email Alerts": "邮件告警"
+    "Email Alerts": "邮件告警",
+    "Loadbalancing": "负载均衡",
+    "Fallbacks": "降级策略",
+    "Setting": "设置",
+    "In DB": "已存储",
+    "In Config": "配置中",
+    "Not Set": "未设置",
+    "Update": "更新",
+    "Reset": "重置"
 }

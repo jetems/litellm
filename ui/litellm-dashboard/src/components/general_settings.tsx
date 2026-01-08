@@ -23,6 +23,7 @@ import { TrashIcon, CheckCircleIcon } from "@heroicons/react/outline";
 
 import RouterSettings from "./router_settings";
 import Fallbacks from "./fallbacks";
+import { useTranslate } from "@/i18n";
 interface GeneralSettingsPageProps {
   accessToken: string | null;
   userRole: string | null;
@@ -39,6 +40,7 @@ interface generalSettingsItem {
 }
 
 const GeneralSettings: React.FC<GeneralSettingsPageProps> = ({ accessToken, userRole, userID, modelData }) => {
+  const t = useTranslate();
   const [generalSettings, setGeneralSettings] = useState<generalSettingsItem[]>([]);
 
   useEffect(() => {
@@ -108,9 +110,9 @@ const GeneralSettings: React.FC<GeneralSettingsPageProps> = ({ accessToken, user
     <div className="w-full">
       <TabGroup className="h-[75vh] w-full">
         <TabList variant="line" defaultValue="1" className="px-8 pt-4">
-          <Tab value="1">Loadbalancing</Tab>
-          <Tab value="2">Fallbacks</Tab>
-          <Tab value="3">General</Tab>
+          <Tab value="1">{t("Loadbalancing")}</Tab>
+          <Tab value="2">{t("Fallbacks")}</Tab>
+          <Tab value="3">{t("General")}</Tab>
         </TabList>
         <TabPanels className="px-8 py-6">
           <TabPanel>
@@ -134,10 +136,10 @@ const GeneralSettings: React.FC<GeneralSettingsPageProps> = ({ accessToken, user
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableHeaderCell>Setting</TableHeaderCell>
-                    <TableHeaderCell>Value</TableHeaderCell>
-                    <TableHeaderCell>Status</TableHeaderCell>
-                    <TableHeaderCell>Action</TableHeaderCell>
+                    <TableHeaderCell>{t("Setting")}</TableHeaderCell>
+                    <TableHeaderCell>{t("Value")}</TableHeaderCell>
+                    <TableHeaderCell>{t("Status")}</TableHeaderCell>
+                    <TableHeaderCell>{t("Action")}</TableHeaderCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>

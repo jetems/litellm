@@ -269,5 +269,13 @@
     "Logging Callbacks": "Logging Callbacks",
     "Alerting Types": "Alerting Types",
     "Alerting Settings": "Alerting Settings",
-    "Email Alerts": "Email Alerts"
+    "Email Alerts": "Email Alerts",
+    "Loadbalancing": "Loadbalancing",
+    "Fallbacks": "Fallbacks",
+    "Setting": "Setting",
+    "In DB": "In DB",
+    "In Config": "In Config",
+    "Not Set": "Not Set",
+    "Update": "Update",
+    "Reset": "Reset"
 }
