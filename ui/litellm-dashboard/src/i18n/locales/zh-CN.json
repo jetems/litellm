@@ -289,5 +289,7 @@
     "Delete Model": "删除模型",
     "Overview": "概览",
     "Model Settings": "模型设置",
-    "Edit Settings": "编辑设置"
+    "Edit Settings": "编辑设置",
+    "Add New Agent": "添加新代理",
+    "Delete Agent": "删除代理"
 }

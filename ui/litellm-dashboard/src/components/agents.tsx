@@ -8,6 +8,7 @@ import { isAdminRole } from "@/utils/roles";
 import AgentInfoView from "./agents/agent_info";
 import NotificationsManager from "./molecules/notifications_manager";
 import { Agent } from "./agents/types";
+import { useTranslate } from "@/i18n";
 
 interface AgentsPanelProps {
   accessToken: string | null;
@@ -19,6 +20,7 @@ interface AgentsResponse {
 }
 
 const AgentsPanel: React.FC<AgentsPanelProps> = ({ accessToken, userRole }) => {
+  const t = useTranslate();
   const [agentsList, setAgentsList] = useState<Agent[]>([]);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -96,7 +98,7 @@ const AgentsPanel: React.FC<AgentsPanelProps> = ({ accessToken, userRole }) => {
         <p className="text-sm text-gray-600">List of A2A-spec agents that are available to be used in your organization. Go to AI Hub, to make agents public.</p>
         <div className="mt-2">
           <Button onClick={handleAddAgent} disabled={!accessToken}>
-            + Add New Agent
+            + {t("Add New Agent")}
           </Button>
         </div>
       </div>

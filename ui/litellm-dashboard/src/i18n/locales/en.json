@@ -289,5 +289,7 @@
     "Delete Model": "Delete Model",
     "Overview": "Overview",
     "Model Settings": "Model Settings",
-    "Edit Settings": "Edit Settings"
+    "Edit Settings": "Edit Settings",
+    "Add New Agent": "Add New Agent",
+    "Delete Agent": "Delete Agent"
 }
