@@ -28,6 +28,7 @@ import { columns } from "./view_users/columns";
 import { UserDataTable } from "./view_users/table";
 import { UserInfo } from "./view_users/types";
 import { Skeleton } from "antd";
+import { useTranslate } from "@/i18n";
 
 const { Text, Title } = Typography;
 
@@ -70,6 +71,7 @@ const initialFilters: FilterState = {
 };
 
 const ViewUserDashboard: React.FC<ViewUserDashboardProps> = ({ accessToken, token, userRole, userID, teams }) => {
+  const t = useTranslate();
   const queryClient = useQueryClient();
   const [currentPage, setCurrentPage] = useState(1);
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -286,7 +288,7 @@ const ViewUserDashboard: React.FC<ViewUserDashboardProps> = ({ accessToken, toke
     },
     handleDelete,
     handleResetPassword,
-    () => {}, // placeholder function, will be overridden in UserDataTable
+    () => { }, // placeholder function, will be overridden in UserDataTable
   );
 
   return (
@@ -308,12 +310,12 @@ const ViewUserDashboard: React.FC<ViewUserDashboardProps> = ({ accessToken, toke
                 variant={selectionMode ? "primary" : "secondary"}
                 className="flex items-center"
               >
-                {selectionMode ? "Cancel Selection" : "Select Users"}
+                {selectionMode ? t("Cancel") : t("Select Users")}
               </Button>
 
               {selectionMode && (
                 <Button onClick={handleBulkEdit} disabled={selectedUsers.length === 0} className="flex items-center">
-                  Bulk Edit ({selectedUsers.length} selected)
+                  {t("Bulk Edit")} ({selectedUsers.length} {t("selected")})
                 </Button>
               )}
             </>
@@ -323,8 +325,8 @@ const ViewUserDashboard: React.FC<ViewUserDashboardProps> = ({ accessToken, toke
 
       <TabGroup defaultIndex={0} onIndexChange={(index) => setActiveTab(index === 0 ? "users" : "settings")}>
         <TabList className="mb-4">
-          <Tab>Users</Tab>
-          <Tab>Default User Settings</Tab>
+          <Tab>{t("Users")}</Tab>
+          <Tab>{t("Default User Settings")}</Tab>
         </TabList>
 
         <TabPanels>
@@ -388,9 +390,9 @@ const ViewUserDashboard: React.FC<ViewUserDashboardProps> = ({ accessToken, toke
 
       <DeleteResourceModal
         isOpen={isDeleteModalOpen}
-        title="Delete User?"
-        message="Are you sure you want to delete this user? This action cannot be undone."
-        resourceInformationTitle="User Information"
+        title={t("Delete User") + "?"}
+        message={t("Are you sure?") + " " + t("This action cannot be undone") + "."}
+        resourceInformationTitle={t("User") + " " + t("Info")}
         resourceInformation={[
           { label: "Email", value: userToDelete?.user_email },
           { label: "User ID", value: userToDelete?.user_id, code: true },

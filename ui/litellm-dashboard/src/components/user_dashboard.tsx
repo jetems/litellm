@@ -18,6 +18,7 @@ import { KeyResponse, Team } from "./key_team_helpers/key_list";
 import { jwtDecode } from "jwt-decode";
 import { Typography } from "antd";
 import { clearTokenCookies } from "@/utils/cookieUtils";
+import { useTranslate } from "@/i18n";
 
 export interface ProxySettings {
   PROXY_BASE_URL: string | null;
@@ -78,6 +79,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({
   addKey,
   createClicked,
 }) => {
+  const t = useTranslate();
   const [userSpendData, setUserSpendData] = useState<UserInfo | null>(null);
   const [currentOrg, setCurrentOrg] = useState<Organization | null>(null);
 
@@ -327,7 +329,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({
   }
 
   if (userID == null) {
-    return <h1>User ID is not set</h1>;
+    return <h1>{t("User ID is not set")}</h1>;
   }
 
   if (userRole == null) {
@@ -338,8 +340,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({
     const { Title, Paragraph } = Typography;
     return (
       <div>
-        <Title level={1}>Access Denied</Title>
-        <Paragraph>Ask your proxy admin for access to create keys</Paragraph>
+        <Title level={1}>{t("Access Denied")}</Title>
+        <Paragraph>{t("Ask your proxy admin for access to create keys")}</Paragraph>
       </div>
     );
   }
