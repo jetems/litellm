@@ -250,5 +250,15 @@
     "Create New Organization": "创建新组织",
     "Your Organizations": "我的组织",
     "Limits": "限制",
-    "No limit": "无限制"
+    "No limit": "无限制",
+    "Team Based Usage": "按团队统计",
+    "Customer Usage": "按客户统计",
+    "Tag Based Usage": "按标签统计",
+    "Cost": "成本",
+    "Monthly Spend": "月度支出",
+    "Top Virtual Keys": "虚拟密钥排行",
+    "Top Models": "模型排行",
+    "Spend by Provider": "按供应商支出",
+    "Total Spend Per Team": "团队总支出",
+    "Daily Spend Per Team": "团队日支出"
 }

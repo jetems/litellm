@@ -51,6 +51,7 @@ import {
 } from "./networking";
 import TopKeyView from "./UsagePage/components/EntityUsage/TopKeyView";
 import { formatNumberWithCommas } from "@/utils/dataUtils";
+import { useTranslate } from "@/i18n";
 console.log("process.env.NODE_ENV", process.env.NODE_ENV);
 
 interface UsagePageProps {
@@ -133,6 +134,7 @@ const isAdminOrAdminViewer = (role: string | null): boolean => {
 };
 
 const UsagePage: React.FC<UsagePageProps> = ({ accessToken, token, userRole, userID, keys, premiumUser }) => {
+  const t = useTranslate();
   const currentDate = new Date();
   const [keySpendData, setKeySpendData] = useState<any[]>([]);
   const [topKeys, setTopKeys] = useState<any[]>([]);
@@ -564,9 +566,9 @@ const UsagePage: React.FC<UsagePageProps> = ({ accessToken, token, userRole, use
 
           {isAdminOrAdminViewer(userRole) ? (
             <>
-              <Tab>Team Based Usage</Tab>
-              <Tab>Customer Usage</Tab>
-              <Tab>Tag Based Usage</Tab>
+              <Tab>{t("Team Based Usage")}</Tab>
+              <Tab>{t("Customer Usage")}</Tab>
+              <Tab>{t("Tag Based Usage")}</Tab>
             </>
           ) : (
             <>
@@ -578,8 +580,8 @@ const UsagePage: React.FC<UsagePageProps> = ({ accessToken, token, userRole, use
           <TabPanel>
             <TabGroup>
               <TabList variant="solid" className="mt-1">
-                <Tab>Cost</Tab>
-                <Tab>Activity</Tab>
+                <Tab>{t("Cost")}</Tab>
+                <Tab>{t("Activity")}</Tab>
               </TabList>
               <TabPanels>
                 <TabPanel>
@@ -593,7 +595,7 @@ const UsagePage: React.FC<UsagePageProps> = ({ accessToken, token, userRole, use
                     </Col>
                     <Col numColSpan={2}>
                       <Card>
-                        <Title>Monthly Spend</Title>
+                        <Title>{t("Monthly Spend")}</Title>
                         <BarChart
                           data={keySpendData}
                           index="date"
@@ -602,19 +604,19 @@ const UsagePage: React.FC<UsagePageProps> = ({ accessToken, token, userRole, use
                           valueFormatter={valueFormatter}
                           yAxisWidth={100}
                           tickGap={5}
-                          // customTooltip={customTooltip}
+                        // customTooltip={customTooltip}
                         />
                       </Card>
                     </Col>
                     <Col numColSpan={1}>
                       <Card className="h-full">
-                        <Title>Top Virtual Keys</Title>
+                        <Title>{t("Top Virtual Keys")}</Title>
                         <TopKeyView topKeys={topKeys} teams={null} />
                       </Card>
                     </Col>
                     <Col numColSpan={1}>
                       <Card className="h-full">
-                        <Title>Top Models</Title>
+                        <Title>{t("Top Models")}</Title>
                         <BarChart
                           className="mt-4 h-40"
                           data={topModels}
@@ -632,7 +634,7 @@ const UsagePage: React.FC<UsagePageProps> = ({ accessToken, token, userRole, use
                     <Col numColSpan={1}></Col>
                     <Col numColSpan={2}>
                       <Card className="mb-2">
-                        <Title>Spend by Provider</Title>
+                        <Title>{t("Spend by Provider")}</Title>
                         <>
                           <Grid numItems={2}>
                             <Col numColSpan={1}>

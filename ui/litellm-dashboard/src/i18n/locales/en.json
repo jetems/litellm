@@ -250,5 +250,15 @@
     "Create New Organization": "Create New Organization",
     "Your Organizations": "Your Organizations",
     "Limits": "Limits",
-    "No limit": "No limit"
+    "No limit": "No limit",
+    "Team Based Usage": "Team Based Usage",
+    "Customer Usage": "Customer Usage",
+    "Tag Based Usage": "Tag Based Usage",
+    "Cost": "Cost",
+    "Monthly Spend": "Monthly Spend",
+    "Top Virtual Keys": "Top Virtual Keys",
+    "Top Models": "Top Models",
+    "Spend by Provider": "Spend by Provider",
+    "Total Spend Per Team": "Total Spend Per Team",
+    "Daily Spend Per Team": "Daily Spend Per Team"
 }
