@@ -10,6 +10,7 @@ import NotificationsManager from "./molecules/notifications_manager";
 import { Guardrail, GuardrailDefinitionLocation } from "./guardrails/types";
 import DeleteResourceModal from "./common_components/DeleteResourceModal";
 import { getGuardrailLogoAndName } from "./guardrails/guardrail_info_helpers";
+import { useTranslate } from "@/i18n";
 
 interface GuardrailsPanelProps {
   accessToken: string | null;
@@ -35,6 +36,7 @@ interface GuardrailsResponse {
 }
 
 const GuardrailsPanel: React.FC<GuardrailsPanelProps> = ({ accessToken, userRole }) => {
+  const t = useTranslate();
   const [guardrailsList, setGuardrailsList] = useState<Guardrail[]>([]);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -121,15 +123,15 @@ const GuardrailsPanel: React.FC<GuardrailsPanelProps> = ({ accessToken, userRole
     <div className="w-full mx-auto flex-auto overflow-y-auto m-8 p-2">
       <TabGroup index={activeTab} onIndexChange={setActiveTab}>
         <TabList className="mb-4">
-          <Tab>Guardrails</Tab>
-          <Tab disabled={!accessToken || guardrailsList.length === 0}>Test Playground</Tab>
+          <Tab>{t("Guardrails")}</Tab>
+          <Tab disabled={!accessToken || guardrailsList.length === 0}>{t("Test Playground")}</Tab>
         </TabList>
 
         <TabPanels>
           <TabPanel>
             <div className="flex justify-between items-center mb-4">
               <Button onClick={handleAddGuardrail} disabled={!accessToken}>
-                + Add New Guardrail
+                + {t("Add New Guardrail")}
               </Button>
             </div>
 

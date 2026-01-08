@@ -291,5 +291,14 @@
     "Model Settings": "Model Settings",
     "Edit Settings": "Edit Settings",
     "Add New Agent": "Add New Agent",
-    "Delete Agent": "Delete Agent"
+    "Delete Agent": "Delete Agent",
+    "Guardrails": "Guardrails",
+    "Test Playground": "Test Playground",
+    "Add New Guardrail": "Add New Guardrail",
+    "Delete Guardrail": "Delete Guardrail",
+    "Cache Analytics": "Cache Analytics",
+    "Cache Health": "Cache Health",
+    "Cache Settings": "Cache Settings",
+    "Cache Hit Ratio": "Cache Hit Ratio",
+    "Cache Hits": "Cache Hits"
 }

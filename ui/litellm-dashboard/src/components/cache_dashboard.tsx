@@ -25,6 +25,7 @@ import { adminGlobalCacheActivity, cachingHealthCheckCall } from "./networking";
 // Import the new component
 import { CacheHealthTab } from "./cache_health";
 import CacheSettings from "./cache_settings";
+import { useTranslate } from "@/i18n";
 
 const formatDateWithoutTZ = (date: Date | undefined) => {
   if (!date) return undefined;
@@ -97,6 +98,7 @@ const deepParse = (input: any) => {
 };
 
 const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole, userID, premiumUser }) => {
+  const t = useTranslate();
   const [filteredData, setFilteredData] = useState<uiData[]>([]);
   const [selectedApiKeys, setSelectedApiKeys] = useState<string[]>([]);
   const [selectedModels, setSelectedModels] = useState<string[]>([]);
@@ -270,11 +272,11 @@ const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole
     <TabGroup className="gap-2 p-8 h-full w-full mt-2 mb-8">
       <TabList className="flex justify-between mt-2 w-full items-center">
         <div className="flex">
-          <Tab>Cache Analytics</Tab>
+          <Tab>{t("Cache Analytics")}</Tab>
           <Tab>
-            <pre>Cache Health</pre>
+            <pre>{t("Cache Health")}</pre>
           </Tab>
-          <Tab>Cache Settings</Tab>
+          <Tab>{t("Cache Settings")}</Tab>
         </div>
 
         <div className="flex items-center space-x-2">

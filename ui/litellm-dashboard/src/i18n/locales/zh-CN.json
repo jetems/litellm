@@ -291,5 +291,14 @@
     "Model Settings": "模型设置",
     "Edit Settings": "编辑设置",
     "Add New Agent": "添加新代理",
-    "Delete Agent": "删除代理"
+    "Delete Agent": "删除代理",
+    "Guardrails": "护栏",
+    "Test Playground": "测试沙盒",
+    "Add New Guardrail": "添加新护栏",
+    "Delete Guardrail": "删除护栏",
+    "Cache Analytics": "缓存统计",
+    "Cache Health": "缓存健康",
+    "Cache Settings": "缓存设置",
+    "Cache Hit Ratio": "缓存命中率",
+    "Cache Hits": "缓存命中"
 }
