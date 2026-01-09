@@ -574,5 +574,19 @@
     "please provide another key alias": "请提供另一个密钥别名",
     "Enter": "输入",
     "Key Hash": "密钥哈希",
-    "Never": "从不"
+    "Never": "从不",
+    "Login": "登录",
+    "Logging in...": "登录中...",
+    "Access your LiteLLM Admin UI.": "访问您的 LiteLLM 管理界面。",
+    "Default Credentials": "默认凭证",
+    "By default, Username is": "默认情况下，用户名为",
+    "and Password is your set LiteLLM Proxy": "密码为您设置的 LiteLLM Proxy",
+    "Need to set UI credentials or SSO?": "需要设置 UI 凭证或 SSO？",
+    "Check the documentation": "查看文档",
+    "Username": "用户名",
+    "Password": "密码",
+    "Enter your username": "请输入用户名",
+    "Enter your password": "请输入密码",
+    "Please enter your username": "请输入用户名",
+    "Please enter your password": "请输入密码"
 }

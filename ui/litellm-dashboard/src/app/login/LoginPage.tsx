@@ -4,6 +4,7 @@ import { useLogin } from "@/app/(dashboard)/hooks/login/useLogin";
 import { useUIConfig } from "@/app/(dashboard)/hooks/uiConfig/useUIConfig";
 import LoadingScreen from "@/components/common_components/LoadingScreen";
 import { getProxyBaseUrl } from "@/components/networking";
+import { I18nProvider, useTranslate } from "@/i18n";
 import { getCookie } from "@/utils/cookieUtils";
 import { isJwtExpired } from "@/utils/jwtUtils";
 import { InfoCircleOutlined } from "@ant-design/icons";
@@ -19,6 +20,7 @@ function LoginPageContent() {
   const { data: uiConfig, isLoading: isConfigLoading } = useUIConfig();
   const loginMutation = useLogin();
   const router = useRouter();
+  const t = useTranslate();
 
   useEffect(() => {
     if (isConfigLoading) {
@@ -68,23 +70,22 @@ function LoginPageContent() {
           </div>
 
           <div className="text-center">
-            <Title level={3}>Login</Title>
-            <Text type="secondary">Access your LiteLLM Admin UI.</Text>
+            <Title level={3}>{t("Login")}</Title>
+            <Text type="secondary">{t("Access your LiteLLM Admin UI.")}</Text>
           </div>
 
           <Alert
-            message="Default Credentials"
+            message={t("Default Credentials")}
             description={
               <>
                 <Paragraph className="text-sm">
-                  By default, Username is <code className="bg-gray-100 px-1 py-0.5 rounded text-xs">admin</code> and
-                  Password is your set LiteLLM Proxy
+                  {t("By default, Username is")} <code className="bg-gray-100 px-1 py-0.5 rounded text-xs">admin</code> {t("and Password is your set LiteLLM Proxy")}
                   <code className="bg-gray-100 px-1 py-0.5 rounded text-xs">MASTER_KEY</code>.
                 </Paragraph>
                 <Paragraph className="text-sm">
-                  Need to set UI credentials or SSO?{" "}
+                  {t("Need to set UI credentials or SSO?")}{" "}
                   <a href="https://docs.litellm.ai/docs/proxy/ui" target="_blank" rel="noopener noreferrer">
-                    Check the documentation
+                    {t("Check the documentation")}
                   </a>
                   .
                 </Paragraph>
@@ -99,12 +100,12 @@ function LoginPageContent() {
 
           <Form onFinish={handleSubmit} layout="vertical" requiredMark={true}>
             <Form.Item
-              label="Username"
+              label={t("Username")}
               name="username"
-              rules={[{ required: true, message: "Please enter your username" }]}
+              rules={[{ required: true, message: t("Please enter your username") }]}
             >
               <Input
-                placeholder="Enter your username"
+                placeholder={t("Enter your username")}
                 autoComplete="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -115,12 +116,12 @@ function LoginPageContent() {
             </Form.Item>
 
             <Form.Item
-              label="Password"
+              label={t("Password")}
               name="password"
-              rules={[{ required: true, message: "Please enter your password" }]}
+              rules={[{ required: true, message: t("Please enter your password") }]}
             >
               <Input.Password
-                placeholder="Enter your password"
+                placeholder={t("Enter your password")}
                 autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -138,7 +139,7 @@ function LoginPageContent() {
                 block
                 size="large"
               >
-                {isLoginLoading ? "Logging in..." : "Login"}
+                {isLoginLoading ? t("Logging in...") : t("Login")}
               </Button>
             </Form.Item>
           </Form>
@@ -153,7 +154,9 @@ export default function LoginPage() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <LoginPageContent />
+      <I18nProvider>
+        <LoginPageContent />
+      </I18nProvider>
     </QueryClientProvider>
   );
 }

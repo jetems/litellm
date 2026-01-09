@@ -574,5 +574,19 @@
     "Key Hash": "Key Hash",
     "Models field is disabled for this key type": "Models field is disabled for this key type",
     "No users found": "No users found",
-    "Please select a model": "Please select a model"
+    "Please select a model": "Please select a model",
+    "Login": "Login",
+    "Logging in...": "Logging in...",
+    "Access your LiteLLM Admin UI.": "Access your LiteLLM Admin UI.",
+    "Default Credentials": "Default Credentials",
+    "By default, Username is": "By default, Username is",
+    "and Password is your set LiteLLM Proxy": "and Password is your set LiteLLM Proxy",
+    "Need to set UI credentials or SSO?": "Need to set UI credentials or SSO?",
+    "Check the documentation": "Check the documentation",
+    "Username": "Username",
+    "Password": "Password",
+    "Enter your username": "Enter your username",
+    "Enter your password": "Enter your password",
+    "Please enter your username": "Please enter your username",
+    "Please enter your password": "Please enter your password"
 }
