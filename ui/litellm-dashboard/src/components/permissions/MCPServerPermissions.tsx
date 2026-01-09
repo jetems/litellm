@@ -12,12 +12,15 @@ interface MCPServerPermissionsProps {
   accessToken?: string | null;
 }
 
-export function MCPServerPermissions({ 
-  mcpServers, 
-  mcpAccessGroups = [], 
+import { useTranslate } from "@/i18n";
+
+export function MCPServerPermissions({
+  mcpServers,
+  mcpAccessGroups = [],
   mcpToolPermissions = {},
-  accessToken 
+  accessToken
 }: MCPServerPermissionsProps) {
+  const t = useTranslate();
   const [mcpServerDetails, setMCPServerDetails] = useState<MCPServer[]>([]);
   const [accessGroupNames, setAccessGroupNames] = useState<string[]>([]);
   const [expandedServers, setExpandedServers] = useState<Set<string>>(new Set());
@@ -94,32 +97,31 @@ export function MCPServerPermissions({
     <div className="space-y-3">
       <div className="flex items-center gap-2">
         <ServerIcon className="h-4 w-4 text-blue-600" />
-        <Text className="font-semibold text-gray-900">MCP Servers</Text>
+        <Text className="font-semibold text-gray-900">{t("MCP Servers")}</Text>
         <Badge color="blue" size="xs">
           {totalCount}
         </Badge>
       </div>
-      
+
       {totalCount > 0 ? (
         <div className="max-h-[400px] overflow-y-auto space-y-2 pr-1">
           {mergedItems.map((item, index) => {
             const toolsForServer = item.type === "server" ? mcpToolPermissions[item.value] : undefined;
             const hasToolRestrictions = toolsForServer && toolsForServer.length > 0;
             const isExpanded = expandedServers.has(item.value);
-            
+
             return (
               <div key={index} className="space-y-2">
-                <div 
+                <div
                   onClick={() => hasToolRestrictions && toggleServerExpansion(item.value)}
-                  className={`flex items-center gap-3 py-2 px-3 rounded-lg border border-gray-200 transition-all ${
-                    hasToolRestrictions 
-                      ? 'cursor-pointer hover:bg-gray-50 hover:border-gray-300' 
+                  className={`flex items-center gap-3 py-2 px-3 rounded-lg border border-gray-200 transition-all ${hasToolRestrictions
+                      ? 'cursor-pointer hover:bg-gray-50 hover:border-gray-300'
                       : 'bg-white'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-2 flex-1 min-w-0">
                     {item.type === "server" ? (
-                      <Tooltip title={`Full ID: ${item.value}`} placement="top">
+                      <Tooltip title={`${t("Full ID")}: ${item.value}`} placement="top">
                         <div className="inline-flex items-center gap-2 min-w-0">
                           <span className="inline-block w-1.5 h-1.5 bg-blue-500 rounded-full flex-shrink-0"></span>
                           <span className="text-sm font-medium text-gray-900 truncate">{getMCPServerDisplayName(item.value)}</span>
@@ -130,16 +132,16 @@ export function MCPServerPermissions({
                         <span className="inline-block w-1.5 h-1.5 bg-green-500 rounded-full flex-shrink-0"></span>
                         <span className="text-sm font-medium text-gray-900 truncate">{getAccessGroupDisplayName(item.value)}</span>
                         <span className="ml-1 px-1.5 py-0.5 text-[9px] font-semibold text-green-600 bg-green-50 border border-green-200 rounded uppercase tracking-wide flex-shrink-0">
-                          Group
+                          {t("Group")}
                         </span>
                       </div>
                     )}
                   </div>
-                  
+
                   {hasToolRestrictions && (
                     <div className="flex items-center gap-1 flex-shrink-0 whitespace-nowrap">
                       <span className="text-xs font-medium text-gray-600">{toolsForServer.length}</span>
-                      <span className="text-xs text-gray-500">{toolsForServer.length === 1 ? "tool" : "tools"}</span>
+                      <span className="text-xs text-gray-500">{toolsForServer.length === 1 ? t("tool") : t("tools")}</span>
                       {isExpanded ? (
                         <ChevronDownIcon className="h-3.5 w-3.5 text-gray-400 ml-0.5" />
                       ) : (
@@ -148,7 +150,7 @@ export function MCPServerPermissions({
                     </div>
                   )}
                 </div>
-                
+
                 {/* Show tool permissions if expanded */}
                 {hasToolRestrictions && isExpanded && (
                   <div className="ml-4 pl-4 border-l-2 border-blue-200 pb-1">
@@ -171,7 +173,7 @@ export function MCPServerPermissions({
       ) : (
         <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-50 border border-gray-200">
           <ServerIcon className="h-4 w-4 text-gray-400" />
-          <Text className="text-gray-500 text-sm">No MCP servers or access groups configured</Text>
+          <Text className="text-gray-500 text-sm">{t("No MCP servers or access groups configured")}</Text>
         </div>
       )}
     </div>

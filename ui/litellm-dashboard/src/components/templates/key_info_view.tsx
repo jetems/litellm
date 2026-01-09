@@ -5,6 +5,7 @@ import { Badge, Button, Card, Grid, Tab, TabGroup, TabList, TabPanel, TabPanels,
 import { Button as AntdButton, Form, Tooltip } from "antd";
 import { CheckIcon, CopyIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useTranslate } from "@/i18n";
 import { rolesWithWriteAccess } from "../../utils/roles";
 import { mapDisplayToInternalNames, mapInternalToDisplayNames } from "../callback_info_helpers";
 import AutoRotationView from "../common_components/AutoRotationView";
@@ -54,6 +55,7 @@ export default function KeyInfoView({
   setAccessToken,
   backButtonText = "Back to Keys",
 }: KeyInfoViewProps) {
+  const t = useTranslate();
   const [isEditing, setIsEditing] = useState(false);
   const [form] = Form.useForm();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -90,7 +92,7 @@ export default function KeyInfoView({
         <Button icon={ArrowLeftIcon} variant="light" onClick={onClose} className="mb-4">
           {backButtonText}
         </Button>
-        <Text>Key not found</Text>
+        <Text>{t("Key not found")}</Text>
       </div>
     );
   }
@@ -175,13 +177,13 @@ export default function KeyInfoView({
             ...(formValues.logging_settings ? { logging: formValues.logging_settings } : {}),
             ...(formValues.disabled_callbacks?.length > 0
               ? {
-                  litellm_disabled_callbacks: mapDisplayToInternalNames(formValues.disabled_callbacks),
-                }
+                litellm_disabled_callbacks: mapDisplayToInternalNames(formValues.disabled_callbacks),
+              }
               : {}),
           };
         } catch (error) {
           console.error("Error parsing metadata JSON:", error);
-          NotificationManager.error("Invalid metadata JSON");
+          NotificationManager.error(t("Invalid metadata JSON"));
           return;
         }
       } else {
@@ -194,8 +196,8 @@ export default function KeyInfoView({
           ...(formValues.logging_settings ? { logging: formValues.logging_settings } : {}),
           ...(formValues.disabled_callbacks?.length > 0
             ? {
-                litellm_disabled_callbacks: mapDisplayToInternalNames(formValues.disabled_callbacks),
-              }
+              litellm_disabled_callbacks: mapDisplayToInternalNames(formValues.disabled_callbacks),
+            }
             : {}),
         };
       }
@@ -230,6 +232,7 @@ export default function KeyInfoView({
     } catch (error) {
       NotificationManager.fromBackend(parseErrorMessage(error));
       console.error("Error updating key:", error);
+      NotificationManager.error(t("Error updating key"));
     }
   };
 
@@ -237,7 +240,7 @@ export default function KeyInfoView({
     try {
       if (!accessToken) return;
       await keyDeleteCall(accessToken as string, currentKeyData.token || currentKeyData.token_id);
-      NotificationManager.success("Key deleted successfully");
+      NotificationManager.success(t("Key deleted successfully"));
       if (onDelete) {
         onDelete();
       }
@@ -312,7 +315,7 @@ export default function KeyInfoView({
 
           <div className="flex items-center cursor-pointer mb-2 space-y-6">
             <div>
-              <Text className="text-xs text-gray-400 uppercase tracking-wide mt-2">Key ID</Text>
+              <Text className="text-xs text-gray-400 uppercase tracking-wide mt-2">{t("Key ID")}</Text>
               <Text className="text-gray-500 font-mono text-sm">{currentKeyData.token_id || currentKeyData.token}</Text>
             </div>
             <AntdButton
@@ -320,11 +323,10 @@ export default function KeyInfoView({
               size="small"
               icon={copiedStates["key-id"] ? <CheckIcon size={12} /> : <CopyIcon size={12} />}
               onClick={() => copyToClipboard(currentKeyData.token_id || currentKeyData.token, "key-id")}
-              className={`ml-2 transition-all duration-200${
-                copiedStates["key-id"]
-                  ? "text-green-600 bg-green-50 border-green-200"
-                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-              }`}
+              className={`ml-2 transition-all duration-200${copiedStates["key-id"]
+                ? "text-green-600 bg-green-50 border-green-200"
+                : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                }`}
             />
           </div>
 
@@ -332,19 +334,19 @@ export default function KeyInfoView({
           <div className="flex items-center gap-2 flex-wrap">
             <Text className="text-sm text-gray-500">
               {currentKeyData.updated_at && currentKeyData.updated_at !== currentKeyData.created_at
-                ? `Updated: ${formatTimestamp(currentKeyData.updated_at)}`
-                : `Created: ${formatTimestamp(currentKeyData.created_at)}`}
+                ? `${t("Updated")}: ${formatTimestamp(currentKeyData.updated_at)}`
+                : `${t("Created")}: ${formatTimestamp(currentKeyData.created_at)}`}
             </Text>
 
             {isRecentlyRegenerated && (
               <Badge color="green" size="xs" className="animate-pulse">
-                Recently Regenerated
+                {t("Recently Regenerated")}
               </Badge>
             )}
 
             {lastRegeneratedAt && (
               <Badge color="blue" size="xs">
-                Regenerated
+                {t("Regenerated")}
               </Badge>
             )}
           </div>
@@ -352,7 +354,7 @@ export default function KeyInfoView({
         {userRole && rolesWithWriteAccess.includes(userRole) && (
           <div className="flex gap-2">
             <Tooltip
-              title={!premiumUser ? "This is a LiteLLM Enterprise feature, and requires a valid key to use." : ""}
+              title={!premiumUser ? t("This is a LiteLLM Enterprise feature, and requires a valid key to use.") : ""}
             >
               <span className="inline-block">
                 <Button
@@ -362,7 +364,7 @@ export default function KeyInfoView({
                   className="flex items-center"
                   disabled={!premiumUser}
                 >
-                  Regenerate Key
+                  {t("Regenerate Key")}
                 </Button>
               </span>
             </Tooltip>
@@ -372,7 +374,7 @@ export default function KeyInfoView({
               onClick={() => setIsDeleteModalOpen(true)}
               className="flex items-center text-red-500 border-red-500 hover:text-red-700"
             >
-              Delete Key
+              {t("Delete Key")}
             </Button>
           </div>
         )}
@@ -399,7 +401,7 @@ export default function KeyInfoView({
               <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl min-h-[380px] py-6 overflow-hidden transform transition-all flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-900">Delete Key</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">{t("Delete Key")}</h3>
                     <button
                       onClick={() => {
                         setIsDeleteModalOpen(false);
@@ -426,26 +428,23 @@ export default function KeyInfoView({
                       </div>
                       <div>
                         <p className="text-base font-medium text-red-600">
-                          Warning: You are about to delete this Virtual Key.
+                          {t("Warning: You are about to delete this Virtual Key.")}
                         </p>
                         <p className="text-base text-red-600 mt-2">
-                          This action is irreversible and will immediately revoke access for any applications using this
-                          key.
+                          {t("This action is irreversible and will immediately revoke access for any applications using this key.")}
                         </p>
                       </div>
                     </div>
-                    <p className="text-base text-gray-600 mb-5">Are you sure you want to delete this Virtual Key?</p>
+                    <p className="text-base text-gray-600 mb-5">{t("Are you sure you want to delete this Virtual Key?")}</p>
                     <div className="mb-5">
                       <label className="block text-base font-medium text-gray-700 mb-2">
-                        {`Type `}
-                        <span className="underline">{keyName}</span>
-                        {` to confirm deletion:`}
+                        {t("Type")} <span className="underline">{keyName}</span> {t("to confirm deletion:")}
                       </label>
                       <input
                         type="text"
                         value={deleteConfirmInput}
                         onChange={(e) => setDeleteConfirmInput(e.target.value)}
-                        placeholder="Enter key name exactly"
+                        placeholder={t("Enter key name exactly")}
                         className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                         autoFocus
                       />
@@ -460,14 +459,14 @@ export default function KeyInfoView({
                     }}
                     className="px-5 py-3 bg-white border border-gray-300 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                   >
-                    Cancel
+                    {t("Cancel")}
                   </button>
                   <button
                     onClick={handleDelete}
                     disabled={!isValid}
                     className={`px-5 py-3 rounded-md text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 ${isValid ? "bg-red-600 hover:bg-red-700" : "bg-red-300 cursor-not-allowed"}`}
                   >
-                    Delete Key
+                    {t("Delete Key")}
                   </button>
                 </div>
               </div>
@@ -477,8 +476,8 @@ export default function KeyInfoView({
 
       <TabGroup>
         <TabList className="mb-4">
-          <Tab>Overview</Tab>
-          <Tab>Settings</Tab>
+          <Tab>{t("Overview")}</Tab>
+          <Tab>{t("Settings")}</Tab>
         </TabList>
 
         <TabPanels>
@@ -486,28 +485,28 @@ export default function KeyInfoView({
           <TabPanel>
             <Grid numItems={1} numItemsSm={2} numItemsLg={3} className="gap-6">
               <Card>
-                <Text>Spend</Text>
+                <Text>{t("Spend")}</Text>
                 <div className="mt-2">
                   <Title>${formatNumberWithCommas(currentKeyData.spend, 4)}</Title>
                   <Text>
-                    of{" "}
+                    {t("of")}{" "}
                     {currentKeyData.max_budget !== null
                       ? `$${formatNumberWithCommas(currentKeyData.max_budget)}`
-                      : "Unlimited"}
+                      : t("Unlimited")}
                   </Text>
                 </div>
               </Card>
 
               <Card>
-                <Text>Rate Limits</Text>
+                <Text>{t("Rate Limits")}</Text>
                 <div className="mt-2">
-                  <Text>TPM: {currentKeyData.tpm_limit !== null ? currentKeyData.tpm_limit : "Unlimited"}</Text>
-                  <Text>RPM: {currentKeyData.rpm_limit !== null ? currentKeyData.rpm_limit : "Unlimited"}</Text>
+                  <Text>TPM: {currentKeyData.tpm_limit !== null ? currentKeyData.tpm_limit : t("Unlimited")}</Text>
+                  <Text>RPM: {currentKeyData.rpm_limit !== null ? currentKeyData.rpm_limit : t("Unlimited")}</Text>
                 </div>
               </Card>
 
               <Card>
-                <Text>Models</Text>
+                <Text>{t("Models")}</Text>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {currentKeyData.models && currentKeyData.models.length > 0 ? (
                     currentKeyData.models.map((model, index) => (
@@ -516,7 +515,7 @@ export default function KeyInfoView({
                       </Badge>
                     ))
                   ) : (
-                    <Text>No models specified</Text>
+                    <Text>{t("No models specified")}</Text>
                   )}
                 </div>
               </Card>
@@ -554,9 +553,9 @@ export default function KeyInfoView({
           <TabPanel>
             <Card className="overflow-y-auto max-h-[65vh]">
               <div className="flex justify-between items-center mb-4">
-                <Title>Key Settings</Title>
+                <Title>{t("Key Settings")}</Title>
                 {!isEditing && userRole && rolesWithWriteAccess.includes(userRole) && (
-                  <Button onClick={() => setIsEditing(true)}>Edit Settings</Button>
+                  <Button onClick={() => setIsEditing(true)}>{t("Edit Settings")}</Button>
                 )}
               </div>
 
@@ -574,50 +573,50 @@ export default function KeyInfoView({
               ) : (
                 <div className="space-y-4">
                   <div>
-                    <Text className="font-medium">Key ID</Text>
+                    <Text className="font-medium">{t("Key ID")}</Text>
                     <Text className="font-mono">{currentKeyData.token_id || currentKeyData.token}</Text>
                   </div>
 
                   <div>
-                    <Text className="font-medium">Key Alias</Text>
-                    <Text>{currentKeyData.key_alias || "Not Set"}</Text>
+                    <Text className="font-medium">{t("Key Alias")}</Text>
+                    <Text>{currentKeyData.key_alias || t("Not Set")}</Text>
                   </div>
 
                   <div>
-                    <Text className="font-medium">Secret Key</Text>
+                    <Text className="font-medium">{t("Secret Key")}</Text>
                     <Text className="font-mono">{currentKeyData.key_name}</Text>
                   </div>
 
                   <div>
-                    <Text className="font-medium">Team ID</Text>
-                    <Text>{currentKeyData.team_id || "Not Set"}</Text>
+                    <Text className="font-medium">{t("Team ID")}</Text>
+                    <Text>{currentKeyData.team_id || t("Not Set")}</Text>
                   </div>
 
                   <div>
-                    <Text className="font-medium">Organization</Text>
-                    <Text>{currentKeyData.organization_id || "Not Set"}</Text>
+                    <Text className="font-medium">{t("Organization")}</Text>
+                    <Text>{currentKeyData.organization_id || t("Not Set")}</Text>
                   </div>
 
                   <div>
-                    <Text className="font-medium">Created</Text>
+                    <Text className="font-medium">{t("Created")}</Text>
                     <Text>{formatTimestamp(currentKeyData.created_at)}</Text>
                   </div>
 
                   {lastRegeneratedAt && (
                     <div>
-                      <Text className="font-medium">Last Regenerated</Text>
+                      <Text className="font-medium">{t("Last Regenerated")}</Text>
                       <div className="flex items-center gap-2">
                         <Text>{formatTimestamp(lastRegeneratedAt)}</Text>
                         <Badge color="green" size="xs">
-                          Recent
+                          {t("Recent")}
                         </Badge>
                       </div>
                     </div>
                   )}
 
                   <div>
-                    <Text className="font-medium">Expires</Text>
-                    <Text>{currentKeyData.expires ? formatTimestamp(currentKeyData.expires) : "Never"}</Text>
+                    <Text className="font-medium">{t("Expires")}</Text>
+                    <Text>{currentKeyData.expires ? formatTimestamp(currentKeyData.expires) : t("Never")}</Text>
                   </div>
 
                   <AutoRotationView
@@ -631,16 +630,16 @@ export default function KeyInfoView({
                   />
 
                   <div>
-                    <Text className="font-medium">Spend</Text>
+                    <Text className="font-medium">{t("Spend")}</Text>
                     <Text>${formatNumberWithCommas(currentKeyData.spend, 4)} USD</Text>
                   </div>
 
                   <div>
-                    <Text className="font-medium">Budget</Text>
+                    <Text className="font-medium">{t("Budget")}</Text>
                     <Text>
                       {currentKeyData.max_budget !== null
                         ? `$${formatNumberWithCommas(currentKeyData.max_budget, 2)}`
-                        : "Unlimited"}
+                        : t("Unlimited")}
                     </Text>
                   </div>
 
@@ -649,10 +648,10 @@ export default function KeyInfoView({
                     <div className="flex flex-wrap gap-2 mt-1">
                       {Array.isArray(currentKeyData.metadata?.tags) && currentKeyData.metadata.tags.length > 0
                         ? currentKeyData.metadata.tags.map((tag, index) => (
-                            <span key={index} className="px-2 mr-2 py-1 bg-blue-100 rounded text-xs">
-                              {tag}
-                            </span>
-                          ))
+                          <span key={index} className="px-2 mr-2 py-1 bg-blue-100 rounded text-xs">
+                            {tag}
+                          </span>
+                        ))
                         : "No tags specified"}
                     </div>
                   </div>
@@ -662,41 +661,41 @@ export default function KeyInfoView({
                     <Text>
                       {Array.isArray(currentKeyData.metadata?.prompts) && currentKeyData.metadata.prompts.length > 0
                         ? currentKeyData.metadata.prompts.map((prompt, index) => (
-                            <span key={index} className="px-2 mr-2 py-1 bg-blue-100 rounded text-xs">
-                              {prompt}
-                            </span>
-                          ))
+                          <span key={index} className="px-2 mr-2 py-1 bg-blue-100 rounded text-xs">
+                            {prompt}
+                          </span>
+                        ))
                         : "No prompts specified"}
                     </Text>
                   </div>
 
                   <div>
-                    <Text className="font-medium">Allowed Pass Through Routes</Text>
+                    <Text className="font-medium">{t("Allowed Pass Through Routes")}</Text>
                     <Text>
                       {Array.isArray(currentKeyData.metadata?.allowed_passthrough_routes) &&
-                      currentKeyData.metadata.allowed_passthrough_routes.length > 0
+                        currentKeyData.metadata.allowed_passthrough_routes.length > 0
                         ? currentKeyData.metadata.allowed_passthrough_routes.map((route, index) => (
-                            <span key={index} className="px-2 mr-2 py-1 bg-blue-100 rounded text-xs">
-                              {route}
-                            </span>
-                          ))
-                        : "No pass through routes specified"}
+                          <span key={index} className="px-2 mr-2 py-1 bg-blue-100 rounded text-xs">
+                            {route}
+                          </span>
+                        ))
+                        : t("No pass through routes specified")}
                     </Text>
                   </div>
 
                   <div>
-                    <Text className="font-medium">Disable Global Guardrails</Text>
+                    <Text className="font-medium">{t("Disable Global Guardrails")}</Text>
                     <Text>
                       {currentKeyData.metadata?.disable_global_guardrails === true ? (
-                        <Badge color="yellow">Enabled - Global guardrails bypassed</Badge>
+                        <Badge color="yellow">{t("Enabled - Global guardrails bypassed")}</Badge>
                       ) : (
-                        <Badge color="green">Disabled - Global guardrails active</Badge>
+                        <Badge color="green">{t("Disabled - Global guardrails active")}</Badge>
                       )}
                     </Text>
                   </div>
 
                   <div>
-                    <Text className="font-medium">Models</Text>
+                    <Text className="font-medium">{t("Models")}</Text>
                     <div className="flex flex-wrap gap-2 mt-1">
                       {currentKeyData.models && currentKeyData.models.length > 0 ? (
                         currentKeyData.models.map((model, index) => (
@@ -705,37 +704,37 @@ export default function KeyInfoView({
                           </span>
                         ))
                       ) : (
-                        <Text>No models specified</Text>
+                        <Text>{t("No models specified")}</Text>
                       )}
                     </div>
                   </div>
 
                   <div>
-                    <Text className="font-medium">Rate Limits</Text>
-                    <Text>TPM: {currentKeyData.tpm_limit !== null ? currentKeyData.tpm_limit : "Unlimited"}</Text>
-                    <Text>RPM: {currentKeyData.rpm_limit !== null ? currentKeyData.rpm_limit : "Unlimited"}</Text>
+                    <Text className="font-medium">{t("Rate Limits")}</Text>
+                    <Text>TPM: {currentKeyData.tpm_limit !== null ? currentKeyData.tpm_limit : t("Unlimited")}</Text>
+                    <Text>RPM: {currentKeyData.rpm_limit !== null ? currentKeyData.rpm_limit : t("Unlimited")}</Text>
                     <Text>
-                      Max Parallel Requests:{" "}
+                      {t("Max Parallel Requests")}:{" "}
                       {currentKeyData.max_parallel_requests !== null
                         ? currentKeyData.max_parallel_requests
-                        : "Unlimited"}
+                        : t("Unlimited")}
                     </Text>
                     <Text>
-                      Model TPM Limits:{" "}
+                      {t("Model TPM Limits")}:{" "}
                       {currentKeyData.metadata?.model_tpm_limit
                         ? JSON.stringify(currentKeyData.metadata.model_tpm_limit)
-                        : "Unlimited"}
+                        : t("Unlimited")}
                     </Text>
                     <Text>
-                      Model RPM Limits:{" "}
+                      {t("Model RPM Limits")}:{" "}
                       {currentKeyData.metadata?.model_rpm_limit
                         ? JSON.stringify(currentKeyData.metadata.model_rpm_limit)
-                        : "Unlimited"}
+                        : t("Unlimited")}
                     </Text>
                   </div>
 
                   <div>
-                    <Text className="font-medium">Metadata</Text>
+                    <Text className="font-medium">{t("Metadata")}</Text>
                     <pre className="bg-gray-100 p-2 rounded text-xs overflow-auto mt-1">
                       {formatMetadataForDisplay(stripTagsFromMetadata(currentKeyData.metadata))}
                     </pre>
