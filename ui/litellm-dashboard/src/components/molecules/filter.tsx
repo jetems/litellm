@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect } from "react";
 import { Button, Input, Select } from "antd";
 import { FilterIcon } from "@heroicons/react/outline";
 import debounce from "lodash/debounce";
+import { useTranslate } from "@/i18n";
 
 export interface FilterOption {
   name: string;
@@ -28,8 +29,11 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
   onApplyFilters,
   onResetFilters,
   initialValues = {},
-  buttonLabel = "Filters",
+  buttonLabel,
 }) => {
+  const t = useTranslate();
+  const actualButtonLabel = buttonLabel || t("Filters");
+
   const [showFilters, setShowFilters] = useState<boolean>(false);
   const [tempValues, setTempValues] = useState<FilterValues>(initialValues);
   const [searchOptionsMap, setSearchOptionsMap] = useState<{
@@ -141,9 +145,9 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
           onClick={() => setShowFilters(!showFilters)}
           className="flex items-center gap-2"
         >
-          {buttonLabel}
+          {actualButtonLabel}
         </Button>
-        <Button onClick={resetFilters}>Reset Filters</Button>
+        <Button onClick={resetFilters}>{t("Reset Filters")}</Button>
       </div>
 
       {showFilters && (
@@ -159,7 +163,7 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
                   <Select
                     showSearch
                     className="w-full"
-                    placeholder={`Search ${option.label || option.name}...`}
+                    placeholder={`${t("Search")}${option.label || option.name}...`}
                     value={tempValues[option.name] || undefined}
                     onChange={(value) => handleFilterChange(option.name, value)}
                     onDropdownVisibleChange={(open) => handleDropdownVisibleChange(open, option)}
@@ -176,12 +180,12 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
                     loading={searchLoadingMap[option.name]}
                     options={searchOptionsMap[option.name] || []}
                     allowClear
-                    notFoundContent={searchLoadingMap[option.name] ? "Loading..." : "No results found"}
+                    notFoundContent={searchLoadingMap[option.name] ? t("Loading...") : t("No results found")}
                   />
                 ) : option.options ? (
                   <Select
                     className="w-full"
-                    placeholder={`Select ${option.label || option.name}...`}
+                    placeholder={`${t("Select")}${option.label || option.name}...`}
                     value={tempValues[option.name] || undefined}
                     onChange={(value) => handleFilterChange(option.name, value)}
                     allowClear
@@ -195,7 +199,7 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
                 ) : (
                   <Input
                     className="w-full"
-                    placeholder={`Enter ${option.label || option.name}...`}
+                    placeholder={`${t("Enter")} ${option.label || option.name}...`}
                     value={tempValues[option.name] || ""}
                     onChange={(e) => handleFilterChange(option.name, e.target.value)}
                     allowClear

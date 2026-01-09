@@ -12,6 +12,7 @@ import { Organization, userListCall } from "./networking";
 import { useFilterLogic } from "./key_team_helpers/filter_logic";
 import { Setter } from "@/types";
 import { updateExistingKeys } from "@/utils/dataUtils";
+import { useTranslate } from "@/i18n";
 import { flexRender, getCoreRowModel, getSortedRowModel, SortingState, useReactTable } from "@tanstack/react-table";
 import { Table, TableHead, TableHeaderCell, TableBody, TableRow, TableCell, Icon } from "@tremor/react";
 import { SwitchVerticalIcon, ChevronUpIcon, ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/outline";
@@ -67,6 +68,7 @@ const TeamFilter = ({
   selectedTeam: Team | null;
   setSelectedTeam: (team: Team | null) => void;
 }) => {
+  const t = useTranslate();
   const handleTeamChange = (value: string) => {
     const team = teams?.find((t) => t.team_id === value);
     setSelectedTeam(team || null);
@@ -75,14 +77,14 @@ const TeamFilter = ({
   return (
     <div className="mb-4">
       <div className="flex items-center gap-2">
-        <span className="text-sm text-gray-600">Where Team is</span>
+        <span className="text-sm text-gray-600">{t("Where Team is")}</span>
         <Select
           value={selectedTeam?.team_id || ""}
           onValueChange={handleTeamChange}
-          placeholder="Team ID"
+          placeholder={t("Team ID")}
           className="w-[400px]"
         >
-          <SelectItem value="team_id">Team ID</SelectItem>
+          <SelectItem value="team_id">{t("Team ID")}</SelectItem>
           {teams?.map((team) => (
             <SelectItem key={team.team_id} value={team.team_id}>
               <span className="font-medium">{team.team_alias}</span>{" "}
@@ -123,6 +125,7 @@ export function AllKeysTable({
   premiumUser,
   setAccessToken,
 }: AllKeysTableProps) {
+  const t = useTranslate();
   const [selectedKeyId, setSelectedKeyId] = useState<string | null>(null);
   const [userList, setUserList] = useState<UserResponse[]>([]);
   const [sorting, setSorting] = React.useState<SortingState>(() => {
@@ -194,7 +197,7 @@ export function AllKeysTable({
     {
       id: "token",
       accessorKey: "token",
-      header: "Key ID",
+      header: t("Key ID"),
       cell: (info) => (
         <div className="overflow-hidden">
           <Tooltip title={info.getValue() as string}>
@@ -213,7 +216,7 @@ export function AllKeysTable({
     {
       id: "key_alias",
       accessorKey: "key_alias",
-      header: "Key Alias",
+      header: t("Key Alias"),
       cell: (info) => {
         const value = info.getValue() as string;
         return (
@@ -224,23 +227,23 @@ export function AllKeysTable({
     {
       id: "key_name",
       accessorKey: "key_name",
-      header: "Secret Key",
+      header: t("Secret Key"),
       cell: (info) => <span className="font-mono text-xs">{info.getValue() as string}</span>,
     },
     {
       id: "team_alias",
       accessorKey: "team_id",
-      header: "Team Alias",
+      header: t("Team Alias"),
       cell: ({ row, getValue }) => {
         const teamId = getValue() as string;
         const team = teams?.find((t) => t.team_id === teamId);
-        return team?.team_alias || "Unknown";
+        return team?.team_alias || t("Unknown");
       },
     },
     {
       id: "team_id",
       accessorKey: "team_id",
-      header: "Team ID",
+      header: t("Team ID"),
       cell: (info) => (
         <Tooltip title={info.getValue() as string}>
           {info.getValue() ? `${(info.getValue() as string).slice(0, 7)}...` : "-"}
@@ -250,13 +253,13 @@ export function AllKeysTable({
     {
       id: "organization_id",
       accessorKey: "organization_id",
-      header: "Organization ID",
+      header: t("Organization ID"),
       cell: (info) => (info.getValue() ? info.renderValue() : "-"),
     },
     {
       id: "user_email",
       accessorKey: "user_id",
-      header: "User Email",
+      header: t("User Email"),
       cell: (info) => {
         const userId = info.getValue() as string;
         const user = userList.find((u) => u.user_id === userId);
@@ -272,7 +275,7 @@ export function AllKeysTable({
     {
       id: "user_id",
       accessorKey: "user_id",
-      header: "User ID",
+      header: t("User ID"),
       cell: (info) => {
         const userId = info.getValue() as string | null;
         if (userId && userId.length > 15) {
@@ -288,7 +291,7 @@ export function AllKeysTable({
     {
       id: "created_at",
       accessorKey: "created_at",
-      header: "Created At",
+      header: t("Created At"),
       cell: (info) => {
         const value = info.getValue();
         return value ? new Date(value as string).toLocaleDateString() : "-";
@@ -297,7 +300,7 @@ export function AllKeysTable({
     {
       id: "created_by",
       accessorKey: "created_by",
-      header: "Created By",
+      header: t("Created By"),
       cell: (info) => {
         const value = info.getValue() as string | null;
         if (value && value.length > 15) {
@@ -313,35 +316,35 @@ export function AllKeysTable({
     {
       id: "updated_at",
       accessorKey: "updated_at",
-      header: "Updated At",
+      header: t("Updated At"),
       cell: (info) => {
         const value = info.getValue();
-        return value ? new Date(value as string).toLocaleDateString() : "Never";
+        return value ? new Date(value as string).toLocaleDateString() : t("Never");
       },
     },
     {
       id: "expires",
       accessorKey: "expires",
-      header: "Expires",
+      header: t("Expires"),
       cell: (info) => {
         const value = info.getValue();
-        return value ? new Date(value as string).toLocaleDateString() : "Never";
+        return value ? new Date(value as string).toLocaleDateString() : t("Never");
       },
     },
     {
       id: "spend",
       accessorKey: "spend",
-      header: "Spend (USD)",
+      header: t("Spend (USD)"),
       cell: (info) => formatNumberWithCommas(info.getValue() as number, 4),
     },
     {
       id: "max_budget",
       accessorKey: "max_budget",
-      header: "Budget (USD)",
+      header: t("Budget (USD)"),
       cell: (info) => {
         const maxBudget = info.getValue() as number | null;
         if (maxBudget === null) {
-          return "Unlimited";
+          return t("Unlimited");
         }
         return `$${formatNumberWithCommas(maxBudget)}`;
       },
@@ -349,16 +352,16 @@ export function AllKeysTable({
     {
       id: "budget_reset_at",
       accessorKey: "budget_reset_at",
-      header: "Budget Reset",
+      header: t("Budget Reset"),
       cell: (info) => {
         const value = info.getValue();
-        return value ? new Date(value as string).toLocaleString() : "Never";
+        return value ? new Date(value as string).toLocaleString() : t("Never");
       },
     },
     {
       id: "models",
       accessorKey: "models",
-      header: "Models",
+      header: t("Models"),
       cell: (info) => {
         const models = info.getValue() as string[];
         return (
@@ -367,7 +370,7 @@ export function AllKeysTable({
               <div className="flex flex-col">
                 {models.length === 0 ? (
                   <Badge size={"xs"} className="mb-1" color="red">
-                    <Text>All Proxy Models</Text>
+                    <Text>{t("All Proxy Models")}</Text>
                   </Badge>
                 ) : (
                   <>
@@ -391,7 +394,7 @@ export function AllKeysTable({
                         {models.slice(0, 3).map((model, index) =>
                           model === "all-proxy-models" ? (
                             <Badge key={index} size={"xs"} color="red">
-                              <Text>All Proxy Models</Text>
+                              <Text>{t("All Proxy Models")}</Text>
                             </Badge>
                           ) : (
                             <Badge key={index} size={"xs"} color="blue">
@@ -406,7 +409,7 @@ export function AllKeysTable({
                         {models.length > 3 && !expandedAccordions[info.row.id] && (
                           <Badge size={"xs"} color="gray" className="cursor-pointer">
                             <Text>
-                              +{models.length - 3} {models.length - 3 === 1 ? "more model" : "more models"}
+                              +{models.length - 3} {models.length - 3 === 1 ? t("more model") : t("more models")}
                             </Text>
                           </Badge>
                         )}
@@ -415,7 +418,7 @@ export function AllKeysTable({
                             {models.slice(3).map((model, index) =>
                               model === "all-proxy-models" ? (
                                 <Badge key={index + 3} size={"xs"} color="red">
-                                  <Text>All Proxy Models</Text>
+                                  <Text>{t("All Proxy Models")}</Text>
                                 </Badge>
                               ) : (
                                 <Badge key={index + 3} size={"xs"} color="blue">
@@ -441,13 +444,13 @@ export function AllKeysTable({
     },
     {
       id: "rate_limits",
-      header: "Rate Limits",
+      header: t("Rate Limits"),
       cell: ({ row }) => {
         const key = row.original;
         return (
           <div>
-            <div>TPM: {key.tpm_limit !== null ? key.tpm_limit : "Unlimited"}</div>
-            <div>RPM: {key.rpm_limit !== null ? key.rpm_limit : "Unlimited"}</div>
+            <div>TPM: {key.tpm_limit !== null ? key.tpm_limit : t("Unlimited")}</div>
+            <div>RPM: {key.rpm_limit !== null ? key.rpm_limit : t("Unlimited")}</div>
           </div>
         );
       },
@@ -457,7 +460,7 @@ export function AllKeysTable({
   const filterOptions: FilterOption[] = [
     {
       name: "Team ID",
-      label: "Team ID",
+      label: t("Team ID"),
       isSearchable: true,
       searchFn: async (searchText: string) => {
         if (!allTeams || allTeams.length === 0) return [];
@@ -476,7 +479,7 @@ export function AllKeysTable({
     },
     {
       name: "Organization ID",
-      label: "Organization ID",
+      label: t("Organization ID"),
       isSearchable: true,
       searchFn: async (searchText: string) => {
         if (!allOrganizations || allOrganizations.length === 0) return [];
@@ -488,14 +491,14 @@ export function AllKeysTable({
         return filteredOrgs
           .filter((org) => org.organization_id !== null && org.organization_id !== undefined)
           .map((org) => ({
-            label: `${org.organization_id || "Unknown"} (${org.organization_id})`,
+            label: `${org.organization_id || t("Unknown")} (${org.organization_id})`,
             value: org.organization_id as string,
           }));
       },
     },
     {
       name: "Key Alias",
-      label: "Key Alias",
+      label: t("Key Alias"),
       isSearchable: true,
       searchFn: async (searchText) => {
         const filteredKeyAliases = allKeyAliases.filter((key) => {
@@ -512,12 +515,12 @@ export function AllKeysTable({
     },
     {
       name: "User ID",
-      label: "User ID",
+      label: t("User ID"),
       isSearchable: false,
     },
     {
       name: "Key Hash",
-      label: "Key Hash",
+      label: t("Key Hash"),
       isSearchable: false,
     },
   ];
@@ -607,16 +610,16 @@ export function AllKeysTable({
 
           <div className="flex items-center justify-between w-full mb-4">
             <span className="inline-flex text-sm text-gray-700">
-              Showing{" "}
+              {t("Showing")}{" "}
               {isLoading
                 ? "..."
                 : `${(pagination.currentPage - 1) * pageSize + 1} - ${Math.min(pagination.currentPage * pageSize, pagination.totalCount)}`}{" "}
-              of {isLoading ? "..." : pagination.totalCount} results
+              {t("of")} {isLoading ? "..." : pagination.totalCount} {t("results")}
             </span>
 
             <div className="inline-flex items-center gap-2">
               <span className="text-sm text-gray-700">
-                Page {isLoading ? "..." : pagination.currentPage} of {isLoading ? "..." : pagination.totalPages}
+                {t("Page")} {isLoading ? "..." : pagination.currentPage} {t("of")} {isLoading ? "..." : pagination.totalPages}
               </span>
 
               <button
@@ -624,7 +627,7 @@ export function AllKeysTable({
                 disabled={isLoading || pagination.currentPage === 1}
                 className="px-3 py-1 text-sm border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Previous
+                {t("Previous")}
               </button>
 
               <button
@@ -632,7 +635,7 @@ export function AllKeysTable({
                 disabled={isLoading || pagination.currentPage === pagination.totalPages}
                 className="px-3 py-1 text-sm border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Next
+                {t("Next")}
               </button>
             </div>
           </div>
@@ -646,11 +649,10 @@ export function AllKeysTable({
                         {headerGroup.headers.map((header) => (
                           <TableHeaderCell
                             key={header.id}
-                            className={`py-1 h-8 ${
-                              header.id === "actions"
-                                ? "sticky right-0 bg-white shadow-[-4px_0_8px_-6px_rgba(0,0,0,0.1)]"
-                                : ""
-                            }`}
+                            className={`py-1 h-8 ${header.id === "actions"
+                              ? "sticky right-0 bg-white shadow-[-4px_0_8px_-6px_rgba(0,0,0,0.1)]"
+                              : ""
+                              }`}
                             onClick={header.column.getToggleSortingHandler()}
                           >
                             <div className="flex items-center justify-between gap-2">
@@ -682,7 +684,7 @@ export function AllKeysTable({
                       <TableRow>
                         <TableCell colSpan={columns.length} className="h-8 text-center">
                           <div className="text-center text-gray-500">
-                            <p>🚅 Loading keys...</p>
+                            <p>🚅 {t("Loading keys...")}</p>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -708,7 +710,7 @@ export function AllKeysTable({
                       <TableRow>
                         <TableCell colSpan={columns.length} className="h-8 text-center">
                           <div className="text-center text-gray-500">
-                            <p>No keys found</p>
+                            <p>{t("No keys found")}</p>
                           </div>
                         </TableCell>
                       </TableRow>
