@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { Col, Grid, Text } from "@tremor/react";
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslate } from "@/i18n";
 
 import { handleAddModelSubmit } from "@/components/add_model/handle_add_model_submit";
 
@@ -160,6 +161,8 @@ const ModelsAndEndpointsView: React.FC<ModelDashboardProps> = ({
   const { data: credentialsResponse } = useCredentials(accessToken);
   const credentialsList = credentialsResponse?.credentials || [];
   const { data: uiSettings } = useUISettings(accessToken || "");
+
+  const t = useTranslate();
 
   const isInternalUser = userRole && internalUserRoles.includes(userRole);
   const shouldHideAddModelTab = isInternalUser && uiSettings?.values?.disable_model_add_for_internal_users === true;
@@ -489,8 +492,8 @@ const ModelsAndEndpointsView: React.FC<ModelDashboardProps> = ({
     const { Title, Paragraph } = Typography;
     return (
       <div>
-        <Title level={1}>Access Denied</Title>
-        <Paragraph>Ask your proxy admin for access to view all models</Paragraph>
+        <Title level={1}>{t("Access Denied")}</Title>
+        <Paragraph>{t("Ask your proxy admin for access to view all models")}</Paragraph>
       </div>
     );
   }
@@ -578,11 +581,11 @@ const ModelsAndEndpointsView: React.FC<ModelDashboardProps> = ({
           {/* Model Management Header */}
           <div className="flex justify-between items-center mb-4">
             <div>
-              <h2 className="text-lg font-semibold">Model Management</h2>
+              <h2 className="text-lg font-semibold">{t("Model Management")}</h2>
               {!all_admin_roles.includes(userRole) ? (
-                <p className="text-sm text-gray-600">Add models for teams you are an admin for.</p>
+                <p className="text-sm text-gray-600">{t("Add models for teams you are an admin for.")}</p>
               ) : (
-                <p className="text-sm text-gray-600">Add and manage models for the proxy</p>
+                <p className="text-sm text-gray-600">{t("Add and manage models for the proxy")}</p>
               )}
             </div>
           </div>
@@ -628,19 +631,19 @@ const ModelsAndEndpointsView: React.FC<ModelDashboardProps> = ({
             <TabGroup index={selectedTabIndex} onIndexChange={setSelectedTabIndex} className="gap-2 h-[75vh] w-full ">
               <TabList className="flex justify-between mt-2 w-full items-center">
                 <div className="flex">
-                  {all_admin_roles.includes(userRole) ? <Tab>All Models</Tab> : <Tab>Your Models</Tab>}
-                  {!shouldHideAddModelTab && <Tab>Add Model</Tab>}
-                  {all_admin_roles.includes(userRole) && <Tab>LLM Credentials</Tab>}
-                  {all_admin_roles.includes(userRole) && <Tab>Pass-Through Endpoints</Tab>}
-                  {all_admin_roles.includes(userRole) && <Tab>Health Status</Tab>}
-                  {all_admin_roles.includes(userRole) && <Tab>Model Analytics</Tab>}
-                  {all_admin_roles.includes(userRole) && <Tab>Model Retry Settings</Tab>}
-                  {all_admin_roles.includes(userRole) && <Tab>Model Group Alias</Tab>}
-                  {all_admin_roles.includes(userRole) && <Tab>Price Data Reload</Tab>}
+                  {all_admin_roles.includes(userRole) ? <Tab>{t("All Models")}</Tab> : <Tab>{t("Your Models")}</Tab>}
+                  {!shouldHideAddModelTab && <Tab>{t("Add Model")}</Tab>}
+                  {all_admin_roles.includes(userRole) && <Tab>{t("LLM Credentials")}</Tab>}
+                  {all_admin_roles.includes(userRole) && <Tab>{t("Pass-Through Endpoints")}</Tab>}
+                  {all_admin_roles.includes(userRole) && <Tab>{t("Health Status")}</Tab>}
+                  {all_admin_roles.includes(userRole) && <Tab>{t("Model Analytics")}</Tab>}
+                  {all_admin_roles.includes(userRole) && <Tab>{t("Model Retry Settings")}</Tab>}
+                  {all_admin_roles.includes(userRole) && <Tab>{t("Model Group Alias")}</Tab>}
+                  {all_admin_roles.includes(userRole) && <Tab>{t("Price Data Reload")}</Tab>}
                 </div>
 
                 <div className="flex items-center space-x-2">
-                  {lastRefreshed && <Text>Last Refreshed: {lastRefreshed}</Text>}
+                  {lastRefreshed && <Text>{t("Last Refreshed:")} {lastRefreshed}</Text>}
                   <Icon
                     icon={RefreshIcon} // Modify as necessary for correct icon name
                     variant="shadow"

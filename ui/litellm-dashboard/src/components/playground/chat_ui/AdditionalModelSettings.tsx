@@ -1,3 +1,4 @@
+import { useTranslate } from "@/i18n";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { Text } from "@tremor/react";
 import { Checkbox, InputNumber, Slider, Tooltip } from "antd";
@@ -20,6 +21,7 @@ const AdditionalModelSettings: React.FC<AdditionalModelSettingsProps> = ({
   onMaxTokensChange,
   onUseAdvancedParamsChange,
 }) => {
+  const t = useTranslate();
   const [internalUseAdvancedParams, setInternalUseAdvancedParams] = useState(false);
   const useAdvancedParams =
     externalUseAdvancedParams !== undefined ? externalUseAdvancedParams : internalUseAdvancedParams;
@@ -61,15 +63,15 @@ const AdditionalModelSettings: React.FC<AdditionalModelSettingsProps> = ({
   return (
     <div className="space-y-4 p-4 w-80">
       <Checkbox checked={useAdvancedParams} onChange={(e) => handleUseAdvancedParamsChange(e.target.checked)}>
-        <span className="font-medium">Use Advanced Parameters</span>
+        <span className="font-medium">{t("Use Advanced Parameters")}</span>
       </Checkbox>
 
       <div className="space-y-4 transition-opacity duration-200" style={{ opacity: disabledOpacity }}>
         <div>
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-1">
-              <Text className={`text-sm ${disabledTextColor}`}>Temperature</Text>
-              <Tooltip title="Controls randomness. Lower values make output more deterministic, higher values more creative.">
+              <Text className={`text-sm ${disabledTextColor}`}>{t("Temperature")}</Text>
+              <Tooltip title={t("Controls randomness. Lower values make output more deterministic, higher values more creative.")}>
                 <InfoCircleOutlined className={`text-xs ${disabledTextColor} cursor-help`} />
               </Tooltip>
             </div>
@@ -102,8 +104,8 @@ const AdditionalModelSettings: React.FC<AdditionalModelSettingsProps> = ({
         <div>
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-1">
-              <Text className={`text-sm ${disabledTextColor}`}>Max Tokens</Text>
-              <Tooltip title="Maximum number of tokens to generate in the response.">
+              <Text className={`text-sm ${disabledTextColor}`}>{t("Max Tokens")}</Text>
+              <Tooltip title={t("Maximum number of tokens to generate in the response.")}>
                 <InfoCircleOutlined className={`text-xs ${disabledTextColor} cursor-help`} />
               </Tooltip>
             </div>

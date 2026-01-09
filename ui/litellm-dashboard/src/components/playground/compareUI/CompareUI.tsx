@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslate } from "@/i18n";
+
 import NotificationsManager from "@/components/molecules/notifications_manager";
 import { ClearOutlined, DeleteOutlined, FilePdfOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Input, Select, Tooltip } from "antd";
@@ -53,6 +55,14 @@ const GENERIC_FOLLOW_UPS = [
 const SUGGESTED_PROMPTS = ["Write me a poem", "Explain quantum computing", "Draft a polite email requesting a meeting"];
 const DEFAULT_ENDPOINT = EndpointId.CHAT_COMPLETIONS;
 export default function CompareUI({ accessToken, disabledPersonalKeyCreation }: CompareUIProps) {
+  const t = useTranslate();
+  const GENERIC_FOLLOW_UPS = [
+    t("Can you summarize the key points?"),
+    t("What assumptions did you make?"),
+    t("What are the next steps?"),
+  ];
+  const SUGGESTED_PROMPTS = [t("Write me a poem"), t("Explain quantum computing"), t("Draft a polite email requesting a meeting")];
+
   const [comparisons, setComparisons] = useState<ComparisonInstance[]>([
     {
       id: "1",
@@ -90,7 +100,7 @@ export default function CompareUI({ accessToken, disabledPersonalKeyCreation }: 
   const [isLoadingModels, setIsLoadingModels] = useState(false);
   const [isLoadingAgents, setIsLoadingAgents] = useState(false);
   const [selectedEndpoint, setSelectedEndpoint] = useState<EndpointIdType>(DEFAULT_ENDPOINT);
-  
+
   // Derived state from endpoint config
   const endpointConfig = getEndpointConfig(selectedEndpoint);
   const isA2AMode = isAgentEndpoint(selectedEndpoint);
@@ -206,8 +216,8 @@ export default function CompareUI({ accessToken, disabledPersonalKeyCreation }: 
           ...(comparison.model
             ? {}
             : {
-                model: modelOptions[index % modelOptions.length] ?? "",
-              }),
+              model: modelOptions[index % modelOptions.length] ?? "",
+            }),
         };
       }),
     );
@@ -278,9 +288,9 @@ export default function CompareUI({ accessToken, disabledPersonalKeyCreation }: 
       return prev.map((comparison) =>
         comparison.id === id
           ? {
-              ...comparison,
-              ...updates,
-            }
+            ...comparison,
+            ...updates,
+          }
           : comparison,
       );
     });
@@ -482,7 +492,7 @@ export default function CompareUI({ accessToken, disabledPersonalKeyCreation }: 
       return;
     }
     if (!effectiveApiKey) {
-      NotificationsManager.fromBackend("Please provide a Virtual Key or select Current UI Session");
+      NotificationsManager.fromBackend(t("Please provide a Virtual Key or select Current UI Session"));
       return;
     }
     const targetComparisons = comparisons;
@@ -576,49 +586,49 @@ export default function CompareUI({ accessToken, disabledPersonalKeyCreation }: 
       // Use A2A or chat completion based on endpoint
       const requestPromise = isA2AMode
         ? makeA2AStreamMessageRequest(
-            prepared.agent,
-            prepared.inputMessage,
-            (text, model) => {
-              // A2A sends full accumulated text, so replace instead of append
-              setComparisons((prev) =>
-                prev.map((c) => {
-                  if (c.id !== prepared.id) return c;
-                  const messages = [...c.messages];
-                  const last = messages[messages.length - 1];
-                  if (last && last.role === "assistant") {
-                    messages[messages.length - 1] = { ...last, content: text, model: last.model ?? model };
-                  } else {
-                    messages.push({ role: "assistant", content: text, model });
-                  }
-                  return { ...c, messages };
-                }),
-              );
-            },
-            effectiveApiKey,
-            undefined,
-            (time) => updateTimingDataForComparison(prepared.id, time),
-            (latency) => updateTotalLatencyForComparison(prepared.id, latency),
-          )
+          prepared.agent,
+          prepared.inputMessage,
+          (text, model) => {
+            // A2A sends full accumulated text, so replace instead of append
+            setComparisons((prev) =>
+              prev.map((c) => {
+                if (c.id !== prepared.id) return c;
+                const messages = [...c.messages];
+                const last = messages[messages.length - 1];
+                if (last && last.role === "assistant") {
+                  messages[messages.length - 1] = { ...last, content: text, model: last.model ?? model };
+                } else {
+                  messages.push({ role: "assistant", content: text, model });
+                }
+                return { ...c, messages };
+              }),
+            );
+          },
+          effectiveApiKey,
+          undefined,
+          (time) => updateTimingDataForComparison(prepared.id, time),
+          (latency) => updateTotalLatencyForComparison(prepared.id, latency),
+        )
         : makeOpenAIChatCompletionRequest(
-            prepared.apiChatHistory,
-            (chunk, model) => appendAssistantChunk(prepared.id, chunk, model),
-            prepared.model,
-            effectiveApiKey,
-            tags,
-            undefined,
-            (content) => appendReasoningContent(prepared.id, content),
-            (time) => updateTimingDataForComparison(prepared.id, time),
-            (usage) => updateUsageDataForComparison(prepared.id, usage),
-            prepared.traceId,
-            vectorStoreIds,
-            guardrails,
-            undefined,
-            undefined,
-            (searchResults) => updateSearchResultsForComparison(prepared.id, searchResults),
-            useAdvancedParams ? prepared.temperature : undefined,
-            useAdvancedParams ? prepared.maxTokens : undefined,
-            (latency) => updateTotalLatencyForComparison(prepared.id, latency),
-          );
+          prepared.apiChatHistory,
+          (chunk, model) => appendAssistantChunk(prepared.id, chunk, model),
+          prepared.model,
+          effectiveApiKey,
+          tags,
+          undefined,
+          (content) => appendReasoningContent(prepared.id, content),
+          (time) => updateTimingDataForComparison(prepared.id, time),
+          (usage) => updateUsageDataForComparison(prepared.id, usage),
+          prepared.traceId,
+          vectorStoreIds,
+          guardrails,
+          undefined,
+          undefined,
+          (searchResults) => updateSearchResultsForComparison(prepared.id, searchResults),
+          useAdvancedParams ? prepared.temperature : undefined,
+          useAdvancedParams ? prepared.maxTokens : undefined,
+          (latency) => updateTotalLatencyForComparison(prepared.id, latency),
+        );
 
       requestPromise
         .catch((error) => {
@@ -638,13 +648,13 @@ export default function CompareUI({ accessToken, disabledPersonalKeyCreation }: 
                 messages[messages.length - 1] = {
                   ...last,
                   content: assistantContent
-                    ? `${assistantContent}\nError fetching response: ${errorMessage}`
-                    : `Error fetching response: ${errorMessage}`,
+                    ? `${assistantContent}\n${t("Error fetching response: ")}${errorMessage}`
+                    : `${t("Error fetching response: ")}${errorMessage}`,
                 };
               } else {
                 messages.push({
                   role: "assistant",
-                  content: `Error fetching response: ${errorMessage}`,
+                  content: `${t("Error fetching response: ")}${errorMessage}`,
                 });
               }
               return {
@@ -659,9 +669,9 @@ export default function CompareUI({ accessToken, disabledPersonalKeyCreation }: 
             prev.map((comparison) =>
               comparison.id === prepared.id
                 ? {
-                    ...comparison,
-                    isLoading: false,
-                  }
+                  ...comparison,
+                  isLoading: false,
+                }
                 : comparison,
             ),
           );
@@ -688,7 +698,7 @@ export default function CompareUI({ accessToken, disabledPersonalKeyCreation }: 
         <div className="border-b px-4 py-2">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-gray-600">Virtual Key Source</span>
+              <span className="text-sm font-medium text-gray-600">{t("Virtual Key Source")}</span>
               <Select
                 value={apiKeySource}
                 onChange={(value) => setApiKeySource(value as "session" | "custom")}
@@ -696,29 +706,29 @@ export default function CompareUI({ accessToken, disabledPersonalKeyCreation }: 
                 className="w-48"
               >
                 <Select.Option value="session" disabled={!canUseSessionKey}>
-                  Current UI Session
+                  {t("Current UI Session")}
                 </Select.Option>
-                <Select.Option value="custom">Virtual Key</Select.Option>
+                <Select.Option value="custom">{t("Virtual Key")}</Select.Option>
               </Select>
               {apiKeySource === "custom" && (
                 <Input.Password
                   value={customApiKey}
                   onChange={(event) => setCustomApiKey(event.target.value)}
-                  placeholder="Enter Virtual Key"
+                  placeholder={t("Enter Virtual Key")}
                   className="w-56"
                 />
               )}
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-gray-600">Endpoint</span>
-              <Select 
-                value={selectedEndpoint} 
+              <span className="text-sm font-medium text-gray-600">{t("Endpoint")}</span>
+              <Select
+                value={selectedEndpoint}
                 onChange={(value) => setSelectedEndpoint(value as EndpointIdType)}
                 className="w-56"
               >
                 {getAvailableEndpoints().map((endpoint) => (
-                  <Select.Option 
-                    key={endpoint.value} 
+                  <Select.Option
+                    key={endpoint.value}
                     value={endpoint.value}
                   >
                     {endpoint.label}
@@ -728,15 +738,15 @@ export default function CompareUI({ accessToken, disabledPersonalKeyCreation }: 
             </div>
             <div className="flex items-center gap-3">
               <Button onClick={clearAllChats} disabled={!hasMessages} icon={<ClearOutlined />}>
-                Clear All Chats
+                {t("Clear All Chats")}
               </Button>
               <Tooltip
                 title={
-                  comparisons.length >= maxComparisons ? "Compare up to 3 models at a time" : "Add another comparison"
+                  comparisons.length >= maxComparisons ? t("Compare up to 3 models at a time") : t("Add another comparison")
                 }
               >
                 <Button onClick={addComparison} disabled={comparisons.length >= maxComparisons} icon={<PlusOutlined />}>
-                  Add Comparison
+                  {t("Add Comparison")}
                 </Button>
               </Tooltip>
             </div>
@@ -768,7 +778,7 @@ export default function CompareUI({ accessToken, disabledPersonalKeyCreation }: 
             <div className="border border-gray-200 shadow-lg rounded-xl bg-white p-4">
               <div className="flex items-center justify-between gap-4 mb-3 min-h-8">
                 {hasAttachment ? (
-                  <span className="text-sm text-gray-500">Attachment ready to send</span>
+                  <span className="text-sm text-gray-500">{t("Attachment ready to send")}</span>
                 ) : showSuggestedPrompts ? (
                   <div className="flex items-center gap-2 overflow-x-auto">
                     {SUGGESTED_PROMPTS.map((prompt) => (

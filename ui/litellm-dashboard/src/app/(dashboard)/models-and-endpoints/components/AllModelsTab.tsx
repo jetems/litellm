@@ -7,6 +7,7 @@ import { getDisplayModelName } from "@/components/view_model/model_name_display"
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { PaginationState, Table as TableInstance } from "@tanstack/react-table";
 import { Grid, Select, SelectItem, TabPanel, Text } from "@tremor/react";
+import { useTranslate } from "@/i18n";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 type ModelViewMode = "all" | "current_team";
@@ -33,7 +34,9 @@ const AllModelsTab = ({
   modelData,
 }: AllModelsTabProps) => {
   const { userId, userRole, premiumUser } = useAuthorized();
+
   const { teams } = useTeams();
+  const t = useTranslate();
 
   const [modelNameSearch, setModelNameSearch] = useState<string>("");
   const [modelViewMode, setModelViewMode] = useState<ModelViewMode>("current_team");
@@ -116,7 +119,7 @@ const AllModelsTab = ({
             <div className="border-b px-6 py-4 bg-gray-50">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <Text className="text-lg font-semibold text-gray-900">Current Team:</Text>
+                  <Text className="text-lg font-semibold text-gray-900">{t("Current Team:")}</Text>
                   <Select
                     className="w-80"
                     defaultValue="personal"
@@ -133,7 +136,7 @@ const AllModelsTab = ({
                     <SelectItem value="personal">
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        <span className="font-medium">Personal</span>
+                        <span className="font-medium">{t("Personal")}</span>
                       </div>
                     </SelectItem>
                     {teams
@@ -154,7 +157,7 @@ const AllModelsTab = ({
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <Text className="text-lg font-semibold text-gray-900">View:</Text>
+                  <Text className="text-lg font-semibold text-gray-900">{t("View:")}</Text>
                   <Select
                     className="w-64"
                     defaultValue="current_team"
@@ -164,13 +167,13 @@ const AllModelsTab = ({
                     <SelectItem value="current_team">
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                        <span className="font-medium">Current Team Models</span>
+                        <span className="font-medium">{t("Current Team Models")}</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="all">
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
-                        <span className="font-medium">All Available Models</span>
+                        <span className="font-medium">{t("All Available Models")}</span>
                       </div>
                     </SelectItem>
                   </Select>
@@ -183,24 +186,23 @@ const AllModelsTab = ({
                   <div className="text-xs text-gray-500">
                     {currentTeam === "personal" ? (
                       <span>
-                        To access these models: Create a Virtual Key without selecting a team on the{" "}
+                        {t("To access these models: Create a Virtual Key without selecting a team on the")}{" "}
                         <a
                           href="/public?login=success&page=api-keys"
                           className="text-gray-600 hover:text-gray-800 underline"
                         >
-                          Virtual Keys page
+                          {t("Virtual Keys page")}
                         </a>
                       </span>
                     ) : (
                       <span>
-                        To access these models: Create a Virtual Key and select Team as &quot;
-                        {typeof currentTeam !== "string" ? currentTeam.team_alias || currentTeam.team_id : ""}&quot; on
-                        the{" "}
+                        {t("To access these models: Create a Virtual Key and select Team as")} &quot;
+                        {typeof currentTeam !== "string" ? currentTeam.team_alias || currentTeam.team_id : ""}&quot; {t("on the")}{" "}
                         <a
                           href="/public?login=success&page=api-keys"
                           className="text-gray-600 hover:text-gray-800 underline"
                         >
-                          Virtual Keys page
+                          {t("Virtual Keys page")}
                         </a>
                       </span>
                     )}
@@ -218,7 +220,7 @@ const AllModelsTab = ({
                   <div className="relative w-64">
                     <input
                       type="text"
-                      placeholder="Search model names..."
+                      placeholder={t("Search model names...")}
                       className="w-full px-3 py-2 pl-8 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       value={modelNameSearch}
                       onChange={(e) => setModelNameSearch(e.target.value)}
@@ -251,7 +253,7 @@ const AllModelsTab = ({
                         d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
                       />
                     </svg>
-                    Filters
+                    {t("Filters")}
                   </button>
 
                   {/* Reset Filters Button */}
@@ -267,7 +269,7 @@ const AllModelsTab = ({
                         d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                       />
                     </svg>
-                    Reset Filters
+                    {t("Reset Filters")}
                   </button>
                 </div>
 
@@ -279,10 +281,10 @@ const AllModelsTab = ({
                       <Select
                         value={selectedModelGroup ?? "all"}
                         onValueChange={(value) => setSelectedModelGroup(value === "all" ? "all" : value)}
-                        placeholder="Filter by Public Model Name"
+                        placeholder={t("Filter by Public Model Name")}
                       >
-                        <SelectItem value="all">All Models</SelectItem>
-                        <SelectItem value="wildcard">Wildcard Models (*)</SelectItem>
+                        <SelectItem value="all">{t("All Models")}</SelectItem>
+                        <SelectItem value="wildcard">{t("Wildcard Models (*)")}</SelectItem>
                         {availableModelGroups.map((group, idx) => (
                           <SelectItem key={idx} value={group}>
                             {group}
@@ -296,9 +298,9 @@ const AllModelsTab = ({
                       <Select
                         value={selectedModelAccessGroupFilter ?? "all"}
                         onValueChange={(value) => setSelectedModelAccessGroupFilter(value === "all" ? null : value)}
-                        placeholder="Filter by Model Access Group"
+                        placeholder={t("Filter by Model Access Group")}
                       >
-                        <SelectItem value="all">All Model Access Groups</SelectItem>
+                        <SelectItem value="all">{t("All Model Access Groups")}</SelectItem>
                         {availableModelAccessGroups.map((accessGroup, idx) => (
                           <SelectItem key={idx} value={accessGroup}>
                             {accessGroup}
@@ -313,11 +315,11 @@ const AllModelsTab = ({
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-700">
                     {filteredData.length > 0
-                      ? `Showing ${pagination.pageIndex * pagination.pageSize + 1} - ${Math.min(
-                          (pagination.pageIndex + 1) * pagination.pageSize,
-                          filteredData.length,
-                        )} of ${filteredData.length} results`
-                      : "Showing 0 results"}
+                      ? `${t("Showing")} ${pagination.pageIndex * pagination.pageSize + 1} - ${Math.min(
+                        (pagination.pageIndex + 1) * pagination.pageSize,
+                        filteredData.length,
+                      )} ${t("of")} ${filteredData.length} ${t("results")}`
+                      : t("Showing 0 results")}
                   </span>
 
                   {/* Pagination Controls */}
@@ -328,13 +330,12 @@ const AllModelsTab = ({
                           setPagination((prev: PaginationState) => ({ ...prev, pageIndex: prev.pageIndex - 1 }))
                         }
                         disabled={pagination.pageIndex === 0}
-                        className={`px-3 py-1 text-sm border rounded-md ${
-                          pagination.pageIndex === 0
-                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                            : "hover:bg-gray-50"
-                        }`}
+                        className={`px-3 py-1 text-sm border rounded-md ${pagination.pageIndex === 0
+                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                          : "hover:bg-gray-50"
+                          }`}
                       >
-                        Previous
+                        {t("Previous")}
                       </button>
 
                       <button
@@ -342,13 +343,12 @@ const AllModelsTab = ({
                           setPagination((prev: PaginationState) => ({ ...prev, pageIndex: prev.pageIndex + 1 }))
                         }
                         disabled={pagination.pageIndex >= Math.ceil(filteredData.length / pagination.pageSize) - 1}
-                        className={`px-3 py-1 text-sm border rounded-md ${
-                          pagination.pageIndex >= Math.ceil(filteredData.length / pagination.pageSize) - 1
-                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                            : "hover:bg-gray-50"
-                        }`}
+                        className={`px-3 py-1 text-sm border rounded-md ${pagination.pageIndex >= Math.ceil(filteredData.length / pagination.pageSize) - 1
+                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                          : "hover:bg-gray-50"
+                          }`}
                       >
-                        Next
+                        {t("Next")}
                       </button>
                     </div>
                   )}
@@ -364,11 +364,12 @@ const AllModelsTab = ({
                 setSelectedModelId,
                 setSelectedTeamId,
                 getDisplayModelName,
-                () => {},
-                () => {},
+                () => { },
+                () => { },
                 setEditModel,
                 expandedRows,
                 setExpandedRows,
+                t
               )}
               data={paginatedData}
               isLoading={false}

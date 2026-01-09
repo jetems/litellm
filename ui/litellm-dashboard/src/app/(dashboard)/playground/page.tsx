@@ -12,9 +12,12 @@ interface ProxySettings {
   LITELLM_UI_API_DOC_BASE_URL?: string | null;
 }
 
+import { useTranslate } from "@/i18n";
+
 export default function PlaygroundPage() {
   const { accessToken, userRole, userId, disabledPersonalKeyCreation, token } = useAuthorized();
   const [proxySettings, setProxySettings] = useState<ProxySettings | undefined>(undefined);
+  const t = useTranslate();
 
   useEffect(() => {
     const initializeProxySettings = async () => {
@@ -35,8 +38,8 @@ export default function PlaygroundPage() {
   return (
     <TabGroup className="h-full w-full">
       <TabList className="mb-0">
-        <Tab>Chat</Tab>
-        <Tab>Compare</Tab>
+        <Tab>{t("Chat")}</Tab>
+        <Tab>{t("Compare")}</Tab>
       </TabList>
       <TabPanels className="h-full">
         <TabPanel className="h-full">
