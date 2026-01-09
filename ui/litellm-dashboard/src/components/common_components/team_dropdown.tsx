@@ -1,6 +1,7 @@
 import React from "react";
 import { Select } from "antd";
 import { Team } from "../key_team_helpers/key_list";
+import { useTranslate } from "@/i18n";
 
 interface TeamDropdownProps {
   teams?: Team[] | null;
@@ -10,11 +11,12 @@ interface TeamDropdownProps {
 }
 
 const TeamDropdown: React.FC<TeamDropdownProps> = ({ teams, value, onChange, disabled }) => {
+  const t = useTranslate();
   console.log("disabled", disabled);
   return (
     <Select
       showSearch
-      placeholder="Search or select a team"
+      placeholder={t("Search or select a team")}
       value={value}
       onChange={onChange}
       disabled={disabled}
@@ -32,6 +34,7 @@ const TeamDropdown: React.FC<TeamDropdownProps> = ({ teams, value, onChange, dis
         return teamAlias.includes(searchTerm) || teamId.includes(searchTerm);
       }}
       optionFilterProp="children"
+      notFoundContent={t("No data")}
     >
       {teams?.map((team) => (
         <Select.Option key={team.team_id} value={team.team_id}>
@@ -43,3 +46,4 @@ const TeamDropdown: React.FC<TeamDropdownProps> = ({ teams, value, onChange, dis
 };
 
 export default TeamDropdown;
+

@@ -1,5 +1,6 @@
 import React from "react";
 import { NumberInput } from "@tremor/react";
+import { useTranslate } from "@/i18n";
 
 interface NumericalInputProps {
   step?: number;
@@ -16,7 +17,7 @@ interface NumericalInputProps {
  * @param {Object} props - Component props
  * @param {number} [props.step=0.01] - Step increment for the input
  * @param {Object} [props.style] - Custom styles to apply
- * @param {string} [props.placeholder="Enter a numerical value"] - Placeholder text
+ * @param {string} [props.placeholder] - Placeholder text
  * @param {number} [props.min] - Minimum value
  * @param {number} [props.max] - Maximum value
  * @param {Function} [props.onChange] - On change handler
@@ -25,18 +26,21 @@ interface NumericalInputProps {
 const NumericalInput: React.FC<NumericalInputProps> = ({
   step = 0.01,
   style = { width: "100%" },
-  placeholder = "Enter a numerical value",
+  placeholder,
   min,
   max,
   onChange,
   ...rest
 }) => {
+  const t = useTranslate();
+  const defaultPlaceholder = t("Enter a numerical value");
+
   return (
     <NumberInput
       onWheel={(event) => event.currentTarget.blur()}
       step={step}
       style={style}
-      placeholder={placeholder}
+      placeholder={placeholder || defaultPlaceholder}
       min={min}
       max={max}
       onChange={onChange}
@@ -46,3 +50,4 @@ const NumericalInput: React.FC<NumericalInputProps> = ({
 };
 
 export default NumericalInput;
+

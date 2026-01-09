@@ -647,7 +647,7 @@ const CreateKey: React.FC<CreateKeyProps> = ({
                     message: userRole === "you" ? t("Please input a key name") : t("Please input a service account ID"),
                   },
                 ]}
-                help="required"
+                help={t("required")}
               >
                 <TextInput placeholder="" />
               </Form.Item>
@@ -670,7 +670,7 @@ const CreateKey: React.FC<CreateKeyProps> = ({
                 help={
                   keyType === "management" || keyType === "read_only"
                     ? t("Models field is disabled for this key type")
-                    : "required"
+                    : t("required")
                 }
                 className="mt-4"
               >
@@ -770,13 +770,13 @@ const CreateKey: React.FC<CreateKeyProps> = ({
                       </span>
                     }
                     name="max_budget"
-                    help={`${t("Budget cannot exceed team max budget")}: $${team?.max_budget !== null && team?.max_budget !== undefined ? team?.max_budget : "unlimited"}`}
+                    help={`${t("Budget cannot exceed team max budget")}: ${team?.max_budget !== null && team?.max_budget !== undefined ? team?.max_budget : t("unlimited")}`}
                     rules={[
                       {
                         validator: async (_, value) => {
                           if (value && team && team.max_budget !== null && value > team.max_budget) {
                             throw new Error(
-                              `${t("Budget cannot exceed team max budget")}: $${formatNumberWithCommas(team.max_budget, 4)}`,
+                              `${t("Budget cannot exceed team max budget")}: ${formatNumberWithCommas(team.max_budget, 4)}`,
                             );
                           }
                         },
@@ -796,7 +796,7 @@ const CreateKey: React.FC<CreateKeyProps> = ({
                       </span>
                     }
                     name="budget_duration"
-                    help={`${t("Team Reset Budget")}: ${team?.budget_duration !== null && team?.budget_duration !== undefined ? team?.budget_duration : "None"}`}
+                    help={`${t("Team Reset Budget")}: ${team?.budget_duration !== null && team?.budget_duration !== undefined ? team?.budget_duration : t("None")}`}
                   >
                     <BudgetDurationDropdown onChange={(value) => form.setFieldValue("budget_duration", value)} />
                   </Form.Item>
@@ -811,7 +811,7 @@ const CreateKey: React.FC<CreateKeyProps> = ({
                       </span>
                     }
                     name="tpm_limit"
-                    help={`TPM cannot exceed team TPM limit: ${team?.tpm_limit !== null && team?.tpm_limit !== undefined ? team?.tpm_limit : "unlimited"}`}
+                    help={`${t("TPM cannot exceed team TPM limit")}: ${team?.tpm_limit !== null && team?.tpm_limit !== undefined ? team?.tpm_limit : t("unlimited")}`}
                     rules={[
                       {
                         validator: async (_, value) => {
@@ -843,7 +843,7 @@ const CreateKey: React.FC<CreateKeyProps> = ({
                       </span>
                     }
                     name="rpm_limit"
-                    help={`RPM cannot exceed team RPM limit: ${team?.rpm_limit !== null && team?.rpm_limit !== undefined ? team?.rpm_limit : "unlimited"}`}
+                    help={`${t("RPM cannot exceed team RPM limit")}: ${team?.rpm_limit !== null && team?.rpm_limit !== undefined ? team?.rpm_limit : t("unlimited")}`}
                     rules={[
                       {
                         validator: async (_, value) => {
@@ -1277,6 +1277,42 @@ const CreateKey: React.FC<CreateKeyProps> = ({
                           "tpm_limit",
                           "rpm_limit",
                         ]}
+                        overrideLabels={{
+                          spend: t("Spend"),
+                          user_id: t("User Id"),
+                          max_parallel_requests: t("Max Parallel Requests"),
+                          allowed_cache_controls: t("Allowed Cache Controls"),
+                          config: t("Config"),
+                          permissions: t("Permissions"),
+                          model_max_budget: t("Model Max Budget"),
+                          model_rpm_limit: t("Model Rpm Limit"),
+                          model_tpm_limit: t("Model Tpm Limit"),
+                          prompts: t("Prompts"),
+                          blocked: t("Blocked"),
+                          aliases: t("Aliases"),
+                          soft_budget: t("Soft Budget"),
+                          default_model: t("Default Model"),
+                          key_max_budget: t("Key Max Budget"),
+                          object_permission: t("Object Permission"),
+                          key: t("Key"),
+                          budget_id: t("Budget Id"),
+                          enforced_params: t("Enforced Params"),
+                          allowed_routes: t("Allowed Routes"),
+                          allowed_passthrough_routes: t("Allowed Passthrough Routes"),
+                          allowed_vector_store_indexes: t("Allowed Vector Store Indexes"),
+                          rpm_limit_type: t("Rpm Limit Type"),
+                          tpm_limit_type: t("Tpm Limit Type"),
+                          send_invite_email: t("Send Invite Email"),
+                          key_type: t("Key Type"),
+                          auto_rotate: t("Auto Rotate"),
+                          rotation_interval: t("Rotation Interval"),
+                          organization_id: t("Organization Id"),
+                        }}
+                        overrideTooltips={{
+                          auto_rotate: t("Whether this key should be automatically rotated"),
+                          rotation_interval: t("How often to rotate this key (e.g., '30d', '90d'). Required if auto_rotate=True"),
+                          key_type: t("default"),
+                        }}
                       />
                     </AccordionBody>
                   </Accordion>

@@ -1,5 +1,6 @@
 import React from "react";
 import { Select } from "antd";
+import { useTranslate } from "@/i18n";
 
 const { Option } = Select;
 
@@ -16,6 +17,7 @@ const BudgetDurationDropdown: React.FC<BudgetDurationDropdownProps> = ({
   className = "",
   style = {},
 }) => {
+  const t = useTranslate();
   return (
     <Select
       style={{ width: "100%", ...style }}
@@ -24,9 +26,9 @@ const BudgetDurationDropdown: React.FC<BudgetDurationDropdownProps> = ({
       className={className}
       placeholder="n/a"
     >
-      <Option value="24h">daily</Option>
-      <Option value="7d">weekly</Option>
-      <Option value="30d">monthly</Option>
+      <Option value="24h">{t("daily")}</Option>
+      <Option value="7d">{t("weekly")}</Option>
+      <Option value="30d">{t("monthly")}</Option>
     </Select>
   );
 };
@@ -44,3 +46,4 @@ export const getBudgetDurationLabel = (value: string | null | undefined): string
 };
 
 export default BudgetDurationDropdown;
+

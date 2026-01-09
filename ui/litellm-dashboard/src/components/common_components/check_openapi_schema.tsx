@@ -5,6 +5,7 @@ import { InfoCircleOutlined } from "@ant-design/icons";
 import { Tooltip } from "antd";
 import { getOpenAPISchema } from "../networking";
 import { formatLabel } from "@/utils/textUtils";
+import { useTranslate } from "@/i18n";
 
 interface SchemaProperty {
   type?: string;
@@ -53,49 +54,6 @@ const validateJSON = (value: string): boolean => {
   }
 };
 
-const getFieldHelp = (key: string, property: SchemaProperty, type: string): string => {
-  // Default help text based on type
-  const defaultHelp =
-    {
-      string: "Text input",
-      number: "Numeric input",
-      integer: "Whole number input",
-      boolean: "True/False value",
-    }[type] || "Text input";
-
-  // Specific field help text
-  const specificHelp: { [key: string]: string } = {
-    max_budget: "Enter maximum budget in USD (e.g., 100.50)",
-    budget_duration: "Select a time period for budget reset",
-    tpm_limit: "Enter maximum tokens per minute (whole number)",
-    rpm_limit: "Enter maximum requests per minute (whole number)",
-    duration: "Enter duration (e.g., 30s, 24h, 7d)",
-    metadata: 'Enter JSON object with key-value pairs\nExample: {"team": "research", "project": "nlp"}',
-    config: 'Enter configuration as JSON object\nExample: {"setting": "value"}',
-    permissions: "Enter comma-separated permission strings",
-    enforced_params: 'Enter parameters as JSON object\nExample: {"param": "value"}',
-    blocked: "Enter true/false or specific block conditions",
-    aliases: 'Enter aliases as JSON object\nExample: {"alias1": "value1", "alias2": "value2"}',
-    models: "Select one or more model names",
-    key_alias: "Enter a unique identifier for this key",
-    tags: "Enter comma-separated tag strings",
-  };
-
-  // Get specific help text or use default based on type
-  const helpText = specificHelp[key] || defaultHelp;
-
-  // Add format requirements for special cases
-  if (isJSONField(key, property)) {
-    return `${helpText}\nMust be valid JSON format`;
-  }
-
-  if (property.enum) {
-    return `Select from available options\nAllowed values: ${property.enum.join(", ")}`;
-  }
-
-  return helpText;
-};
-
 const SchemaFormFields: React.FC<SchemaFormFieldsProps> = ({
   schemaComponent,
   excludedFields = [],
@@ -105,8 +63,52 @@ const SchemaFormFields: React.FC<SchemaFormFieldsProps> = ({
   customValidation = {},
   defaultValues = {},
 }) => {
+  const t = useTranslate();
   const [schemaProperties, setSchemaProperties] = useState<OpenAPISchema | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const getFieldHelp = (key: string, property: SchemaProperty, type: string): string => {
+    // Default help text based on type
+    const defaultHelp =
+      {
+        string: t("Text input"),
+        number: t("Numeric input"),
+        integer: t("Whole number input"),
+        boolean: t("True/False value"),
+      }[type] || t("Text input");
+
+    // Specific field help text
+    const specificHelp: { [key: string]: string } = {
+      max_budget: t("Enter maximum budget in USD (e.g., 100.50)"),
+      budget_duration: t("Select a time period for budget reset"),
+      tpm_limit: t("Enter maximum tokens per minute (whole number)"),
+      rpm_limit: t("Enter maximum requests per minute (whole number)"),
+      duration: t("Enter duration (e.g., 30s, 24h, 7d)"),
+      metadata: t("Enter JSON object with key-value pairs") + '\n' + t("Example") + ': {"team": "research", "project": "nlp"}',
+      config: t("Enter configuration as JSON object") + '\n' + t("Example") + ': {"setting": "value"}',
+      permissions: t("Enter comma-separated permission strings"),
+      enforced_params: t("Enter parameters as JSON object") + '\n' + t("Example") + ': {"param": "value"}',
+      blocked: t("Enter true/false or specific block conditions"),
+      aliases: t("Enter aliases as JSON object") + '\n' + t("Example") + ': {"alias1": "value1", "alias2": "value2"}',
+      models: t("Select one or more model names"),
+      key_alias: t("Enter a unique identifier for this key"),
+      tags: t("Enter comma-separated tag strings"),
+    };
+
+    // Get specific help text or use default based on type
+    const helpText = specificHelp[key] || defaultHelp;
+
+    // Add format requirements for special cases
+    if (isJSONField(key, property)) {
+      return `${helpText}\n${t("Must be valid JSON format")}`;
+    }
+
+    if (property.enum) {
+      return `${t("Select from available options")}\n${t("Allowed values")}: ${property.enum.join(", ")}`;
+    }
+
+    return helpText;
+  };
 
   useEffect(() => {
     const fetchOpenAPISchema = async () => {
@@ -130,7 +132,7 @@ const SchemaFormFields: React.FC<SchemaFormFieldsProps> = ({
         form.setFieldsValue(defaultFormValues);
       } catch (error) {
         console.error("Schema fetch error:", error);
-        setError(error instanceof Error ? error.message : "Failed to fetch schema");
+        setError(error instanceof Error ? error.message : t("Failed to fetch schema"));
       }
     };
 
@@ -158,7 +160,7 @@ const SchemaFormFields: React.FC<SchemaFormFieldsProps> = ({
 
     const rules = [];
     if (isRequired) {
-      rules.push({ required: true, message: `${label} is required` });
+      rules.push({ required: true, message: `${label} ${t("is required")}` });
     }
     if (customValidation[key]) {
       rules.push({ validator: customValidation[key] });
@@ -167,7 +169,7 @@ const SchemaFormFields: React.FC<SchemaFormFieldsProps> = ({
       rules.push({
         validator: async (_: any, value: string) => {
           if (value && !validateJSON(value)) {
-            throw new Error("Please enter valid JSON");
+            throw new Error(t("Please enter valid JSON"));
           }
         },
       });
@@ -186,7 +188,7 @@ const SchemaFormFields: React.FC<SchemaFormFieldsProps> = ({
 
     let inputComponent;
     if (isJSONField(key, property)) {
-      inputComponent = <Input.TextArea rows={4} placeholder="Enter as JSON" className="font-mono" />;
+      inputComponent = <Input.TextArea rows={4} placeholder={t("Enter as JSON")} className="font-mono" />;
     } else if (property.enum) {
       inputComponent = (
         <Select>
@@ -221,7 +223,7 @@ const SchemaFormFields: React.FC<SchemaFormFieldsProps> = ({
   };
 
   if (error) {
-    return <div className="text-red-500">Error: {error}</div>;
+    return <div className="text-red-500">{t("Error")}: {error}</div>;
   }
 
   if (!schemaProperties?.properties) {
@@ -238,3 +240,4 @@ const SchemaFormFields: React.FC<SchemaFormFieldsProps> = ({
 };
 
 export default SchemaFormFields;
+

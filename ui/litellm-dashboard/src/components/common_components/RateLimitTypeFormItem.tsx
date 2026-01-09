@@ -1,6 +1,7 @@
 import React from "react";
 import { Form, Select, Tooltip } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
+import { useTranslate } from "@/i18n";
 
 const { Option } = Select;
 
@@ -30,6 +31,7 @@ export const RateLimitTypeFormItem: React.FC<RateLimitTypeFormItemProps> = ({
   form,
   onChange,
 }) => {
+  const t = useTranslate();
   const limitTypeUpper = type.toUpperCase();
   const limitTypeLower = type.toLowerCase();
 
@@ -42,13 +44,13 @@ export const RateLimitTypeFormItem: React.FC<RateLimitTypeFormItemProps> = ({
     }
   };
 
-  const tooltipTitle = `Select 'guaranteed_throughput' to prevent overallocating ${limitTypeUpper} limit when the key belongs to a Team with specific ${limitTypeUpper} limits.`;
+  const tooltipTitle = t("Select 'guaranteed_throughput' to prevent overallocating limit when the key belongs to a Team with specific limits.", { type: limitTypeUpper });
 
   return (
     <Form.Item
       label={
         <span>
-          {limitTypeUpper} Rate Limit Type{" "}
+          {t("{type} Rate Limit Type", { type: limitTypeUpper })}{" "}
           <Tooltip title={tooltipTitle}>
             <InfoCircleOutlined style={{ marginLeft: "4px" }} />
           </Tooltip>
@@ -60,46 +62,43 @@ export const RateLimitTypeFormItem: React.FC<RateLimitTypeFormItemProps> = ({
     >
       <Select
         defaultValue={showDetailedDescriptions ? "default" : undefined}
-        placeholder="Select rate limit type"
+        placeholder={t("Select rate limit type")}
         style={{ width: "100%" }}
         optionLabelProp={showDetailedDescriptions ? "label" : undefined}
         onChange={handleChange}
       >
         {showDetailedDescriptions ? (
           <>
-            <Option value="best_effort_throughput" label="Default">
+            <Option value="best_effort_throughput" label={t("Default")}>
               <div style={{ padding: "4px 0" }}>
-                <div style={{ fontWeight: 500 }}>Default</div>
+                <div style={{ fontWeight: 500 }}>{t("Default")}</div>
                 <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "2px" }}>
-                  Best effort throughput - no error if we&apos;re overallocating {limitTypeLower} (Team/Key Limits
-                  checked at runtime).
+                  {t("Best effort throughput - no error if overallocating (Team/Key Limits checked at runtime).")}
                 </div>
               </div>
             </Option>
-            <Option value="guaranteed_throughput" label="Guaranteed throughput">
+            <Option value="guaranteed_throughput" label={t("Guaranteed throughput")}>
               <div style={{ padding: "4px 0" }}>
-                <div style={{ fontWeight: 500 }}>Guaranteed throughput</div>
+                <div style={{ fontWeight: 500 }}>{t("Guaranteed throughput")}</div>
                 <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "2px" }}>
-                  Guaranteed throughput - raise an error if we&apos;re overallocating {limitTypeLower} (also checks
-                  model-specific limits)
+                  {t("Guaranteed throughput - raise an error if overallocating (also checks model-specific limits)")}
                 </div>
               </div>
             </Option>
-            <Option value="dynamic" label="Dynamic">
+            <Option value="dynamic" label={t("Dynamic")}>
               <div style={{ padding: "4px 0" }}>
-                <div style={{ fontWeight: 500 }}>Dynamic</div>
+                <div style={{ fontWeight: 500 }}>{t("Dynamic")}</div>
                 <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "2px" }}>
-                  If the key has a set {limitTypeUpper} (e.g. 2 {limitTypeUpper}) and there are no 429 errors, it can
-                  dynamically exceed the limit when the model being called is not erroring.
+                  {t("If the key has a set limit and there are no 429 errors, it can dynamically exceed the limit.")}
                 </div>
               </div>
             </Option>
           </>
         ) : (
           <>
-            <Option value="best_effort_throughput">Best effort throughput</Option>
-            <Option value="guaranteed_throughput">Guaranteed throughput</Option>
-            <Option value="dynamic">Dynamic</Option>
+            <Option value="best_effort_throughput">{t("Best effort throughput")}</Option>
+            <Option value="guaranteed_throughput">{t("Guaranteed throughput")}</Option>
+            <Option value="dynamic">{t("Dynamic")}</Option>
           </>
         )}
       </Select>
@@ -108,3 +107,4 @@ export const RateLimitTypeFormItem: React.FC<RateLimitTypeFormItemProps> = ({
 };
 
 export default RateLimitTypeFormItem;
+
