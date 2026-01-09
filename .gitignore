@@ -104,3 +104,5 @@ scripts/private_key.pem
 scripts/generate_license.py
 scripts/LICENSE_GENERATOR.md
 scripts/public_key.pem
+ui/litellm-dashboard/out/*
+litellm/proxy/_experimental/out/*
