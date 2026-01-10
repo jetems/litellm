@@ -53,7 +53,7 @@ const defaultServerRootPath = "/";
 export let serverRootPath = defaultServerRootPath;
 export let proxyBaseUrl = defaultProxyBaseUrl;
 if (isLocal != true) {
-  console.log = function () {};
+  console.log = function () { };
 }
 
 const getWindowLocation = () => {
@@ -3505,7 +3505,7 @@ export const userDailyActivityAggregatedCall = async (accessToken: string, start
 
 export const userGetAllUsersCall = async (accessToken: string, role: string) => {
   try {
-    const url = proxyBaseUrl ? `${proxyBaseUrl}/user/get_users?role=${role}` : `/user/get_users?role=${role}`;
+    const url = proxyBaseUrl ? `${proxyBaseUrl}/user/list?role=${role}` : `/user/list?role=${role}`;
     console.log("in userGetAllUsersCall:", url);
     const response = await fetch(url, {
       method: "GET",
