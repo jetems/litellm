@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Card, Title, Text, Button as TremorButton, Tab, TabGroup, TabList, TabPanel, TabPanels} from "@tremor/react";
+import { Card, Title, Text, Button as TremorButton, Tab, TabGroup, TabList, TabPanel, TabPanels } from "@tremor/react";
 import { Form, Input, Button as AntButton, message, Spin, Descriptions } from "antd";
 import { ArrowLeftIcon } from "@heroicons/react/outline";
 import { getAgentInfo, patchAgentCall, getAgentCreateMetadata, AgentCreateInfo } from "../networking";
@@ -9,6 +9,7 @@ import DynamicAgentFormFields, { buildDynamicAgentData } from "./dynamic_agent_f
 import { buildAgentDataFromForm, parseAgentForForm } from "./agent_config";
 import AgentCostView from "./agent_cost_view";
 import { detectAgentType, parseDynamicAgentForForm } from "./agent_type_utils";
+import { useTranslate } from "@/i18n";
 
 interface AgentInfoViewProps {
   agentId: string;
@@ -23,6 +24,7 @@ const AgentInfoView: React.FC<AgentInfoViewProps> = ({
   accessToken,
   isAdmin,
 }) => {
+  const t = useTranslate();
   const [agent, setAgent] = useState<Agent | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -54,11 +56,11 @@ const AgentInfoView: React.FC<AgentInfoViewProps> = ({
     try {
       const data = await getAgentInfo(accessToken, agentId);
       setAgent(data);
-      
+
       // Detect agent type
       const agentType = detectAgentType(data);
       setDetectedAgentType(agentType);
-      
+
       // Parse form values based on agent type
       if (agentType === "a2a") {
         form.setFieldsValue(parseAgentForForm(data));
@@ -67,12 +69,12 @@ const AgentInfoView: React.FC<AgentInfoViewProps> = ({
         if (typeInfo) {
           form.setFieldsValue(parseDynamicAgentForForm(data, typeInfo));
         } else {
-      form.setFieldsValue(parseAgentForForm(data));
+          form.setFieldsValue(parseAgentForForm(data));
         }
       }
     } catch (error) {
       console.error("Error fetching agent info:", error);
-      message.error("Failed to load agent information");
+      message.error(t("Failed to load agent information"));
     } finally {
       setIsLoading(false);
     }
@@ -99,7 +101,7 @@ const AgentInfoView: React.FC<AgentInfoViewProps> = ({
     setIsSaving(true);
     try {
       let updateData: any;
-      
+
       if (detectedAgentType === "a2a") {
         updateData = buildAgentDataFromForm(values, agent);
       } else if (selectedAgentTypeInfo) {
@@ -109,14 +111,14 @@ const AgentInfoView: React.FC<AgentInfoViewProps> = ({
       } else {
         updateData = buildAgentDataFromForm(values, agent);
       }
-      
+
       await patchAgentCall(accessToken, agentId, updateData);
-      message.success("Agent updated successfully");
+      message.success(t("Agent updated successfully"));
       setIsEditing(false);
       fetchAgentInfo();
     } catch (error) {
       console.error("Error updating agent:", error);
-      message.error("Failed to update agent");
+      message.error(t("Failed to update agent"));
     } finally {
       setIsSaving(false);
     }
@@ -135,9 +137,9 @@ const AgentInfoView: React.FC<AgentInfoViewProps> = ({
   if (!agent) {
     return (
       <div className="p-4">
-        <div className="text-center">Agent not found</div>
+        <div className="text-center">{t("Agent not found")}</div>
         <TremorButton onClick={onClose} className="mt-4">
-          Back to Agents List
+          {t("Back to Agents List")}
         </TremorButton>
       </div>
     );
@@ -154,71 +156,71 @@ const AgentInfoView: React.FC<AgentInfoViewProps> = ({
     <div className="p-4">
       <div>
         <TremorButton icon={ArrowLeftIcon} variant="light" onClick={onClose} className="mb-4">
-          Back to Agents
+          {t("Back to Agents")}
         </TremorButton>
-        <Title>{agent.agent_name || "Unnamed Agent"}</Title>
+        <Title>{agent.agent_name || t("Unnamed Agent")}</Title>
         <Text className="text-gray-500 font-mono">{agent.agent_id}</Text>
       </div>
 
       <TabGroup>
         <TabList className="mb-4">
-          <Tab key="overview">Overview</Tab>
-          {isAdmin ? <Tab key="settings">Settings</Tab> : <></>}
+          <Tab key="overview">{t("Overview")}</Tab>
+          {isAdmin ? <Tab key="settings">{t("Settings")}</Tab> : <></>}
         </TabList>
 
         <TabPanels>
           {/* Overview Panel */}
           <TabPanel>
             <Descriptions bordered column={1}>
-              <Descriptions.Item label="Agent ID">{agent.agent_id}</Descriptions.Item>
-              <Descriptions.Item label="Agent Name">{agent.agent_name}</Descriptions.Item>
-              <Descriptions.Item label="Display Name">{agent.agent_card_params?.name || "-"}</Descriptions.Item>
-              <Descriptions.Item label="Description">{agent.agent_card_params?.description || "-"}</Descriptions.Item>
-              <Descriptions.Item label="URL">{agent.agent_card_params?.url || "-"}</Descriptions.Item>
-              <Descriptions.Item label="Version">{agent.agent_card_params?.version || "-"}</Descriptions.Item>
-              <Descriptions.Item label="Protocol Version">{agent.agent_card_params?.protocolVersion || "-"}</Descriptions.Item>
-              <Descriptions.Item label="Streaming">
-                {agent.agent_card_params?.capabilities?.streaming ? "Yes" : "No"}
+              <Descriptions.Item label={t("Agent ID")}>{agent.agent_id}</Descriptions.Item>
+              <Descriptions.Item label={t("Agent Name")}>{agent.agent_name}</Descriptions.Item>
+              <Descriptions.Item label={t("Display Name")}>{agent.agent_card_params?.name || "-"}</Descriptions.Item>
+              <Descriptions.Item label={t("Description")}>{agent.agent_card_params?.description || "-"}</Descriptions.Item>
+              <Descriptions.Item label={t("URL")}>{agent.agent_card_params?.url || "-"}</Descriptions.Item>
+              <Descriptions.Item label={t("Version")}>{agent.agent_card_params?.version || "-"}</Descriptions.Item>
+              <Descriptions.Item label={t("Protocol Version")}>{agent.agent_card_params?.protocolVersion || "-"}</Descriptions.Item>
+              <Descriptions.Item label={t("Streaming")}>
+                {agent.agent_card_params?.capabilities?.streaming ? t("Yes") : t("No")}
               </Descriptions.Item>
               {agent.agent_card_params?.capabilities?.pushNotifications && (
-                <Descriptions.Item label="Push Notifications">Yes</Descriptions.Item>
+                <Descriptions.Item label={t("Push Notifications")}>{t("Yes")}</Descriptions.Item>
               )}
               {agent.agent_card_params?.capabilities?.stateTransitionHistory && (
-                <Descriptions.Item label="State Transition History">Yes</Descriptions.Item>
+                <Descriptions.Item label={t("State Transition History")}>{t("Yes")}</Descriptions.Item>
               )}
-              <Descriptions.Item label="Skills">
-                {agent.agent_card_params?.skills?.length || 0} configured
+              <Descriptions.Item label={t("Skills")}>
+                {agent.agent_card_params?.skills?.length || 0} {t("configured")}
               </Descriptions.Item>
               {agent.litellm_params?.model && (
-                <Descriptions.Item label="Model">{agent.litellm_params.model}</Descriptions.Item>
+                <Descriptions.Item label={t("Model")}>{agent.litellm_params.model}</Descriptions.Item>
               )}
               {agent.litellm_params?.make_public !== undefined && (
-                <Descriptions.Item label="Make Public">{agent.litellm_params.make_public ? "Yes" : "No"}</Descriptions.Item>
+                <Descriptions.Item label={t("Make Public")}>{agent.litellm_params.make_public ? t("Yes") : t("No")}</Descriptions.Item>
               )}
               {agent.agent_card_params?.iconUrl && (
-                <Descriptions.Item label="Icon URL">{agent.agent_card_params.iconUrl}</Descriptions.Item>
+                <Descriptions.Item label={t("Icon URL")}>{agent.agent_card_params.iconUrl}</Descriptions.Item>
               )}
               {agent.agent_card_params?.documentationUrl && (
-                <Descriptions.Item label="Documentation URL">{agent.agent_card_params.documentationUrl}</Descriptions.Item>
+                <Descriptions.Item label={t("Documentation URL")}>{agent.agent_card_params.documentationUrl}</Descriptions.Item>
               )}
-              <Descriptions.Item label="Created At">{formatDate(agent.created_at)}</Descriptions.Item>
-              <Descriptions.Item label="Updated At">{formatDate(agent.updated_at)}</Descriptions.Item>
+              <Descriptions.Item label={t("Created At")}>{formatDate(agent.created_at)}</Descriptions.Item>
+              <Descriptions.Item label={t("Updated At")}>{formatDate(agent.updated_at)}</Descriptions.Item>
             </Descriptions>
 
             <AgentCostView agent={agent} />
 
             {agent.agent_card_params?.skills && agent.agent_card_params.skills.length > 0 && (
               <div style={{ marginTop: 24 }}>
-                <Title>Skills</Title>
+                <Title>{t("Skills")}</Title>
                 <Descriptions bordered column={1} style={{ marginTop: 16 }}>
                   {agent.agent_card_params.skills.map((skill: any, index: number) => (
-                    <Descriptions.Item label={skill.name || `Skill ${index + 1}`} key={index}>
+                    <Descriptions.Item label={skill.name || `${t("Skill")} ${index + 1}`} key={index}>
                       <div>
                         <div><strong>ID:</strong> {skill.id}</div>
-                        <div><strong>Description:</strong> {skill.description}</div>
-                        <div><strong>Tags:</strong> {Array.isArray(skill.tags) ? skill.tags.join(", ") : skill.tags}</div>
+                        <div><strong>{t("Description")}:</strong> {skill.description}</div>
+                        <div><strong>{t("Tags")}:</strong> {Array.isArray(skill.tags) ? skill.tags.join(", ") : skill.tags}</div>
                         {skill.examples && skill.examples.length > 0 && (
-                          <div><strong>Examples:</strong> {Array.isArray(skill.examples) ? skill.examples.join(", ") : skill.examples}</div>
+                          <div><strong>{t("Examples")}:</strong> {Array.isArray(skill.examples) ? skill.examples.join(", ") : skill.examples}</div>
                         )}
                       </div>
                     </Descriptions.Item>
@@ -233,9 +235,9 @@ const AgentInfoView: React.FC<AgentInfoViewProps> = ({
             <TabPanel>
               <Card>
                 <div className="flex justify-between items-center mb-4">
-                  <Title>Agent Settings</Title>
+                  <Title>{t("Agent Settings")}</Title>
                   {!isEditing && (
-                    <TremorButton onClick={() => setIsEditing(true)}>Edit Settings</TremorButton>
+                    <TremorButton onClick={() => setIsEditing(true)}>{t("Edit Settings")}</TremorButton>
                   )}
                 </div>
 
@@ -245,7 +247,7 @@ const AgentInfoView: React.FC<AgentInfoViewProps> = ({
                     layout="vertical"
                     onFinish={handleUpdate}
                   >
-                    <Form.Item label="Agent ID">
+                    <Form.Item label={t("Agent ID")}>
                       <Input value={agent.agent_id} disabled />
                     </Form.Item>
 
@@ -254,7 +256,7 @@ const AgentInfoView: React.FC<AgentInfoViewProps> = ({
                     ) : selectedAgentTypeInfo ? (
                       <DynamicAgentFormFields agentTypeInfo={selectedAgentTypeInfo} />
                     ) : (
-                    <AgentFormFields showAgentName={true} />
+                      <AgentFormFields showAgentName={true} />
                     )}
 
                     <div className="flex justify-end gap-2 mt-6">
@@ -262,15 +264,15 @@ const AgentInfoView: React.FC<AgentInfoViewProps> = ({
                         setIsEditing(false);
                         fetchAgentInfo();
                       }}>
-                        Cancel
+                        {t("Cancel")}
                       </AntButton>
                       <TremorButton loading={isSaving}>
-                        Save Changes
+                        {t("Save Changes")}
                       </TremorButton>
                     </div>
                   </Form>
                 ) : (
-                  <Text>Click &quot;Edit Settings&quot; to modify agent configuration.</Text>
+                  <Text>{t("Click \"Edit Settings\" to modify agent configuration.")}</Text>
                 )}
               </Card>
             </TabPanel>
@@ -282,4 +284,3 @@ const AgentInfoView: React.FC<AgentInfoViewProps> = ({
 };
 
 export default AgentInfoView;
-

@@ -4,6 +4,7 @@ import { SwitchVerticalIcon, ChevronUpIcon, ChevronDownIcon, TrashIcon } from "@
 import { Tooltip } from "antd";
 import { CopyOutlined } from "@ant-design/icons";
 import { Agent } from "./types";
+import { useTranslate } from "@/i18n";
 import {
   ColumnDef,
   flexRender,
@@ -32,6 +33,7 @@ const AgentTable: React.FC<AgentTableProps> = ({
   isAdmin,
   onAgentClick,
 }) => {
+  const t = useTranslate();
   const [sorting, setSorting] = useState<SortingState>([{ id: "created_at", desc: true }]);
 
   const formatDate = (dateString?: string) => {
@@ -46,24 +48,24 @@ const AgentTable: React.FC<AgentTableProps> = ({
 
   const columns: ColumnDef<Agent>[] = [
     {
-      header: "Agent Name",
+      header: t("Agent Name"),
       accessorKey: "agent_name",
       cell: ({ row }) => {
         const agent = row.original;
         const name = agent.agent_name || "";
-  return (
+        return (
           <div className="flex items-center gap-2">
             <Tooltip title={name}>
-                <Button
-                  size="xs"
-                  variant="light"
+              <Button
+                size="xs"
+                variant="light"
                 className="font-mono text-blue-500 bg-blue-50 hover:bg-blue-100 text-xs font-normal px-2 py-0.5 text-left overflow-hidden truncate min-w-[200px] justify-start"
-                  onClick={() => onAgentClick(agent.agent_id)}
-                >
+                onClick={() => onAgentClick(agent.agent_id)}
+              >
                 {name}
-                </Button>
-              </Tooltip>
-            <Tooltip title="Copy Agent ID">
+              </Button>
+            </Tooltip>
+            <Tooltip title={t("Copy Agent ID")}>
               <CopyOutlined
                 onClick={(e) => {
                   e.stopPropagation();
@@ -77,10 +79,10 @@ const AgentTable: React.FC<AgentTableProps> = ({
       },
     },
     {
-      header: "Description",
+      header: t("Description"),
       accessorKey: "agent_card_params.description",
       cell: ({ row }) => {
-        const description = row.original.agent_card_params?.description || "No description";
+        const description = row.original.agent_card_params?.description || t("No description");
         return (
           <span className="text-xs text-gray-600 block max-w-[300px] truncate">
             {description}
@@ -89,7 +91,7 @@ const AgentTable: React.FC<AgentTableProps> = ({
       },
     },
     {
-      header: "Created At",
+      header: t("Created At"),
       accessorKey: "created_at",
       cell: ({ row }) => {
         const agent = row.original;
@@ -102,33 +104,33 @@ const AgentTable: React.FC<AgentTableProps> = ({
     },
     ...(isAdmin
       ? [
-          {
-            header: "Actions",
-            id: "actions",
-            enableSorting: false,
-            cell: ({ row }: any) => {
-              const agent = row.original;
-              
-              return (
-                <div className="flex items-center gap-1">
-                  <Tooltip title="Delete agent">
-                    <Button
-                      size="xs"
-                      variant="light"
-                      color="red"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDeleteClick(agent.agent_id, agent.agent_name);
-                      }}
-                      icon={TrashIcon}
-                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                    />
-                  </Tooltip>
-                </div>
-              );
-            },
+        {
+          header: t("Actions"),
+          id: "actions",
+          enableSorting: false,
+          cell: ({ row }: any) => {
+            const agent = row.original;
+
+            return (
+              <div className="flex items-center gap-1">
+                <Tooltip title={t("Delete agent")}>
+                  <Button
+                    size="xs"
+                    variant="light"
+                    color="red"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteClick(agent.agent_id, agent.agent_name);
+                    }}
+                    icon={TrashIcon}
+                    className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                  />
+                </Tooltip>
+              </div>
+            );
           },
-        ]
+        },
+      ]
       : []),
   ];
 
@@ -182,7 +184,7 @@ const AgentTable: React.FC<AgentTableProps> = ({
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-8 text-center">
                   <div className="text-center text-gray-500">
-                    <p>Loading...</p>
+                    <p>{t("Loading...")}</p>
                   </div>
                 </TableCell>
               </TableRow>
@@ -200,13 +202,13 @@ const AgentTable: React.FC<AgentTableProps> = ({
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-8 text-center">
                   <div className="text-center text-gray-500">
-                    <p>No agents found. Create one to get started.</p>
-                </div>
-              </TableCell>
+                    <p>{t("No agents found. Create one to get started.")}</p>
+                  </div>
+                </TableCell>
               </TableRow>
             )}
-      </TableBody>
-    </Table>
+          </TableBody>
+        </Table>
       </div>
     </div>
   );

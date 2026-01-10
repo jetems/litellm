@@ -5,6 +5,7 @@ import { createAgentCall, getAgentCreateMetadata, AgentCreateInfo } from "../net
 import AgentFormFields from "./agent_form_fields";
 import DynamicAgentFormFields, { buildDynamicAgentData } from "./dynamic_agent_form_fields";
 import { getDefaultFormValues, buildAgentDataFromForm } from "./agent_config";
+import { useTranslate } from "@/i18n";
 
 interface AddAgentFormProps {
   visible: boolean;
@@ -19,6 +20,7 @@ const AddAgentForm: React.FC<AddAgentFormProps> = ({
   accessToken,
   onSuccess,
 }) => {
+  const t = useTranslate();
   const [form] = Form.useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [agentType, setAgentType] = useState<string>("a2a");
@@ -47,7 +49,7 @@ const AddAgentForm: React.FC<AddAgentFormProps> = ({
 
   const handleSubmit = async (values: any) => {
     if (!accessToken) {
-      message.error("No access token available");
+      message.error(t("No access token available"));
       return;
     }
 
@@ -62,14 +64,14 @@ const AddAgentForm: React.FC<AddAgentFormProps> = ({
       }
 
       await createAgentCall(accessToken, agentData);
-      message.success("Agent created successfully");
+      message.success(t("Agent created successfully"));
       form.resetFields();
       setAgentType("a2a");
       onSuccess();
       onClose();
     } catch (error) {
       console.error("Error creating agent:", error);
-      message.error("Failed to create agent");
+      message.error(t("Failed to create agent"));
     } finally {
       setIsSubmitting(false);
     }
@@ -100,7 +102,7 @@ const AddAgentForm: React.FC<AddAgentFormProps> = ({
               className="w-6 h-6 object-contain"
             />
           )}
-          <h2 className="text-xl font-semibold text-gray-900">Add New Agent</h2>
+          <h2 className="text-xl font-semibold text-gray-900">{t("Add New Agent")}</h2>
         </div>
       }
       open={visible}
@@ -123,9 +125,9 @@ const AddAgentForm: React.FC<AddAgentFormProps> = ({
         >
           {/* Agent Type Selection */}
           <Form.Item
-            label={<span className="text-sm font-medium text-gray-700">Agent Type</span>}
+            label={<span className="text-sm font-medium text-gray-700">{t("Agent Type")}</span>}
             required
-            tooltip="Select the type of agent you want to create"
+            tooltip={t("Select the type of agent you want to create")}
           >
             <Select
               value={agentType}
@@ -135,8 +137,8 @@ const AddAgentForm: React.FC<AddAgentFormProps> = ({
               optionLabelProp="label"
             >
               {agentTypeMetadata.map((info) => (
-                <Select.Option 
-                  key={info.agent_type} 
+                <Select.Option
+                  key={info.agent_type}
                   value={info.agent_type}
                   label={
                     <div className="flex items-center gap-2">
@@ -175,10 +177,10 @@ const AddAgentForm: React.FC<AddAgentFormProps> = ({
           {/* Footer Buttons */}
           <div className="flex items-center justify-end space-x-3 pt-6 border-t border-gray-100 mt-6">
             <Button variant="secondary" onClick={handleCancel}>
-              Cancel
+              {t("Cancel")}
             </Button>
             <Button variant="primary" loading={isSubmitting}>
-              {isSubmitting ? "Creating..." : "Create Agent"}
+              {isSubmitting ? t("Creating...") : t("Create Agent")}
             </Button>
           </div>
         </Form>

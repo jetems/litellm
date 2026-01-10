@@ -76,11 +76,11 @@ const AgentsPanel: React.FC<AgentsPanelProps> = ({ accessToken, userRole }) => {
     setIsDeleting(true);
     try {
       await deleteAgentCall(accessToken, agentToDelete.id);
-      NotificationsManager.success(`Agent "${agentToDelete.name}" deleted successfully`);
+      NotificationsManager.success(t("Agent deleted successfully", { name: agentToDelete.name }));
       fetchAgents();
     } catch (error) {
       console.error("Error deleting agent:", error);
-      NotificationsManager.fromBackend("Failed to delete agent");
+      NotificationsManager.fromBackend(t("Failed to delete agent"));
     } finally {
       setIsDeleting(false);
       setAgentToDelete(null);
@@ -94,8 +94,8 @@ const AgentsPanel: React.FC<AgentsPanelProps> = ({ accessToken, userRole }) => {
   return (
     <div className="w-full mx-auto flex-auto overflow-y-auto m-8 p-2">
       <div className="flex flex-col gap-2 mb-4">
-        <h1 className="text-2xl font-bold">Agents</h1>
-        <p className="text-sm text-gray-600">List of A2A-spec agents that are available to be used in your organization. Go to AI Hub, to make agents public.</p>
+        <h1 className="text-2xl font-bold">{t("Agents")}</h1>
+        <p className="text-sm text-gray-600">{t("List of A2A-spec agents that are available to be used in your organization. Go to AI Hub, to make agents public.")}</p>
         <div className="mt-2">
           <Button onClick={handleAddAgent} disabled={!accessToken}>
             + {t("Add New Agent")}
@@ -131,16 +131,16 @@ const AgentsPanel: React.FC<AgentsPanelProps> = ({ accessToken, userRole }) => {
 
       {agentToDelete && (
         <Modal
-          title="Delete Agent"
+          title={t("Delete Agent")}
           open={agentToDelete !== null}
           onOk={handleDeleteConfirm}
           onCancel={handleDeleteCancel}
           confirmLoading={isDeleting}
-          okText="Delete"
+          okText={t("Delete")}
           okButtonProps={{ danger: true }}
         >
-          <p>Are you sure you want to delete agent: {agentToDelete.name}?</p>
-          <p>This action cannot be undone.</p>
+          <p>{t("Are you sure you want to delete agent:")}{" "}{agentToDelete.name}?</p>
+          <p>{t("This action cannot be undone")}</p>
         </Modal>
       )}
     </div>

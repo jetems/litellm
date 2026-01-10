@@ -3,6 +3,7 @@ import { Form, Input, Select, Collapse } from "antd";
 import { AgentCreateInfo, AgentCredentialFieldMetadata } from "../networking";
 import { AGENT_FORM_CONFIG } from "./agent_config";
 import CostConfigFields from "./cost_config_fields";
+import { useTranslate } from "@/i18n";
 
 const { Panel } = Collapse;
 
@@ -18,23 +19,24 @@ interface DynamicAgentFormFieldsProps {
 const DynamicAgentFormFields: React.FC<DynamicAgentFormFieldsProps> = ({
   agentTypeInfo,
 }) => {
+  const t = useTranslate();
   return (
     <>
       <Form.Item
-        label="Agent Name"
+        label={t("Agent Name")}
         name="agent_name"
-        rules={[{ required: true, message: "Please enter a unique agent name" }]}
-        tooltip="Unique identifier for the agent"
+        rules={[{ required: true, message: t("Please enter a unique agent name") }]}
+        tooltip={t("Unique identifier for the agent")}
       >
         <Input placeholder="e.g., my-langgraph-agent" />
       </Form.Item>
 
       <Form.Item
-        label="Description"
+        label={t("Description")}
         name="description"
-        tooltip="Brief description of what this agent does"
+        tooltip={t("Brief description of what this agent does")}
       >
-        <Input.TextArea rows={2} placeholder="Describe what this agent does..." />
+        <Input.TextArea rows={2} placeholder={t("Describe what this agent does...")} />
       </Form.Item>
 
       {agentTypeInfo.credential_fields.map((field: AgentCredentialFieldMetadata) => (
@@ -42,7 +44,7 @@ const DynamicAgentFormFields: React.FC<DynamicAgentFormFieldsProps> = ({
           key={field.key}
           label={field.label}
           name={field.key}
-          rules={field.required ? [{ required: true, message: `Please enter ${field.label}` }] : undefined}
+          rules={field.required ? [{ required: true, message: `${t("Please enter")} ${field.label}` }] : undefined}
           tooltip={field.tooltip}
           initialValue={field.default_value}
         >
@@ -65,7 +67,7 @@ const DynamicAgentFormFields: React.FC<DynamicAgentFormFieldsProps> = ({
       ))}
 
       <Collapse style={{ marginBottom: 16 }}>
-        <Panel header={AGENT_FORM_CONFIG.cost.title} key={AGENT_FORM_CONFIG.cost.key}>
+        <Panel header={t(AGENT_FORM_CONFIG.cost.title)} key={AGENT_FORM_CONFIG.cost.key}>
           <CostConfigFields />
         </Panel>
       </Collapse>
@@ -143,4 +145,3 @@ export const buildDynamicAgentData = (
 };
 
 export default DynamicAgentFormFields;
-
