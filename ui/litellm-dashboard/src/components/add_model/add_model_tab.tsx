@@ -1,4 +1,5 @@
 import { useProviderFields } from "@/app/(dashboard)/hooks/providers/useProviderFields";
+import { useTranslate } from "@/i18n";
 import { all_admin_roles } from "@/utils/roles";
 import { Switch, Tab, TabGroup, TabList, TabPanel, TabPanels, Text } from "@tremor/react";
 import type { FormInstance } from "antd";
@@ -62,6 +63,7 @@ const AddModelTab: React.FC<AddModelTabProps> = ({
   userRole,
   premiumUser,
 }) => {
+  const t = useTranslate();
   // Create separate form instance for auto router
   const [autoRouterForm] = Form.useForm();
   // State for test mode and connection testing
@@ -160,12 +162,12 @@ const AddModelTab: React.FC<AddModelTabProps> = ({
     <>
       <TabGroup className="w-full">
         <TabList className="mb-4">
-          <Tab>Add Model</Tab>
-          <Tab>Add Auto Router</Tab>
+          <Tab>{t("Add Model")}</Tab>
+          <Tab>{t("Add Auto Router")}</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
-            <Title level={2}>Add Model</Title>
+            <Title level={2}>{t("Add Model")}</Title>
             <Card>
               <Form
                 form={form}
@@ -183,17 +185,17 @@ const AddModelTab: React.FC<AddModelTabProps> = ({
                 <>
                   {/* Provider Selection */}
                   <Form.Item
-                    rules={[{ required: true, message: "Required" }]}
-                    label="Provider:"
+                    rules={[{ required: true, message: t("Required") }]}
+                    label={t("Provider")}
                     name="custom_llm_provider"
-                    tooltip="E.g. OpenAI, Azure OpenAI, Anthropic, Bedrock, etc."
+                    tooltip={t("E.g. OpenAI, Azure OpenAI, Anthropic, Bedrock, etc.")}
                     labelCol={{ span: 10 }}
                     labelAlign="left"
                   >
                     <AntdSelect
                       showSearch
                       loading={isProviderMetadataLoading}
-                      placeholder={isProviderMetadataLoading ? "Loading providers..." : "Select a provider"}
+                      placeholder={isProviderMetadataLoading ? t("Loading providers...") : t("Select a provider")}
                       optionFilterProp="data-label"
                       onChange={(value) => {
                         setSelectedProvider(value as Providers);
@@ -265,7 +267,7 @@ const AddModelTab: React.FC<AddModelTabProps> = ({
                   <ConditionalPublicModelName />
 
                   {/* Select Mode */}
-                  <Form.Item label="Mode" name="mode" className="mb-1">
+                  <Form.Item label={t("Mode:")} name="mode" className="mb-1">
                     <AntdSelect
                       style={{ width: "100%" }}
                       value={testMode}
@@ -277,9 +279,9 @@ const AddModelTab: React.FC<AddModelTabProps> = ({
                     <Col span={10}></Col>
                     <Col span={10}>
                       <Text className="mb-5 mt-1">
-                        <strong>Optional</strong> - LiteLLM endpoint to use when health checking this model{" "}
+                        <strong>{t("Optional")}</strong> - {t("Optional - LiteLLM endpoint to use when health checking this model")}{" "}
                         <Link href="https://docs.litellm.ai/docs/proxy/health#health" target="_blank">
-                          Learn more
+                          {t("Learn more")}
                         </Link>
                       </Text>
                     </Col>
@@ -288,20 +290,20 @@ const AddModelTab: React.FC<AddModelTabProps> = ({
                   {/* Credentials */}
                   <div className="mb-4">
                     <Typography.Text className="text-sm text-gray-500 mb-2">
-                      Either select existing credentials OR enter new provider credentials below
+                      {t("Either select existing credentials OR enter new provider credentials below")}
                     </Typography.Text>
                   </div>
 
-                  <Form.Item label="Existing Credentials" name="litellm_credential_name" initialValue={null}>
+                  <Form.Item label={t("Existing Credentials")} name="litellm_credential_name" initialValue={null}>
                     <AntdSelect
                       showSearch
-                      placeholder="Select or search for existing credentials"
+                      placeholder={t("Select or search for existing credentials")}
                       optionFilterProp="children"
                       filterOption={(input, option) =>
                         (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
                       }
                       options={[
-                        { value: null, label: "None" },
+                        { value: null, label: t("None") },
                         ...credentials.map((credential) => ({
                           value: credential.credential_name,
                           label: credential.credential_name,
@@ -339,19 +341,19 @@ const AddModelTab: React.FC<AddModelTabProps> = ({
                   </Form.Item>
                   <div className="flex items-center my-4">
                     <div className="flex-grow border-t border-gray-200"></div>
-                    <span className="px-4 text-gray-500 text-sm">Additional Model Info Settings</span>
+                    <span className="px-4 text-gray-500 text-sm">{t("Additional Model Info Settings")}</span>
                     <div className="flex-grow border-t border-gray-200"></div>
                   </div>
                   {/* Team-only Model Switch */}
                   <Form.Item
-                    label="Team-BYOK Model"
-                    tooltip="Only use this model + credential combination for this team. Useful when teams want to onboard their own OpenAI keys."
+                    label={t("Team-BYOK Model")}
+                    tooltip={t("Only use this model + credential combination for this team. Useful when teams want to onboard their own OpenAI keys.")}
                     className="mb-4"
                   >
                     <Tooltip
                       title={
                         !premiumUser
-                          ? "This is an enterprise-only feature. Upgrade to premium to restrict model+credential combinations to a specific team."
+                          ? t("This is an enterprise-only feature. Upgrade to premium to restrict model+credential combinations to a specific team.")
                           : ""
                       }
                       placement="top"
@@ -372,14 +374,14 @@ const AddModelTab: React.FC<AddModelTabProps> = ({
                   {/* Conditional Team Selection */}
                   {isTeamOnly && (
                     <Form.Item
-                      label="Select Team"
+                      label={t("Select Team")}
                       name="team_id"
                       className="mb-4"
-                      tooltip="Only keys for this team will be able to call this model."
+                      tooltip={t("Only keys for this team will be able to call this model.")}
                       rules={[
                         {
                           required: isTeamOnly && !isAdmin,
-                          message: "Please select a team.",
+                          message: t("Please select a team."),
                         },
                       ]}
                     >
@@ -389,15 +391,15 @@ const AddModelTab: React.FC<AddModelTabProps> = ({
                   {isAdmin && (
                     <>
                       <Form.Item
-                        label="Model Access Group"
+                        label={t("Model Access Group")}
                         name="model_access_group"
                         className="mb-4"
-                        tooltip="Use model access groups to give users access to select models, and add new ones to the group over time."
+                        tooltip={t("Use model access groups to give users access to select models, and add new ones to the group over time.")}
                       >
                         <AntdSelect
                           mode="tags"
                           showSearch
-                          placeholder="Select existing groups or type to create new ones"
+                          placeholder={t("Select existing groups or type to create new ones")}
                           optionFilterProp="children"
                           tokenSeparators={[","]}
                           options={modelAccessGroups.map((group) => ({
@@ -419,14 +421,14 @@ const AddModelTab: React.FC<AddModelTabProps> = ({
                   />
 
                   <div className="flex justify-between items-center mb-4">
-                    <Tooltip title="Get help on our github">
-                      <Typography.Link href="https://github.com/BerriAI/litellm/issues">Need Help?</Typography.Link>
+                    <Tooltip title={t("Get help on our github")}>
+                      <Typography.Link href="https://github.com/BerriAI/litellm/issues">{t("Need Help?")}</Typography.Link>
                     </Tooltip>
                     <div className="space-x-2">
                       <Button onClick={handleTestConnection} loading={isTestingConnection}>
-                        Test Connect
+                        {t("Test Connect")}
                       </Button>
-                      <Button htmlType="submit">Add Model</Button>
+                      <Button htmlType="submit">{t("Add Model")}</Button>
                     </div>
                   </div>
                 </>
@@ -446,7 +448,7 @@ const AddModelTab: React.FC<AddModelTabProps> = ({
 
       {/* Test Connection Results Modal */}
       <Modal
-        title="Connection Test Results"
+        title={t("Connection Test Results")}
         open={isResultModalVisible}
         onCancel={() => {
           setIsResultModalVisible(false);
@@ -460,7 +462,7 @@ const AddModelTab: React.FC<AddModelTabProps> = ({
               setIsTestingConnection(false);
             }}
           >
-            Close
+            {t("Close")}
           </Button>,
         ]}
         width={700}

@@ -3,6 +3,7 @@ import { PlusCircleIcon, PencilIcon, TrashIcon, ChevronDownIcon, ChevronRightIco
 import { setCallbacksCall } from "./networking";
 import { Card, Title, Text, Table, TableHead, TableHeaderCell, TableBody, TableRow, TableCell } from "@tremor/react";
 import NotificationsManager from "./molecules/notifications_manager";
+import { useTranslate } from "@/i18n";
 
 type ModelGroupAliasValue = string | { model: string; hidden?: boolean };
 
@@ -23,6 +24,7 @@ const ModelGroupAliasSettings: React.FC<ModelGroupAliasSettingsProps> = ({
   initialModelGroupAlias = {},
   onAliasUpdate,
 }) => {
+  const t = useTranslate();
   const [aliases, setAliases] = useState<AliasItem[]>([]);
   const [newAlias, setNewAlias] = useState({ aliasName: "", targetModelGroup: "" });
   const [editingAlias, setEditingAlias] = useState<AliasItem | null>(null);
@@ -67,20 +69,20 @@ const ModelGroupAliasSettings: React.FC<ModelGroupAliasSettingsProps> = ({
       return true;
     } catch (error) {
       console.error("Failed to save model group alias settings:", error);
-      NotificationsManager.fromBackend("Failed to save model group alias settings");
+      NotificationsManager.fromBackend(t("Failed to save model group alias settings"));
       return false;
     }
   };
 
   const handleAddAlias = async () => {
     if (!newAlias.aliasName || !newAlias.targetModelGroup) {
-      NotificationsManager.fromBackend("Please provide both alias name and target model group");
+      NotificationsManager.fromBackend(t("Please provide both alias name and target model group"));
       return;
     }
 
     // Check for duplicate alias names
     if (aliases.some((alias) => alias.aliasName === newAlias.aliasName)) {
-      NotificationsManager.fromBackend("An alias with this name already exists");
+      NotificationsManager.fromBackend(t("An alias with this name already exists"));
       return;
     }
 
@@ -95,7 +97,7 @@ const ModelGroupAliasSettings: React.FC<ModelGroupAliasSettingsProps> = ({
     if (await saveAliasesToBackend(updatedAliases)) {
       setAliases(updatedAliases);
       setNewAlias({ aliasName: "", targetModelGroup: "" });
-      NotificationsManager.success("Alias added successfully");
+      NotificationsManager.success(t("Alias added successfully"));
     }
   };
 
@@ -107,13 +109,13 @@ const ModelGroupAliasSettings: React.FC<ModelGroupAliasSettingsProps> = ({
     if (!editingAlias) return;
 
     if (!editingAlias.aliasName || !editingAlias.targetModelGroup) {
-      NotificationsManager.fromBackend("Please provide both alias name and target model group");
+      NotificationsManager.fromBackend(t("Please provide both alias name and target model group"));
       return;
     }
 
     // Check for duplicate alias names (excluding current alias)
     if (aliases.some((alias) => alias.id !== editingAlias.id && alias.aliasName === editingAlias.aliasName)) {
-      NotificationsManager.fromBackend("An alias with this name already exists");
+      NotificationsManager.fromBackend(t("An alias with this name already exists"));
       return;
     }
 
@@ -122,7 +124,7 @@ const ModelGroupAliasSettings: React.FC<ModelGroupAliasSettingsProps> = ({
     if (await saveAliasesToBackend(updatedAliases)) {
       setAliases(updatedAliases);
       setEditingAlias(null);
-      NotificationsManager.success("Alias updated successfully");
+      NotificationsManager.success(t("Alias updated successfully"));
     }
   };
 
@@ -135,7 +137,7 @@ const ModelGroupAliasSettings: React.FC<ModelGroupAliasSettingsProps> = ({
 
     if (await saveAliasesToBackend(updatedAliases)) {
       setAliases(updatedAliases);
-      NotificationsManager.success("Alias deleted successfully");
+      NotificationsManager.success(t("Alias deleted successfully"));
     }
   };
 
@@ -152,10 +154,9 @@ const ModelGroupAliasSettings: React.FC<ModelGroupAliasSettingsProps> = ({
     <Card className="mb-6">
       <div className="flex items-center justify-between cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
         <div className="flex flex-col">
-          <Title className="mb-0">Model Group Alias Settings</Title>
+          <Title className="mb-0">{t("Model Group Alias Settings")}</Title>
           <p className="text-sm text-gray-500">
-            Create aliases for your model groups to simplify API calls. For example, you can create an alias
-            &apos;gpt-4o&apos; that points to &apos;gpt-4o-mini-openai&apos; model group.
+            {t("Create aliases for your model groups to simplify API calls. For example, you can create an alias 'gpt-4o' that points to 'gpt-4o-mini-openai' model group.")}
           </p>
         </div>
         <div className="flex items-center">
@@ -170,10 +171,10 @@ const ModelGroupAliasSettings: React.FC<ModelGroupAliasSettingsProps> = ({
       {isExpanded && (
         <div className="mt-4">
           <div className="mb-6">
-            <Text className="text-sm font-medium text-gray-700 mb-2">Add New Alias</Text>
+            <Text className="text-sm font-medium text-gray-700 mb-2">{t("Add New Alias")}</Text>
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Alias Name</label>
+                <label className="block text-xs text-gray-500 mb-1">{t("Alias Name")}</label>
                 <input
                   type="text"
                   value={newAlias.aliasName}
@@ -188,7 +189,7 @@ const ModelGroupAliasSettings: React.FC<ModelGroupAliasSettingsProps> = ({
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Target Model Group</label>
+                <label className="block text-xs text-gray-500 mb-1">{t("Target Model Group")}</label>
                 <input
                   type="text"
                   value={newAlias.targetModelGroup}
@@ -209,21 +210,21 @@ const ModelGroupAliasSettings: React.FC<ModelGroupAliasSettingsProps> = ({
                   className={`flex items-center px-4 py-2 rounded-md text-sm ${!newAlias.aliasName || !newAlias.targetModelGroup ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-green-600 text-white hover:bg-green-700"}`}
                 >
                   <PlusCircleIcon className="w-4 h-4 mr-1" />
-                  Add Alias
+                  {t("Add Alias")}
                 </button>
               </div>
             </div>
           </div>
 
-          <Text className="text-sm font-medium text-gray-700 mb-2">Manage Existing Aliases</Text>
+          <Text className="text-sm font-medium text-gray-700 mb-2">{t("Manage Existing Aliases")}</Text>
           <div className="rounded-lg custom-border relative mb-6">
             <div className="overflow-x-auto">
               <Table className="[&_td]:py-0.5 [&_th]:py-1">
                 <TableHead>
                   <TableRow>
-                    <TableHeaderCell className="py-1 h-8">Alias Name</TableHeaderCell>
-                    <TableHeaderCell className="py-1 h-8">Target Model Group</TableHeaderCell>
-                    <TableHeaderCell className="py-1 h-8">Actions</TableHeaderCell>
+                    <TableHeaderCell className="py-1 h-8">{t("Alias Name")}</TableHeaderCell>
+                    <TableHeaderCell className="py-1 h-8">{t("Target Model Group")}</TableHeaderCell>
+                    <TableHeaderCell className="py-1 h-8">{t("Actions")}</TableHeaderCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -301,7 +302,7 @@ const ModelGroupAliasSettings: React.FC<ModelGroupAliasSettingsProps> = ({
                   {aliases.length === 0 && (
                     <TableRow>
                       <TableCell colSpan={3} className="py-0.5 text-sm text-gray-500 text-center">
-                        No aliases added yet. Add a new alias above.
+                        {t("No aliases added yet. Add a new alias above.")}
                       </TableCell>
                     </TableRow>
                   )}
@@ -312,9 +313,9 @@ const ModelGroupAliasSettings: React.FC<ModelGroupAliasSettingsProps> = ({
 
           {/* Configuration Example */}
           <Card>
-            <Title className="mb-4">Configuration Example</Title>
+            <Title className="mb-4">{t("Configuration Example")}</Title>
             <Text className="text-gray-600 mb-4">
-              Here&apos;s how your current aliases would look in the config.yaml:
+              {t("Here's how your current aliases would look in the config.yaml:")}
             </Text>
             <div className="bg-gray-100 rounded-lg p-4 font-mono text-sm">
               <div className="text-gray-700">

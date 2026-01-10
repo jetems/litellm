@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import { Form, Table } from "antd";
 import { TextInput } from "@tremor/react";
 import { Tooltip } from "../atoms/index";
+import { useTranslate } from "@/i18n";
 import { Providers } from "../provider_info_helpers";
 
 const ConditionalPublicModelName: React.FC = () => {
+  const t = useTranslate();
   const form = Form.useFormInstance();
   const [tableKey, setTableKey] = useState(0); // Add a key to force table re-render
 
@@ -118,7 +120,7 @@ const ConditionalPublicModelName: React.FC = () => {
     {
       title: (
         <span className="flex items-center">
-          Public Model Name
+          {t("Public Model Name")}
           <Tooltip content={publicNameTooltipContent} width="500px" />
         </span>
       ),
@@ -140,7 +142,7 @@ const ConditionalPublicModelName: React.FC = () => {
     {
       title: (
         <span className="flex items-center">
-          LiteLLM Model Name
+          {t("LiteLLM Model Name")}
           <Tooltip content={liteLLMModelTooltipContent} width="360px" />
         </span>
       ),
@@ -152,9 +154,9 @@ const ConditionalPublicModelName: React.FC = () => {
   return (
     <>
       <Form.Item
-        label="Model Mappings"
+        label={t("Model Mappings")}
         name="model_mappings"
-        tooltip="Map public model names to LiteLLM model names for load balancing"
+        tooltip={t("Map public model names to LiteLLM model names for load balancing")}
         labelCol={{ span: 10 }}
         wrapperCol={{ span: 16 }}
         labelAlign="left"
@@ -163,14 +165,14 @@ const ConditionalPublicModelName: React.FC = () => {
             required: true,
             validator: async (_, value) => {
               if (!value || value.length === 0) {
-                throw new Error("At least one model mapping is required");
+                throw new Error(t("At least one model mapping is required"));
               }
               // Check if all mappings have valid public names
               const invalidMappings = value.filter(
                 (mapping: any) => !mapping.public_name || mapping.public_name.trim() === "",
               );
               if (invalidMappings.length > 0) {
-                throw new Error("All model mappings must have valid public names");
+                throw new Error(t("All model mappings must have valid public names"));
               }
             },
           },

@@ -4,6 +4,7 @@ import type { UploadProps } from "antd/es/upload";
 import React, { useState } from "react";
 import ProviderSpecificFields from "../add_model/provider_specific_fields";
 import { Providers, providerLogoMap } from "../provider_info_helpers";
+import { useTranslate } from "@/i18n";
 const { Link } = Typography;
 
 interface AddCredentialsModalProps {
@@ -14,6 +15,7 @@ interface AddCredentialsModalProps {
 }
 
 const AddCredentialsModal: React.FC<AddCredentialsModalProps> = ({ open, onCancel, onAddCredential, uploadProps }) => {
+  const t = useTranslate();
   const [form] = Form.useForm();
   const [selectedProvider, setSelectedProvider] = useState<Providers>(Providers.OpenAI);
 
@@ -30,7 +32,7 @@ const AddCredentialsModal: React.FC<AddCredentialsModalProps> = ({ open, onCance
 
   return (
     <Modal
-      title="Add New Credential"
+      title={t("Add New Credential")}
       open={open}
       onCancel={() => {
         onCancel();
@@ -42,19 +44,19 @@ const AddCredentialsModal: React.FC<AddCredentialsModalProps> = ({ open, onCance
       <Form form={form} onFinish={handleSubmit} layout="vertical">
         {/* Credential Name */}
         <Form.Item
-          label="Credential Name:"
+          label={t("Credential Name:")}
           name="credential_name"
-          rules={[{ required: true, message: "Credential name is required" }]}
+          rules={[{ required: true, message: t("Credential name is required") }]}
         >
-          <TextInput placeholder="Enter a friendly name for these credentials" />
+          <TextInput placeholder={t("Enter a friendly name for these credentials")} />
         </Form.Item>
 
         {/* Provider Selection */}
         <Form.Item
-          rules={[{ required: true, message: "Required" }]}
-          label="Provider:"
+          rules={[{ required: true, message: t("Required") }]}
+          label={t("Provider")}
           name="custom_llm_provider"
-          tooltip="Helper to auto-populate provider specific fields"
+          tooltip={t("Helper to auto-populate provider specific fields")}
         >
           <AntdSelect
             showSearch
@@ -93,8 +95,8 @@ const AddCredentialsModal: React.FC<AddCredentialsModalProps> = ({ open, onCance
 
         {/* Modal Footer */}
         <div className="flex justify-between items-center">
-          <Tooltip title="Get help on our github">
-            <Link href="https://github.com/BerriAI/litellm/issues">Need Help?</Link>
+          <Tooltip title={t("Get help on our github")}>
+            <Link href="https://github.com/BerriAI/litellm/issues">{t("Need Help?")}</Link>
           </Tooltip>
 
           <div>
@@ -105,9 +107,9 @@ const AddCredentialsModal: React.FC<AddCredentialsModalProps> = ({ open, onCance
               }}
               style={{ marginRight: 10 }}
             >
-              Cancel
+              {t("Cancel")}
             </Button>
-            <Button htmlType="submit">{"Add Credential"}</Button>
+            <Button htmlType="submit">{t("Add Credential")}</Button>
           </div>
         </div>
       </Form>

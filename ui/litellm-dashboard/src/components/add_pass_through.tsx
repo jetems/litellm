@@ -28,6 +28,7 @@ import RoutePreview from "./route_preview";
 import NotificationsManager from "./molecules/notifications_manager";
 import PassThroughSecuritySection from "./common_components/PassThroughSecuritySection";
 import PassThroughGuardrailsSection from "./common_components/PassThroughGuardrailsSection";
+import { useTranslate } from "@/i18n";
 const { Option } = Select2;
 
 interface AddFallbacksProps {
@@ -44,6 +45,7 @@ const AddPassThroughEndpoint: React.FC<AddFallbacksProps> = ({
   passThroughItems,
   premiumUser = false,
 }) => {
+  const t = useTranslate();
   const [form] = Form.useForm();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -80,12 +82,12 @@ const AddPassThroughEndpoint: React.FC<AddFallbacksProps> = ({
       if (!premiumUser && 'auth' in formValues) {
         delete formValues.auth;
       }
-      
+
       // Add guardrails to formValues (only if not empty)
       if (guardrails && Object.keys(guardrails).length > 0) {
         formValues.guardrails = guardrails;
       }
-      
+
       console.log(`formValues: ${JSON.stringify(formValues)}`);
 
       const response = await createPassThroughEndpoint(accessToken, formValues);
@@ -96,7 +98,7 @@ const AddPassThroughEndpoint: React.FC<AddFallbacksProps> = ({
       const updatedPassThroughSettings = [...passThroughItems, createdEndpoint];
       setPassThroughItems(updatedPassThroughSettings);
 
-      NotificationsManager.success("Pass-through endpoint created successfully");
+      NotificationsManager.success(t("Pass-through endpoint created successfully"));
       form.resetFields();
       setPathValue("");
       setTargetValue("");
@@ -118,13 +120,13 @@ const AddPassThroughEndpoint: React.FC<AddFallbacksProps> = ({
   return (
     <div>
       <Button className="mx-auto mb-4 mt-4" onClick={() => setIsModalVisible(true)}>
-        + Add Pass-Through Endpoint
+        {t("+ Add Pass-Through Endpoint")}
       </Button>
       <Modal
         title={
           <div className="flex items-center space-x-3 pb-4 border-b border-gray-100">
             <ApiOutlined className="text-xl text-blue-500" />
-            <h2 className="text-xl font-semibold text-gray-900">Add Pass-Through Endpoint</h2>
+            <h2 className="text-xl font-semibold text-gray-900">{t("Add Pass-Through Endpoint")}</h2>
           </div>
         }
         open={isModalVisible}
@@ -139,8 +141,8 @@ const AddPassThroughEndpoint: React.FC<AddFallbacksProps> = ({
       >
         <div className="mt-6">
           <Alert
-            message="What is a Pass-Through Endpoint?"
-            description="Route requests from your LiteLLM proxy to any external API. Perfect for custom models, image generation APIs, or any service you want to proxy through LiteLLM."
+            message={t("What is a Pass-Through Endpoint?")}
+            description={t("Route requests from your LiteLLM proxy to any external API. Perfect for custom models, image generation APIs, or any service you want to proxy through LiteLLM.")}
             type="info"
             showIcon
             className="mb-6"
@@ -159,16 +161,16 @@ const AddPassThroughEndpoint: React.FC<AddFallbacksProps> = ({
           >
             {/* Route Configuration Section */}
             <Card className="p-5">
-              <Title className="text-lg font-semibold text-gray-900 mb-2">Route Configuration</Title>
+              <Title className="text-lg font-semibold text-gray-900 mb-2">{t("Route Configuration")}</Title>
               <Subtitle className="text-gray-600 mb-5">
-                Configure how requests to your domain will be forwarded to the target API
+                {t("Configure how requests to your domain will be forwarded to the target API")}
               </Subtitle>
 
               <div className="space-y-5">
                 <Form.Item
-                  label={<span className="text-sm font-medium text-gray-700">Path Prefix</span>}
+                  label={<span className="text-sm font-medium text-gray-700">{t("Path Prefix")}</span>}
                   name="path"
-                  rules={[{ required: true, message: "Path is required", pattern: /^\// }]}
+                  rules={[{ required: true, message: t("Path is required"), pattern: /^\// }]}
                   extra={
                     <div className="text-xs text-gray-500 mt-1">Example: /bria, /adobe-photoshop, /elasticsearch</div>
                   }
@@ -185,11 +187,11 @@ const AddPassThroughEndpoint: React.FC<AddFallbacksProps> = ({
                 </Form.Item>
 
                 <Form.Item
-                  label={<span className="text-sm font-medium text-gray-700">Target URL</span>}
+                  label={<span className="text-sm font-medium text-gray-700">{t("Target URL")}</span>}
                   name="target"
                   rules={[
-                    { required: true, message: "Target URL is required" },
-                    { type: "url", message: "Please enter a valid URL" },
+                    { required: true, message: t("Target URL is required") },
+                    { type: "url", message: t("Please enter a valid URL") },
                   ]}
                   extra={<div className="text-xs text-gray-500 mt-1">Example:https://engine.prod.bria-api.com</div>}
                   className="mb-4"
@@ -206,9 +208,9 @@ const AddPassThroughEndpoint: React.FC<AddFallbacksProps> = ({
 
                 <div className="flex items-center justify-between py-3">
                   <div>
-                    <div className="text-sm font-medium text-gray-700">Include Subpaths</div>
+                    <div className="text-sm font-medium text-gray-700">{t("Include Subpaths")}</div>
                     <div className="text-xs text-gray-500 mt-0.5">
-                      Forward all subpaths to the target API (recommended for REST APIs)
+                      {t("Forward all subpaths to the target API (recommended for REST APIs)")}
                     </div>
                   </div>
                   <Form.Item name="include_subpath" valuePropName="checked" className="mb-0">
@@ -223,25 +225,25 @@ const AddPassThroughEndpoint: React.FC<AddFallbacksProps> = ({
 
             {/* Headers Section */}
             <Card className="p-6">
-              <Title className="text-lg font-semibold text-gray-900 mb-2">Headers</Title>
+              <Title className="text-lg font-semibold text-gray-900 mb-2">{t("Headers")}</Title>
               <Subtitle className="text-gray-600 mb-6">
-                Add headers that will be sent with every request to the target API
+                {t("Add headers that will be sent with every request to the target API")}
               </Subtitle>
 
               <Form.Item
                 label={
                   <span className="text-sm font-medium text-gray-700 flex items-center">
-                    Authentication Headers
-                    <Tooltip title="Authentication and other headers to forward with requests">
+                    {t("Authentication Headers")}
+                    <Tooltip title={t("Authentication and other headers to forward with requests")}>
                       <InfoCircleOutlined className="ml-2 text-blue-400 hover:text-blue-600 cursor-help" />
                     </Tooltip>
                   </span>
                 }
                 name="headers"
-                rules={[{ required: true, message: "Please configure the headers" }]}
+                rules={[{ required: true, message: t("Please configure the headers") }]}
                 extra={
                   <div className="text-xs text-gray-500 mt-2">
-                    <div className="font-medium mb-1">Add authentication tokens and other required headers</div>
+                    <div className="font-medium mb-1">{t("Add authentication tokens and other required headers")}</div>
                     <div>Common examples: auth_token, Authorization, x-api-key</div>
                   </div>
                 }
@@ -269,14 +271,14 @@ const AddPassThroughEndpoint: React.FC<AddFallbacksProps> = ({
 
             {/* Billing Section */}
             <Card className="p-6">
-              <Title className="text-lg font-semibold text-gray-900 mb-2">Billing</Title>
-              <Subtitle className="text-gray-600 mb-6">Optional cost tracking for this endpoint</Subtitle>
+              <Title className="text-lg font-semibold text-gray-900 mb-2">{t("Billing")}</Title>
+              <Subtitle className="text-gray-600 mb-6">{t("Optional cost tracking for this endpoint")}</Subtitle>
 
               <Form.Item
                 label={
                   <span className="text-sm font-medium text-gray-700 flex items-center">
-                    Cost Per Request (USD)
-                    <Tooltip title="Optional: Track costs for requests to this endpoint">
+                    {t("Cost Per Request (USD)")}
+                    <Tooltip title={t("Optional: Track costs for requests to this endpoint")}>
                       <InfoCircleOutlined className="ml-2 text-gray-400 hover:text-gray-600" />
                     </Tooltip>
                   </span>
@@ -284,7 +286,7 @@ const AddPassThroughEndpoint: React.FC<AddFallbacksProps> = ({
                 name="cost_per_request"
                 extra={
                   <div className="text-xs text-gray-500 mt-2">
-                    The cost charged for each request through this endpoint
+                    {t("The cost charged for each request through this endpoint")}
                   </div>
                 }
               >
@@ -294,7 +296,7 @@ const AddPassThroughEndpoint: React.FC<AddFallbacksProps> = ({
 
             <div className="flex items-center justify-end space-x-3 pt-6 border-t border-gray-100">
               <Button variant="secondary" onClick={handleCancel}>
-                Cancel
+                {t("Cancel")}
               </Button>
               <Button
                 variant="primary"
@@ -304,7 +306,7 @@ const AddPassThroughEndpoint: React.FC<AddFallbacksProps> = ({
                   form.submit();
                 }}
               >
-                {isLoading ? "Creating..." : "Add Pass-Through Endpoint"}
+                {isLoading ? t("Creating...") : t("Add Pass-Through Endpoint")}
               </Button>
             </div>
           </Form>

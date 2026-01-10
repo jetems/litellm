@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Card, Form, Button, Tooltip, Typography, Select as AntdSelect, Modal } from "antd";
 import type { FormInstance } from "antd";
 import { Text, TextInput } from "@tremor/react";
+import { useTranslate } from "@/i18n";
 import { modelAvailableCall } from "../networking";
 import ConnectionErrorDisplay from "./model_connection_test";
 import { all_admin_roles } from "@/utils/roles";
@@ -20,6 +21,7 @@ interface AddAutoRouterTabProps {
 const { Title, Link } = Typography;
 
 const AddAutoRouterTab: React.FC<AddAutoRouterTabProps> = ({ form, handleOk, accessToken, userRole }) => {
+  const t = useTranslate();
   // State for connection testing
   const [isResultModalVisible, setIsResultModalVisible] = useState<boolean>(false);
   const [isTestingConnection, setIsTestingConnection] = useState<boolean>(false);
@@ -141,10 +143,9 @@ const AddAutoRouterTab: React.FC<AddAutoRouterTabProps> = ({ form, handleOk, acc
 
   return (
     <>
-      <Title level={2}>Add Auto Router</Title>
+      <Title level={2}>{t("Add Auto Router")}</Title>
       <Text className="text-gray-600 mb-6">
-        Create an auto router with intelligent routing logic that automatically selects the best model based on user
-        input patterns and semantic matching.
+        {t("Create an auto router with intelligent routing logic that automatically selects the best model based on user input patterns and semantic matching.")}
       </Text>
 
       <Card>
@@ -157,10 +158,10 @@ const AddAutoRouterTab: React.FC<AddAutoRouterTabProps> = ({ form, handleOk, acc
         >
           {/* Auto Router Name */}
           <Form.Item
-            rules={[{ required: true, message: "Auto router name is required" }]}
-            label="Auto Router Name"
+            rules={[{ required: true, message: t("Auto router name is required") }]}
+            label={t("Auto Router Name")}
             name="auto_router_name"
-            tooltip="Unique name for this auto router configuration"
+            tooltip={t("Unique name for this auto router configuration")}
             labelCol={{ span: 10 }}
             labelAlign="left"
           >
@@ -181,15 +182,15 @@ const AddAutoRouterTab: React.FC<AddAutoRouterTabProps> = ({ form, handleOk, acc
 
           {/* Auto Router Default Model */}
           <Form.Item
-            rules={[{ required: true, message: "Default model is required" }]}
-            label="Default Model"
+            rules={[{ required: true, message: t("Default model is required") }]}
+            label={t("Default Model")}
             name="auto_router_default_model"
-            tooltip="Fallback model to use when auto routing logic cannot determine the best model"
+            tooltip={t("Fallback model to use when auto routing logic cannot determine the best model")}
             labelCol={{ span: 10 }}
             labelAlign="left"
           >
             <AntdSelect
-              placeholder="Select a default model"
+              placeholder={t("Select a default model")}
               onChange={(value) => {
                 setShowCustomDefaultModel(value === "custom");
               }}
@@ -198,7 +199,7 @@ const AddAutoRouterTab: React.FC<AddAutoRouterTabProps> = ({ form, handleOk, acc
                   value: model_group,
                   label: model_group,
                 })),
-                { value: "custom", label: "Enter custom model name" },
+                { value: "custom", label: t("Enter custom model name") },
               ]}
               style={{ width: "100%" }}
               showSearch={true}
@@ -207,15 +208,15 @@ const AddAutoRouterTab: React.FC<AddAutoRouterTabProps> = ({ form, handleOk, acc
 
           {/* Auto Router Embedding Model */}
           <Form.Item
-            label="Embedding Model"
+            label={t("Embedding Model")}
             name="auto_router_embedding_model"
-            tooltip="Optional: Embedding model to use for semantic routing decisions"
+            tooltip={t("Optional: Embedding model to use for semantic routing decisions")}
             labelCol={{ span: 10 }}
             labelAlign="left"
           >
             <AntdSelect
               value={form.getFieldValue("auto_router_embedding_model")}
-              placeholder="Select an embedding model (optional)"
+              placeholder={t("Select an embedding model (optional)")}
               onChange={(value) => {
                 setShowCustomEmbeddingModel(value === "custom");
                 form.setFieldValue("auto_router_embedding_model", value);
@@ -225,7 +226,7 @@ const AddAutoRouterTab: React.FC<AddAutoRouterTabProps> = ({ form, handleOk, acc
                   value: model_group,
                   label: model_group,
                 })),
-                { value: "custom", label: "Enter custom model name" },
+                { value: "custom", label: t("Enter custom model name") },
               ]}
               style={{ width: "100%" }}
               showSearch={true}
@@ -234,22 +235,22 @@ const AddAutoRouterTab: React.FC<AddAutoRouterTabProps> = ({ form, handleOk, acc
           </Form.Item>
           <div className="flex items-center my-4">
             <div className="flex-grow border-t border-gray-200"></div>
-            <span className="px-4 text-gray-500 text-sm">Additional Settings</span>
+            <span className="px-4 text-gray-500 text-sm">{t("Additional Settings")}</span>
             <div className="flex-grow border-t border-gray-200"></div>
           </div>
 
           {/* Model Access Groups - Admin only */}
           {isAdmin && (
             <Form.Item
-              label="Model Access Group"
+              label={t("Model Access Group")}
               name="model_access_group"
               className="mb-4"
-              tooltip="Use model access groups to control who can access this auto router"
+              tooltip={t("Use model access groups to control who can access this auto router")}
             >
               <AntdSelect
                 mode="tags"
                 showSearch
-                placeholder="Select existing groups or type to create new ones"
+                placeholder={t("Select existing groups or type to create new ones")}
                 optionFilterProp="children"
                 tokenSeparators={[","]}
                 options={modelAccessGroups.map((group) => ({
@@ -263,12 +264,12 @@ const AddAutoRouterTab: React.FC<AddAutoRouterTabProps> = ({ form, handleOk, acc
           )}
 
           <div className="flex justify-between items-center mb-4">
-            <Tooltip title="Get help on our github">
-              <Typography.Link href="https://github.com/BerriAI/litellm/issues">Need Help?</Typography.Link>
+            <Tooltip title={t("Get help on our github")}>
+              <Typography.Link href="https://github.com/BerriAI/litellm/issues">{t("Need Help?")}</Typography.Link>
             </Tooltip>
             <div className="space-x-2">
               <Button onClick={handleTestConnection} loading={isTestingConnection}>
-                Test Connect
+                {t("Test Connect")}
               </Button>
               <Button
                 onClick={() => {
@@ -278,7 +279,7 @@ const AddAutoRouterTab: React.FC<AddAutoRouterTabProps> = ({ form, handleOk, acc
                   handleAutoRouterSubmit();
                 }}
               >
-                Add Auto Router
+                {t("Add Auto Router")}
               </Button>
             </div>
           </div>
@@ -287,7 +288,7 @@ const AddAutoRouterTab: React.FC<AddAutoRouterTabProps> = ({ form, handleOk, acc
 
       {/* Test Connection Results Modal */}
       <Modal
-        title="Connection Test Results"
+        title={t("Connection Test Results")}
         open={isResultModalVisible}
         onCancel={() => {
           setIsResultModalVisible(false);
@@ -301,7 +302,7 @@ const AddAutoRouterTab: React.FC<AddAutoRouterTabProps> = ({ form, handleOk, acc
               setIsTestingConnection(false);
             }}
           >
-            Close
+            {t("Close")}
           </Button>,
         ]}
         width={700}

@@ -102,7 +102,7 @@ const PassThroughSettings: React.FC<GeneralSettingsPageProps> = ({ accessToken, 
       const updatedSettings = generalSettings.filter((setting) => setting.id !== endpointToDelete);
       setGeneralSettings(updatedSettings);
 
-      NotificationsManager.success("Endpoint deleted successfully.");
+      NotificationsManager.success(t("Endpoint deleted successfully."));
     } catch (error) {
       console.error("Error deleting the endpoint:", error);
       NotificationsManager.fromBackend("Error deleting the endpoint: " + error);
@@ -141,33 +141,33 @@ const PassThroughSettings: React.FC<GeneralSettingsPageProps> = ({ accessToken, 
       ),
     },
     {
-      header: "Path",
+      header: t("Path"),
       accessorKey: "path",
     },
     {
-      header: "Target",
+      header: t("Target"),
       accessorKey: "target",
       cell: (info: any) => <Text>{info.getValue()}</Text>,
     },
     {
       header: () => (
         <div className="flex items-center gap-1">
-          <span>Authentication</span>
-          <Tooltip title="LiteLLM Virtual Key required to call endpoint">
+          <span>{t("Authentication")}</span>
+          <Tooltip title={t("LiteLLM Virtual Key required to call endpoint")}>
             <InformationCircleIcon className="w-4 h-4 text-gray-400 cursor-help" />
           </Tooltip>
         </div>
       ),
       accessorKey: "auth",
-      cell: (info: any) => <Badge color={info.getValue() ? "green" : "gray"}>{info.getValue() ? "Yes" : "No"}</Badge>,
+      cell: (info: any) => <Badge color={info.getValue() ? "green" : "gray"}>{info.getValue() ? t("Yes") : t("No")}</Badge>,
     },
     {
-      header: "Headers",
+      header: t("Headers"),
       accessorKey: "headers",
       cell: (info: any) => <PasswordField value={info.getValue() || {}} />,
     },
     {
-      header: "Actions",
+      header: t("Actions"),
       id: "actions",
       cell: ({ row }) => (
         <div className="flex space-x-1">
@@ -175,13 +175,13 @@ const PassThroughSettings: React.FC<GeneralSettingsPageProps> = ({ accessToken, 
             icon={PencilAltIcon}
             size="sm"
             onClick={() => row.original.id && setSelectedEndpointId(row.original.id)}
-            title="Edit"
+            title={t("Edit")}
           />
           <Icon
             icon={TrashIcon}
             size="sm"
             onClick={() => handleResetField(row.original.id!, row.index)}
-            title="Delete"
+            title={t("Delete")}
           />
         </div>
       ),
@@ -235,7 +235,7 @@ const PassThroughSettings: React.FC<GeneralSettingsPageProps> = ({ accessToken, 
         renderSubComponent={() => <div></div>}
         getRowCanExpand={() => false}
         isLoading={false}
-        noDataMessage="No pass-through endpoints configured"
+        noDataMessage={t("No pass-through endpoints configured")}
       />
 
       {isDeleteModalOpen && (
@@ -255,10 +255,10 @@ const PassThroughSettings: React.FC<GeneralSettingsPageProps> = ({ accessToken, 
               <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div className="sm:flex sm:items-start">
                   <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900">Delete Pass-Through Endpoint</h3>
+                    <h3 className="text-lg leading-6 font-medium text-gray-900">{t("Delete Pass-Through Endpoint")}</h3>
                     <div className="mt-2">
                       <p className="text-sm text-gray-500">
-                        Are you sure you want to delete this pass-through endpoint? This action cannot be undone.
+                        {t("Are you sure you want to delete this pass-through endpoint? This action cannot be undone.")}
                       </p>
                     </div>
                   </div>
@@ -266,9 +266,9 @@ const PassThroughSettings: React.FC<GeneralSettingsPageProps> = ({ accessToken, 
               </div>
               <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                 <Button onClick={confirmDelete} color="red" className="ml-2">
-                  Delete
+                  {t("Delete")}
                 </Button>
-                <Button onClick={cancelDelete}>Cancel</Button>
+                <Button onClick={cancelDelete}>{t("Cancel")}</Button>
               </div>
             </div>
           </div>
