@@ -19,6 +19,7 @@ import ContentFilterConfiguration from "./content_filter/ContentFilterConfigurat
 import ToolPermissionRulesEditor, {
   ToolPermissionConfig,
 } from "./tool_permission/ToolPermissionRulesEditor";
+import { useTranslate } from "@/i18n";
 
 const { Title, Text, Link } = Typography;
 const { Option } = Select;
@@ -86,6 +87,7 @@ interface ProviderParamsResponse {
 }
 
 const AddGuardrailForm: React.FC<AddGuardrailFormProps> = ({ visible, onClose, accessToken, onSuccess }) => {
+  const t = useTranslate();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
@@ -138,7 +140,7 @@ const AddGuardrailForm: React.FC<AddGuardrailFormProps> = ({ visible, onClose, a
         populateGuardrailProviderMap(providerParamsResp);
       } catch (error) {
         console.error("Error fetching guardrail data:", error);
-        NotificationsManager.fromBackend("Failed to load guardrail configuration");
+        NotificationsManager.fromBackend(t("Failed to load guardrail configuration"));
       }
     };
 
@@ -226,7 +228,7 @@ const AddGuardrailForm: React.FC<AddGuardrailFormProps> = ({ visible, onClose, a
       // Validate configuration steps
       if (currentStep === 1) {
         if (shouldRenderPIIConfigSettings(selectedProvider) && selectedEntities.length === 0) {
-          NotificationsManager.fromBackend("Please select at least one PII entity to continue");
+          NotificationsManager.fromBackend(t("Please select at least one PII entity to continue"));
           return;
         }
       }
@@ -341,7 +343,7 @@ const AddGuardrailForm: React.FC<AddGuardrailFormProps> = ({ visible, onClose, a
           // For some guardrails, the config values need to be in litellm_params
           guardrailData.guardrail_info = configObj;
         } catch (error) {
-          NotificationsManager.fromBackend("Invalid JSON in configuration");
+          NotificationsManager.fromBackend(t("Invalid JSON in configuration"));
           setLoading(false);
           return;
         }
@@ -349,7 +351,7 @@ const AddGuardrailForm: React.FC<AddGuardrailFormProps> = ({ visible, onClose, a
 
       if (guardrailProvider === "tool_permission") {
         if (toolPermissionConfig.rules.length === 0) {
-          NotificationsManager.fromBackend("Add at least one tool permission rule");
+          NotificationsManager.fromBackend(t("Add at least one tool permission rule"));
           setLoading(false);
           return;
         }
@@ -417,7 +419,7 @@ const AddGuardrailForm: React.FC<AddGuardrailFormProps> = ({ visible, onClose, a
       console.log("Sending guardrail data:", JSON.stringify(guardrailData));
       await createGuardrailCall(accessToken, guardrailData);
 
-      NotificationsManager.success("Guardrail created successfully");
+      NotificationsManager.success(t("Guardrail created successfully"));
 
       // Reset form and close modal
       resetForm();
@@ -438,19 +440,19 @@ const AddGuardrailForm: React.FC<AddGuardrailFormProps> = ({ visible, onClose, a
       <>
         <Form.Item
           name="guardrail_name"
-          label="Guardrail Name"
-          rules={[{ required: true, message: "Please enter a guardrail name" }]}
+          label={t("Guardrail Name")}
+          rules={[{ required: true, message: t("Please enter a guardrail name") }]}
         >
-          <TextInput placeholder="Enter a name for this guardrail" />
+          <TextInput placeholder={t("Enter a name for this guardrail")} />
         </Form.Item>
 
         <Form.Item
           name="provider"
-          label="Guardrail Provider"
-          rules={[{ required: true, message: "Please select a provider" }]}
+          label={t("Guardrail Provider")}
+          rules={[{ required: true, message: t("Please select a provider") }]}
         >
           <Select
-            placeholder="Select a guardrail provider"
+            placeholder={t("Select a guardrail provider")}
             onChange={handleProviderChange}
             labelInValue={false}
             optionLabelProp="label"
@@ -509,9 +511,9 @@ const AddGuardrailForm: React.FC<AddGuardrailFormProps> = ({ visible, onClose, a
 
         <Form.Item
           name="mode"
-          label="Mode"
-          tooltip="How the guardrail should be applied"
-          rules={[{ required: true, message: "Please select a mode" }]}
+          label={t("Mode")}
+          tooltip={t("How the guardrail should be applied")}
+          rules={[{ required: true, message: t("Please select a mode") }]}
         >
           <Select optionLabelProp="label" mode="multiple">
             {guardrailSettings?.supported_modes?.map((mode) => (
@@ -521,7 +523,7 @@ const AddGuardrailForm: React.FC<AddGuardrailFormProps> = ({ visible, onClose, a
                     <strong>{mode}</strong>
                     {mode === "pre_call" && (
                       <Tag color="green" style={{ marginLeft: "8px" }}>
-                        Recommended
+                        {t("Recommended")}
                       </Tag>
                     )}
                   </div>
@@ -531,52 +533,52 @@ const AddGuardrailForm: React.FC<AddGuardrailFormProps> = ({ visible, onClose, a
                 </div>
               </Option>
             )) || (
-              <>
-                <Option value="pre_call" label="pre_call">
-                  <div>
+                <>
+                  <Option value="pre_call" label="pre_call">
                     <div>
-                      <strong>pre_call</strong> <Tag color="green">Recommended</Tag>
+                      <div>
+                        <strong>pre_call</strong> <Tag color="green">{t("Recommended")}</Tag>
+                      </div>
+                      <div style={{ fontSize: "12px", color: "#888" }}>{modeDescriptions.pre_call}</div>
                     </div>
-                    <div style={{ fontSize: "12px", color: "#888" }}>{modeDescriptions.pre_call}</div>
-                  </div>
-                </Option>
-                <Option value="during_call" label="during_call">
-                  <div>
+                  </Option>
+                  <Option value="during_call" label="during_call">
                     <div>
-                      <strong>during_call</strong>
+                      <div>
+                        <strong>during_call</strong>
+                      </div>
+                      <div style={{ fontSize: "12px", color: "#888" }}>{modeDescriptions.during_call}</div>
                     </div>
-                    <div style={{ fontSize: "12px", color: "#888" }}>{modeDescriptions.during_call}</div>
-                  </div>
-                </Option>
-                <Option value="post_call" label="post_call">
-                  <div>
+                  </Option>
+                  <Option value="post_call" label="post_call">
                     <div>
-                      <strong>post_call</strong>
+                      <div>
+                        <strong>post_call</strong>
+                      </div>
+                      <div style={{ fontSize: "12px", color: "#888" }}>{modeDescriptions.post_call}</div>
                     </div>
-                    <div style={{ fontSize: "12px", color: "#888" }}>{modeDescriptions.post_call}</div>
-                  </div>
-                </Option>
-                <Option value="logging_only" label="logging_only">
-                  <div>
+                  </Option>
+                  <Option value="logging_only" label="logging_only">
                     <div>
-                      <strong>logging_only</strong>
+                      <div>
+                        <strong>logging_only</strong>
+                      </div>
+                      <div style={{ fontSize: "12px", color: "#888" }}>{modeDescriptions.logging_only}</div>
                     </div>
-                    <div style={{ fontSize: "12px", color: "#888" }}>{modeDescriptions.logging_only}</div>
-                  </div>
-                </Option>
-              </>
-            )}
+                  </Option>
+                </>
+              )}
           </Select>
         </Form.Item>
 
         <Form.Item
           name="default_on"
-          label="Always On"
-          tooltip="If enabled, this guardrail will be applied to all requests by default."
+          label={t("Always On")}
+          tooltip={t("If enabled, this guardrail will be applied to all requests by default.")}
         >
           <Select>
-            <Select.Option value={true}>Yes</Select.Option>
-            <Select.Option value={false}>No</Select.Option>
+            <Select.Option value={true}>{t("Yes")}</Select.Option>
+            <Select.Option value={false}>{t("No")}</Select.Option>
           </Select>
         </Form.Item>
 
@@ -691,29 +693,29 @@ const AddGuardrailForm: React.FC<AddGuardrailFormProps> = ({ visible, onClose, a
   const renderStepButtons = () => {
     const totalSteps = shouldRenderContentFilterConfigSettings(selectedProvider) ? 3 : 2;
     const isLastStep = currentStep === totalSteps - 1;
-    
+
     return (
       <div className="flex justify-end space-x-2 mt-4">
         {currentStep > 0 && (
           <Button variant="secondary" onClick={prevStep}>
-            Previous
+            {t("Previous")}
           </Button>
         )}
-        {!isLastStep && <Button onClick={nextStep}>Next</Button>}
+        {!isLastStep && <Button onClick={nextStep}>{t("Next")}</Button>}
         {isLastStep && (
           <Button onClick={handleSubmit} loading={loading}>
-            Create Guardrail
+            {t("Create Guardrail")}
           </Button>
         )}
         <Button variant="secondary" onClick={handleClose}>
-          Cancel
+          {t("Cancel")}
         </Button>
       </div>
     );
   };
 
   return (
-    <Modal title="Add Guardrail" open={visible} onCancel={handleClose} footer={null} width={700}>
+    <Modal title={t("Add Guardrail")} open={visible} onCancel={handleClose} footer={null} width={700}>
       <Form
         form={form}
         layout="vertical"
@@ -723,18 +725,18 @@ const AddGuardrailForm: React.FC<AddGuardrailFormProps> = ({ visible, onClose, a
         }}
       >
         <Steps current={currentStep} className="mb-6">
-          <Step title="Basic Info" />
+          <Step title={t("Basic Info")} />
           <Step
             title={
               shouldRenderPIIConfigSettings(selectedProvider)
-                ? "PII Configuration"
+                ? t("PII Configuration")
                 : shouldRenderContentFilterConfigSettings(selectedProvider)
-                  ? "Pattern Detection"
-                  : "Provider Configuration"
+                  ? t("Pattern Detection")
+                  : t("Provider Configuration")
             }
           />
           {shouldRenderContentFilterConfigSettings(selectedProvider) && (
-            <Step title="Blocked Keywords" />
+            <Step title={t("Blocked Keywords")} />
           )}
         </Steps>
 

@@ -2,6 +2,7 @@ import { Typography } from "antd";
 import React, { useState } from "react";
 import { CategoryFilter, PiiEntityList, QuickActions } from "./pii_components";
 import { PiiConfigurationProps } from "./types";
+import { useTranslate } from "@/i18n";
 
 const { Title, Text } = Typography;
 
@@ -18,6 +19,7 @@ const PiiConfiguration: React.FC<PiiConfigurationProps> = ({
   onActionSelect,
   entityCategories = [],
 }) => {
+  const t = useTranslate();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   // Create a lookup map to quickly find an entity's category
@@ -58,10 +60,10 @@ const PiiConfiguration: React.FC<PiiConfigurationProps> = ({
       <div className="flex justify-between items-center mb-5">
         <div className="flex items-center">
           <Title level={4} className="!m-0 font-semibold text-gray-800">
-            Configure PII Protection
+            {t("Configure PII Protection")}
           </Title>
         </div>
-        <Text className="text-gray-500">{selectedEntities.length} items selected</Text>
+        <Text className="text-gray-500">{t("Items selected", { count: selectedEntities.length })}</Text>
       </div>
 
       <div className="mb-6">

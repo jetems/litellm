@@ -3,6 +3,7 @@ import { Button, Card } from "@tremor/react";
 import { Typography } from "antd";
 import { CopyOutlined, CheckCircleOutlined, ClockCircleOutlined, DownOutlined, RightOutlined } from "@ant-design/icons";
 import NotificationsManager from "../molecules/notifications_manager";
+import { useTranslate } from "@/i18n";
 
 const { Text } = Typography;
 
@@ -24,6 +25,7 @@ interface GuardrailTestResultsProps {
 }
 
 export function GuardrailTestResults({ results, errors }: GuardrailTestResultsProps) {
+  const t = useTranslate();
   const [collapsedResults, setCollapsedResults] = useState<Set<string>>(new Set());
 
   const toggleResultCollapse = (guardrailName: string) => {
@@ -70,7 +72,7 @@ export function GuardrailTestResults({ results, errors }: GuardrailTestResultsPr
 
   return (
     <div className="space-y-3 pt-4 border-t border-gray-200">
-      <h3 className="text-sm font-semibold text-gray-900">Results</h3>
+      <h3 className="text-sm font-semibold text-gray-900">{t("Results")}</h3>
 
       {/* Success Results */}
       {results &&
@@ -80,7 +82,7 @@ export function GuardrailTestResults({ results, errors }: GuardrailTestResultsPr
             <Card key={result.guardrailName} className="bg-green-50 border-green-200">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <div 
+                  <div
                     className="flex items-center space-x-2 cursor-pointer flex-1"
                     onClick={() => toggleResultCollapse(result.guardrailName)}
                   >
@@ -107,13 +109,13 @@ export function GuardrailTestResults({ results, errors }: GuardrailTestResultsPr
                         onClick={async () => {
                           const success = await copyToClipboard(result.response_text);
                           if (success) {
-                            NotificationsManager.success("Result copied to clipboard");
+                            NotificationsManager.success(t("Result copied to clipboard"));
                           } else {
-                            NotificationsManager.fromBackend("Failed to copy result");
+                            NotificationsManager.fromBackend(t("Failed to copy result"));
                           }
                         }}
                       >
-                        Copy
+                        {t("Copy")}
                       </Button>
                     )}
                   </div>
@@ -122,14 +124,14 @@ export function GuardrailTestResults({ results, errors }: GuardrailTestResultsPr
                   <>
                     <div className="bg-white border border-green-200 rounded p-3">
                       <label className="text-xs font-medium text-gray-600 mb-2 block">
-                        Output Text
+                        {t("Output Text")}
                       </label>
                       <div className="font-mono text-sm text-gray-900 whitespace-pre-wrap break-words">
                         {result.response_text}
                       </div>
                     </div>
                     <div className="text-xs text-gray-600">
-                      <span className="font-medium">Characters:</span> {result.response_text.length}
+                      <span className="font-medium">{t("Characters")}:</span> {result.response_text.length}
                     </div>
                   </>
                 )}
@@ -145,7 +147,7 @@ export function GuardrailTestResults({ results, errors }: GuardrailTestResultsPr
           return (
             <Card key={errorItem.guardrailName} className="bg-red-50 border-red-200">
               <div className="flex items-start space-x-2">
-                <div 
+                <div
                   className="cursor-pointer mt-0.5"
                   onClick={() => toggleResultCollapse(errorItem.guardrailName)}
                 >
@@ -166,11 +168,11 @@ export function GuardrailTestResults({ results, errors }: GuardrailTestResultsPr
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-1">
-                    <p 
+                    <p
                       className="text-sm font-medium text-red-800 cursor-pointer"
                       onClick={() => toggleResultCollapse(errorItem.guardrailName)}
                     >
-                      {errorItem.guardrailName} - Error
+                      {errorItem.guardrailName} - {t("Error")}
                     </p>
                     <div className="flex items-center space-x-1 text-xs text-gray-600">
                       <ClockCircleOutlined />
@@ -190,4 +192,3 @@ export function GuardrailTestResults({ results, errors }: GuardrailTestResultsPr
 }
 
 export default GuardrailTestResults;
-
