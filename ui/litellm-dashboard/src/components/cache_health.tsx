@@ -2,6 +2,8 @@ import React from "react";
 import { Text, Button, TabGroup, TabList, Tab, TabPanel, TabPanels } from "@tremor/react";
 import { CheckCircleIcon, XCircleIcon, ClipboardCopyIcon } from "@heroicons/react/outline";
 import { ResponseTimeIndicator } from "./response_time_indicator";
+import { useTranslate } from "@/i18n";
+import { T } from "@/i18n";
 
 // Helper function to deep-parse a JSON string if possible
 const deepParse = (input: any) => {
@@ -17,7 +19,7 @@ const deepParse = (input: any) => {
 };
 
 // TableClickableErrorField component with copy-to-clipboard functionality
-const TableClickableErrorField: React.FC<{ label: string; value: string | null | undefined }> = ({ label, value }) => {
+const TableClickableErrorField: React.FC<{ label: string; value: string | null | undefined; t: (key: string) => string }> = ({ label, value, t }) => {
   const [isExpanded, setIsExpanded] = React.useState(false);
   const [copied, setCopied] = React.useState(false);
   const safeValue = value?.toString() || "N/A";
@@ -71,7 +73,7 @@ interface ErrorDetails {
 }
 
 // Update HealthCheckDetails component to handle errors
-const HealthCheckDetails: React.FC<{ response: any }> = ({ response }) => {
+const HealthCheckDetails: React.FC<{ response: any; t: (key: string) => string }> = ({ response, t }) => {
   // Initialize with safe default values
   let errorDetails: ErrorDetails | null = null;
   let parsedLitellmParams: any = {};
@@ -154,8 +156,8 @@ const HealthCheckDetails: React.FC<{ response: any }> = ({ response }) => {
     <div className="bg-white rounded-lg shadow">
       <TabGroup>
         <TabList className="border-b border-gray-200 px-4">
-          <Tab className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800">Summary</Tab>
-          <Tab className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800">Raw Response</Tab>
+          <Tab className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800"><T>Summary</T></Tab>
+          <Tab className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800"><T>Raw Response</T></Tab>
         </TabList>
 
         <TabPanels>
@@ -170,7 +172,7 @@ const HealthCheckDetails: React.FC<{ response: any }> = ({ response }) => {
                 <Text
                   className={`text-sm font-medium ${response?.status === "healthy" ? "text-green-500" : "text-red-500"}`}
                 >
-                  Cache Status: {response?.status || "unhealthy"}
+                  <T>Cache Status</T>: {response?.status || "unhealthy"}
                 </Text>
               </div>
 
@@ -181,26 +183,27 @@ const HealthCheckDetails: React.FC<{ response: any }> = ({ response }) => {
                     <>
                       <tr>
                         <td colSpan={2} className="pt-4 pb-2 font-semibold text-red-600">
-                          Error Details
+                          <T>Error Details</T>
                         </td>
                       </tr>
-                      <TableClickableErrorField label="Error Message" value={errorDetails.message} />
-                      <TableClickableErrorField label="Traceback" value={errorDetails.traceback} />
+                      <TableClickableErrorField label={t("Error Message")} value={errorDetails.message} t={t} />
+                      <TableClickableErrorField label={t("Traceback")} value={errorDetails.traceback} t={t} />
                     </>
                   )}
 
                   {/* Always show cache details, regardless of error state */}
                   <tr>
                     <td colSpan={2} className="pt-4 pb-2 font-semibold">
-                      Cache Details
+                      <T>Cache Details</T>
                     </td>
                   </tr>
-                  <TableClickableErrorField label="Cache Configuration" value={String(parsedLitellmParams?.type)} />
-                  <TableClickableErrorField label="Ping Response" value={String(response.ping_response)} />
-                  <TableClickableErrorField label="Set Cache Response" value={response.set_cache_response || "N/A"} />
+                  <TableClickableErrorField label={t("Cache Configuration")} value={String(parsedLitellmParams?.type)} t={t} />
+                  <TableClickableErrorField label={t("Ping Response")} value={String(response.ping_response)} t={t} />
+                  <TableClickableErrorField label={t("Set Cache Response")} value={response.set_cache_response || "N/A"} t={t} />
                   <TableClickableErrorField
                     label="litellm_settings.cache_params"
                     value={JSON.stringify(parsedLitellmParams, null, 2)}
+                    t={t}
                   />
 
                   {/* Redis Details Section */}
@@ -208,14 +211,14 @@ const HealthCheckDetails: React.FC<{ response: any }> = ({ response }) => {
                     <>
                       <tr>
                         <td colSpan={2} className="pt-4 pb-2 font-semibold">
-                          Redis Details
+                          <T>Redis Details</T>
                         </td>
                       </tr>
-                      <TableClickableErrorField label="Redis Host" value={redisDetails.redis_host || "N/A"} />
-                      <TableClickableErrorField label="Redis Port" value={redisDetails.redis_port || "N/A"} />
-                      <TableClickableErrorField label="Redis Version" value={redisDetails.redis_version || "N/A"} />
-                      <TableClickableErrorField label="Startup Nodes" value={redisDetails.startup_nodes || "N/A"} />
-                      <TableClickableErrorField label="Namespace" value={redisDetails.namespace || "N/A"} />
+                      <TableClickableErrorField label={t("Redis Host")} value={redisDetails.redis_host || "N/A"} t={t} />
+                      <TableClickableErrorField label={t("Redis Port")} value={redisDetails.redis_port || "N/A"} t={t} />
+                      <TableClickableErrorField label={t("Redis Version")} value={redisDetails.redis_version || "N/A"} t={t} />
+                      <TableClickableErrorField label={t("Startup Nodes")} value={redisDetails.startup_nodes || "N/A"} t={t} />
+                      <TableClickableErrorField label={t("Namespace")} value={redisDetails.namespace || "N/A"} t={t} />
                     </>
                   )}
                 </tbody>
@@ -249,7 +252,7 @@ const HealthCheckDetails: React.FC<{ response: any }> = ({ response }) => {
                     // Then stringify with proper formatting
                     return JSON.stringify(prettyData, null, 2);
                   } catch (e) {
-                    return "Error formatting JSON: " + (e as Error).message;
+                    return t("Error formatting JSON") + ": " + (e as Error).message;
                   }
                 })()}
               </pre>
@@ -267,6 +270,7 @@ export const CacheHealthTab: React.FC<{
   runCachingHealthCheck: () => void;
   responseTimeMs?: number | null;
 }> = ({ accessToken, healthCheckResponse, runCachingHealthCheck, responseTimeMs }) => {
+  const t = useTranslate();
   const [localResponseTimeMs, setLocalResponseTimeMs] = React.useState<number | null>(null);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
@@ -287,12 +291,12 @@ export const CacheHealthTab: React.FC<{
           disabled={isLoading}
           className="bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white text-sm px-4 py-2 rounded-md"
         >
-          {isLoading ? "Running Health Check..." : "Run Health Check"}
+          {isLoading ? <T>Running Health Check...</T> : <T>Run Health Check</T>}
         </Button>
         <ResponseTimeIndicator responseTimeMs={localResponseTimeMs} />
       </div>
 
-      {healthCheckResponse && <HealthCheckDetails response={healthCheckResponse} />}
+      {healthCheckResponse && <HealthCheckDetails response={healthCheckResponse} t={t} />}
     </div>
   );
 };

@@ -1,5 +1,7 @@
 import React from "react";
 import { TextInput } from "@tremor/react";
+import { useTranslate } from "@/i18n";
+import { T } from "@/i18n";
 
 interface ReliabilityRetriesSectionProps {
   routerSettings: { [key: string]: any };
@@ -10,11 +12,12 @@ const ReliabilityRetriesSection: React.FC<ReliabilityRetriesSectionProps> = ({
   routerSettings,
   routerFieldsMetadata,
 }) => {
+  const t = useTranslate();
   return (
     <div className="space-y-6">
       <div className="max-w-3xl">
-        <h3 className="text-sm font-medium text-gray-900">Reliability & Retries</h3>
-        <p className="text-xs text-gray-500 mt-1">Configure retry logic and failure handling</p>
+        <h3 className="text-sm font-medium text-gray-900"><T>Reliability & Retries</T></h3>
+        <p className="text-xs text-gray-500 mt-1"><T>Configure retry logic and failure handling</T></p>
       </div>
       
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">

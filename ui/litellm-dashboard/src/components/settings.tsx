@@ -40,6 +40,7 @@ import { AlertingObject } from "./Settings/LoggingAndAlerts/LoggingCallbacks/typ
 import { parseErrorMessage } from "./shared/errorUtils";
 import DeleteResourceModal from "./common_components/DeleteResourceModal";
 import { useTranslate } from "@/i18n";
+import { T } from "@/i18n";
 interface SettingsPageProps {
   accessToken: string | null;
   userRole: string | null;
@@ -59,9 +60,10 @@ interface DynamicParamsFieldsProps {
   params: string[];
   callbackConfigs: any[];
   selectedCallback: string | null;
+  t: (key: string) => string;
 }
 
-const DynamicParamsFields: React.FC<DynamicParamsFieldsProps> = ({ params, callbackConfigs, selectedCallback }) => {
+const DynamicParamsFields: React.FC<DynamicParamsFieldsProps> = ({ params, callbackConfigs, selectedCallback, t }) => {
   if (!params || params.length === 0) {
     return null;
   }
@@ -86,7 +88,7 @@ const DynamicParamsFields: React.FC<DynamicParamsFieldsProps> = ({ params, callb
                 ? [
                   {
                     required: true,
-                    message: `Please enter the ${fieldLabel.toLowerCase()}`,
+                    message: t("Please enter the {{field}}").replace("{{field}}", fieldLabel.toLowerCase()),
                   },
                 ]
                 : undefined
@@ -95,14 +97,14 @@ const DynamicParamsFields: React.FC<DynamicParamsFieldsProps> = ({ params, callb
             {paramType === "password" ? (
               <Input.Password
                 size="large"
-                placeholder={`Enter your ${fieldLabel.toLowerCase()}`}
+                placeholder={t("Enter your {{field}}").replace("{{field}}", fieldLabel.toLowerCase())}
                 className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
             ) : paramType === "number" ? (
               <Input
                 type="number"
                 size="large"
-                placeholder={`Enter ${fieldLabel.toLowerCase()}`}
+                placeholder={t("Enter {{field}}").replace("{{field}}", fieldLabel.toLowerCase())}
                 className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 min={0}
                 max={1}
@@ -111,7 +113,7 @@ const DynamicParamsFields: React.FC<DynamicParamsFieldsProps> = ({ params, callb
             ) : (
               <Input
                 size="large"
-                placeholder={`Enter your ${fieldLabel.toLowerCase()}`}
+                placeholder={t("Enter your {{field}}").replace("{{field}}", fieldLabel.toLowerCase())}
                 className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
             )}
@@ -128,6 +130,7 @@ interface CallbackSelectorProps {
   selectedCallback: string | null;
   onCallbackChange: (value: string) => void;
   disabled?: boolean;
+  t: (key: string) => string;
 }
 
 const CallbackSelector: React.FC<CallbackSelectorProps> = ({
@@ -135,15 +138,16 @@ const CallbackSelector: React.FC<CallbackSelectorProps> = ({
   selectedCallback,
   onCallbackChange,
   disabled = false,
+  t,
 }) => {
   return (
     <FormItem
-      label="Callback"
+      label={t("Callback")}
       name="callback"
-      rules={disabled ? undefined : [{ required: true, message: "Please select a callback" }]}
+      rules={disabled ? undefined : [{ required: true, message: t("Please select a callback") }]}
     >
       <Select
-        placeholder="Choose a logging callback..."
+        placeholder={t("Choose a logging callback...")}
         size="large"
         className="w-full"
         showSearch
@@ -257,7 +261,7 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
         setCallbackConfigs(data || []);
       })
       .catch((error) => {
-        NotificationsManager.fromBackend("Failed to load callback configs: " + parseErrorMessage(error));
+        NotificationsManager.fromBackend(t("Failed to load callback configs: ") + parseErrorMessage(error));
       });
   }, [accessToken]);
 
@@ -281,14 +285,14 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
     }
   };
   const alerts_to_UI_NAME: Record<string, string> = {
-    llm_exceptions: "LLM Exceptions",
-    llm_too_slow: "LLM Responses Too Slow",
-    llm_requests_hanging: "LLM Requests Hanging",
-    budget_alerts: "Budget Alerts (API Keys, Users)",
-    db_exceptions: "Database Exceptions (Read/Write)",
-    daily_reports: "Weekly/Monthly Spend Reports",
-    outage_alerts: "Outage Alerts",
-    region_outage_alerts: "Region Outage Alerts",
+    llm_exceptions: t("LLM Exceptions"),
+    llm_too_slow: t("LLM Responses Too Slow"),
+    llm_requests_hanging: t("LLM Requests Hanging"),
+    budget_alerts: t("Budget Alerts (API Keys, Users)"),
+    db_exceptions: t("Database Exceptions (Read/Write)"),
+    daily_reports: t("Weekly/Monthly Spend Reports"),
+    outage_alerts: t("Outage Alerts"),
+    region_outage_alerts: t("Region Outage Alerts"),
   };
 
   useEffect(() => {
@@ -338,7 +342,7 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
     try {
       await setCallbacksCall(accessToken, payload);
       NotificationsManager.success(
-        isEdit ? "Callback updated successfully" : `Callback ${callbackName} added successfully`,
+        isEdit ? t("Callback updated successfully") : t("Callback {{callback}} added successfully").replace("{{callback}}", callbackName),
       );
 
       if (isEdit) {
@@ -413,7 +417,7 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
     } catch (error) {
       NotificationsManager.fromBackend(error);
     }
-    NotificationsManager.success("Alerts updated successfully");
+    NotificationsManager.success(t("Alerts updated successfully"));
   };
   const handleSaveChanges = (callback: any) => {
     if (!accessToken) {
@@ -439,7 +443,7 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
     } catch (error) {
       NotificationsManager.fromBackend(error);
     }
-    NotificationsManager.success("Callback updated successfully");
+    NotificationsManager.success(t("Callback updated successfully"));
   };
 
   const handleOk = () => {
@@ -542,7 +546,7 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
     try {
       setIsDeletingCallback(true);
       await deleteCallback(accessToken, callbackToDelete.name);
-      NotificationsManager.success(`Callback ${callbackToDelete.name} deleted successfully`);
+      NotificationsManager.success(t("Callback {{callback}} deleted successfully").replace("{{callback}}", callbackToDelete.name));
 
       // Refresh the callbacks list
       if (userID && userRole) {
@@ -569,10 +573,10 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
       <Grid numItems={1} className="gap-2 p-8 w-full mt-2">
         <TabGroup>
           <TabList variant="line" defaultValue="1">
-            <Tab value="1">{t("Logging Callbacks")}</Tab>
-            <Tab value="2">{t("Alerting Types")}</Tab>
-            <Tab value="3">{t("Alerting Settings")}</Tab>
-            <Tab value="4">{t("Email Alerts")}</Tab>
+            <Tab value="1"><T>Logging Callbacks</T></Tab>
+            <Tab value="2"><T>Alerting Types</T></Tab>
+            <Tab value="3"><T>Alerting Settings</T></Tab>
+            <Tab value="4"><T>Email Alerts</T></Tab>
           </TabList>
           <TabPanels>
             <TabPanel>
@@ -588,7 +592,7 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
                 onTest={async (cb) => {
                   try {
                     await serviceHealthCheck(accessToken, cb.name);
-                    NotificationsManager.success("Health check triggered");
+                    NotificationsManager.success(t("Health check triggered"));
                   } catch (error) {
                     NotificationsManager.fromBackend(parseErrorMessage(error));
                   }
@@ -598,9 +602,9 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
             <TabPanel>
               <Card>
                 <Text className="my-2">
-                  Alerts are only supported for Slack Webhook URLs. Get your webhook urls from{" "}
+                  <T>Alerts are only supported for Slack Webhook URLs. Get your webhook urls from</T>{" "}
                   <a href="https://api.slack.com/messaging/webhooks" target="_blank" style={{ color: "blue" }}>
-                    here
+                    <T>here</T>
                   </a>
                 </Text>
                 <Table>
@@ -608,7 +612,7 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
                     <TableRow>
                       <TableHeaderCell></TableHeaderCell>
                       <TableHeaderCell></TableHeaderCell>
-                      <TableHeaderCell>Slack Webhook URL</TableHeaderCell>
+                      <TableHeaderCell><T>Slack Webhook URL</T></TableHeaderCell>
                     </TableRow>
                   </TableHead>
 
@@ -627,7 +631,7 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
                             ) : (
                               <Button className="flex items-center justify-center">
                                 <a href="https://forms.gle/W3U4PZpJGFHWtHyA9" target="_blank">
-                                  ✨ Enterprise Feature
+                                  <T>✨ Enterprise Feature</T>
                                 </a>
                               </Button>
                             )
@@ -667,7 +671,7 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
                     try {
                       await serviceHealthCheck(accessToken, "slack");
                       NotificationsManager.success(
-                        "Alert test triggered. Test request to slack made - check logs/alerts on slack to verify",
+                        t("Alert test triggered. Test request to slack made - check logs/alerts on slack to verify"),
                       );
                     } catch (error) {
                       NotificationsManager.fromBackend(parseErrorMessage(error));
@@ -675,7 +679,7 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
                   }}
                   className="mx-2"
                 >
-                  Test Alerts
+                  <T>Test Alerts</T>
                 </Button>
               </Card>
             </TabPanel>
@@ -690,7 +694,7 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
       </Grid>
 
       <Modal
-        title="Add Logging Callback"
+        title={t("Add Logging Callback")}
         open={showAddCallbacksModal}
         width={800}
         onCancel={() => {
@@ -706,8 +710,7 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
           target="_blank"
           style={{ color: "blue" }}
         >
-          {" "}
-          LiteLLM Docs: Logging
+          <T>LiteLLM Docs: Logging</T>
         </a>
 
         <Form
@@ -721,12 +724,14 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
             callbackConfigs={callbackConfigs}
             selectedCallback={selectedCallback}
             onCallbackChange={handleSelectedCallbackChange}
+            t={t}
           />
 
           <DynamicParamsFields
             params={selectedCallbackParams}
             callbackConfigs={callbackConfigs}
             selectedCallback={selectedCallback}
+            t={t}
           />
 
           <div className="flex justify-end space-x-3 pt-6 mt-6 border-t border-gray-200">
@@ -739,10 +744,10 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
               }}
               disabled={isAddingCallback}
             >
-              Cancel
+              <T>Cancel</T>
             </Button2>
             <Button2 htmlType="submit" loading={isAddingCallback} disabled={isAddingCallback}>
-              {isAddingCallback ? "Adding..." : "Add Callback"}
+              {isAddingCallback ? <T>Adding...</T> : <T>Add Callback</T>}
             </Button2>
           </div>
         </Form>
@@ -751,7 +756,7 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
       <Modal
         open={showEditCallback}
         width={800}
-        title={"Edit Callback Settings"}
+        title={t("Edit Callback Settings")}
         onCancel={() => {
           setShowEditCallback(false);
           setSelectedEditCallback(null);
@@ -773,6 +778,7 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
                 selectedCallback={selectedEditCallback.name}
                 onCallbackChange={() => { }}
                 disabled={true}
+                t={t}
               />
 
               <DynamicParamsFields
@@ -783,6 +789,7 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
                 )}
                 callbackConfigs={callbackConfigs}
                 selectedCallback={selectedEditCallback.name}
+                t={t}
               />
             </>
           )}
@@ -796,7 +803,7 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
               }}
               disabled={isUpdatingCallback}
             >
-              Cancel
+              <T>Cancel</T>
             </Button2>
             <Button2
               onClick={() => {
@@ -805,7 +812,7 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
               loading={isUpdatingCallback}
               disabled={isUpdatingCallback}
             >
-              {isUpdatingCallback ? "Saving..." : "Save Changes"}
+              {isUpdatingCallback ? <T>Saving...</T> : <T>Save Changes</T>}
             </Button2>
           </div>
         </Form>
@@ -813,12 +820,12 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
 
       <DeleteResourceModal
         isOpen={showDeleteConfirmModal}
-        title="Delete Callback"
-        message="Are you sure you want to delete this callback? This action cannot be undone."
-        resourceInformationTitle="Callback Information"
+        title={t("Delete Callback")}
+        message={t("Are you sure you want to delete this callback? This action cannot be undone.")}
+        resourceInformationTitle={t("Callback Information")}
         resourceInformation={[
-          { label: "Callback Name", value: callbackToDelete?.name },
-          { label: "Mode", value: callbackToDelete?.mode || "success" },
+          { label: t("Callback Name"), value: callbackToDelete?.name },
+          { label: t("Mode"), value: callbackToDelete?.mode || "success" },
         ]}
         onCancel={() => {
           setShowDeleteConfirmModal(false);

@@ -24,6 +24,7 @@ import { TrashIcon, CheckCircleIcon } from "@heroicons/react/outline";
 import RouterSettings from "./router_settings";
 import Fallbacks from "./fallbacks";
 import { useTranslate } from "@/i18n";
+import { T } from "@/i18n";
 interface GeneralSettingsPageProps {
   accessToken: string | null;
   userRole: string | null;
@@ -172,18 +173,18 @@ const GeneralSettings: React.FC<GeneralSettingsPageProps> = ({ accessToken, user
                         <TableCell>
                           {value.stored_in_db == true ? (
                             <Badge icon={CheckCircleIcon} className="text-white">
-                              In DB
+                              <T>In DB</T>
                             </Badge>
                           ) : value.stored_in_db == false ? (
-                            <Badge className="text-gray bg-white outline">In Config</Badge>
+                            <Badge className="text-gray bg-white outline"><T>In Config</T></Badge>
                           ) : (
-                            <Badge className="text-gray bg-white outline">Not Set</Badge>
+                            <Badge className="text-gray bg-white outline"><T>Not Set</T></Badge>
                           )}
                         </TableCell>
                         <TableCell>
-                          <Button onClick={() => handleUpdateField(value.field_name, index)}>Update</Button>
+                          <Button onClick={() => handleUpdateField(value.field_name, index)}><T>Update</T></Button>
                           <Icon icon={TrashIcon} color="red" onClick={() => handleResetField(value.field_name, index)}>
-                            Reset
+                            <T>Reset</T>
                           </Icon>
                         </TableCell>
                       </TableRow>

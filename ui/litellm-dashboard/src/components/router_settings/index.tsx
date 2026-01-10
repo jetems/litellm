@@ -6,6 +6,8 @@ import LatencyBasedConfiguration from "./LatencyBasedConfiguration";
 import ReliabilityRetriesSection from "./ReliabilityRetriesSection";
 import RoutingStrategySelector from "./RoutingStrategySelector";
 import TagFilteringToggle from "./TagFilteringToggle";
+import { useTranslate } from "@/i18n";
+import { T } from "@/i18n";
 
 interface RouterSettingsProps {
   accessToken: string | null;
@@ -20,6 +22,7 @@ interface routingStrategyArgs {
 }
 
 const RouterSettings: React.FC<RouterSettingsProps> = ({ accessToken, userRole, userID, modelData }) => {
+  const t = useTranslate();
   const [routerSettings, setRouterSettings] = useState<{ [key: string]: any }>({});
   const [selectedStrategy, setSelectedStrategy] = useState<string | null>(null);
   const [availableRoutingStrategies, setAvailableRoutingStrategies] = useState<string[]>([]);
@@ -164,10 +167,10 @@ const RouterSettings: React.FC<RouterSettingsProps> = ({ accessToken, userRole, 
     try {
       setCallbacksCall(accessToken, payload);
     } catch (error) {
-      NotificationsManager.fromBackend("Failed to update router settings: " + error);
+      NotificationsManager.fromBackend(t("Failed to update router settings: ") + error);
     }
 
-    NotificationsManager.success("router settings updated successfully");
+    NotificationsManager.success(t("Router settings updated successfully"));
   };
 
   if (!accessToken) {
@@ -179,8 +182,8 @@ const RouterSettings: React.FC<RouterSettingsProps> = ({ accessToken, userRole, 
       {/* Routing Settings Section */}
       <div className="space-y-6">
         <div className="max-w-3xl">
-          <h3 className="text-sm font-medium text-gray-900">Routing Settings</h3>
-          <p className="text-xs text-gray-500 mt-1">Configure how requests are routed to deployments</p>
+          <h3 className="text-sm font-medium text-gray-900"><T>Routing Settings</T></h3>
+          <p className="text-xs text-gray-500 mt-1"><T>Configure how requests are routed to deployments</T></p>
         </div>
 
         {/* Routing Strategy */}
@@ -216,10 +219,10 @@ const RouterSettings: React.FC<RouterSettingsProps> = ({ accessToken, userRole, 
       {/* Actions - Sticky at bottom */}
       <div className="border-t border-gray-200 pt-6 flex justify-end gap-3">
         <Button variant="secondary" size="sm" onClick={() => window.location.reload()} className="text-sm">
-          Reset
+          <T>Reset</T>
         </Button>
         <Button size="sm" onClick={() => handleSaveChanges(routerSettings)} className="text-sm font-medium">
-          Save Changes
+          <T>Save Changes</T>
         </Button>
       </div>
     </div>

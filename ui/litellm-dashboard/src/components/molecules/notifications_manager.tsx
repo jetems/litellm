@@ -2,6 +2,8 @@ import React from "react";
 import { notification } from "antd";
 import { parseErrorMessage } from "../shared/errorUtils";
 import { ArgsProps } from "antd/es/notification";
+import { translate } from "@/i18n";
+import type { Locale } from "@/i18n";
 
 type Placement = "top" | "topLeft" | "topRight" | "bottom" | "bottomLeft" | "bottomRight";
 
@@ -28,6 +30,20 @@ function toIntMaybe(val: any): number | undefined {
   if (typeof val === "number") return val;
   if (typeof val === "string" && /^\d+$/.test(val)) return parseInt(val, 10);
   return undefined;
+}
+
+// Helper function to get current locale from localStorage
+function getCurrentLocale(): Locale {
+  if (typeof window !== "undefined") {
+    const stored = localStorage.getItem("liteLLM-locale");
+    if (stored === "en" || stored === "zh-CN") return stored;
+  }
+  return "en";
+}
+
+// Helper function to translate notification titles
+function t(key: string): string {
+  return translate(key, getCurrentLocale());
 }
 
 const AUTH_MATCH = [
@@ -139,21 +155,21 @@ const CLOUDZERO_MATCH = [
 function titleFor(status?: number, desc?: string): string {
   const d = (desc || "").toLowerCase();
 
-  if (AUTH_MATCH.some((s) => d.includes(s))) return "Authentication Error";
-  if (FORBIDDEN_MATCH.some((s) => d.includes(s))) return "Access Denied";
-  if (DB_MATCH?.some?.((s: string) => d.includes(s)) || status === 503) return "Service Unavailable";
-  if (BUDGET_MATCH?.some?.((s: string) => d.includes(s))) return "Budget Exceeded";
-  if (ENTERPRISE_MATCH?.some?.((s: string) => d.includes(s))) return "Feature Unavailable";
-  if (ROUTER_MATCH?.some?.((s: string) => d.includes(s))) return "Routing Error";
+  if (AUTH_MATCH.some((s) => d.includes(s))) return t("Authentication Error");
+  if (FORBIDDEN_MATCH.some((s) => d.includes(s))) return t("Access Denied");
+  if (DB_MATCH?.some?.((s: string) => d.includes(s)) || status === 503) return t("Service Unavailable");
+  if (BUDGET_MATCH?.some?.((s: string) => d.includes(s))) return t("Budget Exceeded");
+  if (ENTERPRISE_MATCH?.some?.((s: string) => d.includes(s))) return t("Feature Unavailable");
+  if (ROUTER_MATCH?.some?.((s: string) => d.includes(s))) return t("Routing Error");
 
-  if (EXISTS_MATCH.some((s) => d.includes(s))) return "Already Exists";
-  if (GUARDRAIL_MATCH.some((s) => d.includes(s))) return "Content Blocked";
+  if (EXISTS_MATCH.some((s) => d.includes(s))) return t("Already Exists");
+  if (GUARDRAIL_MATCH.some((s) => d.includes(s))) return t("Content Blocked");
 
-  if (FILE_UPLOAD_MATCH.some((s) => d.includes(s))) return "Validation Error";
-  if (CLOUDZERO_MATCH.some((s) => d.includes(s))) return "Integration Error";
+  if (FILE_UPLOAD_MATCH.some((s) => d.includes(s))) return t("Validation Error");
+  if (CLOUDZERO_MATCH.some((s) => d.includes(s))) return t("Integration Error");
 
-  if (VALIDATION_MATCH.some((s) => d.includes(s))) return "Validation Error";
-  if (status === 404 || d.includes("not found") || NOT_FOUND_MATCH.some((s) => d.includes(s))) return "Not Found";
+  if (VALIDATION_MATCH.some((s) => d.includes(s))) return t("Validation Error");
+  if (status === 404 || d.includes("not found") || NOT_FOUND_MATCH.some((s) => d.includes(s))) return t("Not Found");
   if (
     status === 429 ||
     d.includes("rate limit") ||
@@ -161,13 +177,13 @@ function titleFor(status?: number, desc?: string): string {
     d.includes("rpm") ||
     RATE_LIMIT_EXTRA?.some?.((s: string) => d.includes(s))
   )
-    return "Rate Limit Exceeded";
-  if (status && status >= 500) return "Server Error";
-  if (status === 401) return "Authentication Error";
-  if (status === 403) return "Access Denied";
-  if (d.includes("enterprise") || d.includes("premium")) return "Info";
-  if (status && status >= 400) return "Request Error";
-  return "Error";
+    return t("Rate Limit Exceeded");
+  if (status && status >= 500) return t("Server Error");
+  if (status === 401) return t("Authentication Error");
+  if (status === 403) return t("Access Denied");
+  if (d.includes("enterprise") || d.includes("premium")) return t("Info");
+  if (status && status >= 400) return t("Request Error");
+  return t("Error");
 }
 
 const SUCCESS_MATCH = [
@@ -211,10 +227,10 @@ const CONFIG_WARN_MATCH = [
 function classifyGeneralMessage(desc?: string): { kind: "success" | "info" | "warning"; title: string } | null {
   const d = (desc || "").toLowerCase();
 
-  if (SUCCESS_MATCH.some((s) => d.includes(s))) return { kind: "success", title: "Success" };
-  if (DEPRECATION_FEATURE_WARN_MATCH.some((s) => d.includes(s))) return { kind: "warning", title: "Feature Notice" };
-  if (CONFIG_WARN_MATCH.some((s) => d.includes(s))) return { kind: "warning", title: "Configuration Warning" };
-  if (INFO_MATCH.some((s) => d.includes(s))) return { kind: "warning", title: "Rate Limit" }; // show as warning for visibility
+  if (SUCCESS_MATCH.some((s) => d.includes(s))) return { kind: "success", title: t("Success") };
+  if (DEPRECATION_FEATURE_WARN_MATCH.some((s) => d.includes(s))) return { kind: "warning", title: t("Feature Notice") };
+  if (CONFIG_WARN_MATCH.some((s) => d.includes(s))) return { kind: "warning", title: t("Configuration Warning") };
+  if (INFO_MATCH.some((s) => d.includes(s))) return { kind: "warning", title: t("Rate Limit") }; // show as warning for visibility
 
   return null;
 }
@@ -250,7 +266,7 @@ function looksErrorPayload(input: any, status?: number): boolean {
 
 const NotificationManager = {
   error(input: string | NotificationConfig) {
-    const cfg = normalize(input, "Error");
+    const cfg = normalize(input, t("Error"));
     notification.error({
       ...COMMON_NOTIFICATION_PROPS,
       ...cfg,
@@ -260,7 +276,7 @@ const NotificationManager = {
   },
 
   warning(input: string | NotificationConfig) {
-    const cfg = normalize(input, "Warning");
+    const cfg = normalize(input, t("Warning"));
     notification.warning({
       ...COMMON_NOTIFICATION_PROPS,
       ...cfg,
@@ -270,7 +286,7 @@ const NotificationManager = {
   },
 
   info(input: string | NotificationConfig) {
-    const cfg = normalize(input, "Info");
+    const cfg = normalize(input, t("Info"));
     notification.info({
       ...COMMON_NOTIFICATION_PROPS,
       ...cfg,
@@ -283,14 +299,14 @@ const NotificationManager = {
     if (React.isValidElement(input)) {
       notification.success({
         ...COMMON_NOTIFICATION_PROPS,
-        message: "Success",
+        message: t("Success"),
         description: input,
         placement: defaultPlacement(),
         duration: 3.5,
       });
       return;
     }
-    const cfg = normalize(input as string | NotificationConfig, "Success");
+    const cfg = normalize(input as string | NotificationConfig, t("Success"));
     notification.success({
       ...COMMON_NOTIFICATION_PROPS,
       ...cfg,
@@ -308,28 +324,43 @@ const NotificationManager = {
       const title = titleFor(status, description);
       const payload = { ...base, message: title };
 
+      // Get English titles for comparison
+      const rateLimitTitle = t("Rate Limit Exceeded");
+      const infoTitle = t("Info");
+      const budgetTitle = t("Budget Exceeded");
+      const featureTitle = t("Feature Unavailable");
+      const contentTitle = t("Content Blocked");
+      const integrationTitle = t("Integration Error");
+      const serverTitle = t("Server Error");
+      const requestTitle = t("Request Error");
+      const authTitle = t("Authentication Error");
+      const accessTitle = t("Access Denied");
+      const notFoundTitle = t("Not Found");
+      const errorTitle = t("Error");
+      const existsTitle = t("Already Exists");
+
       if (
-        title === "Rate Limit Exceeded" ||
-        title === "Info" ||
-        title === "Budget Exceeded" ||
-        title === "Feature Unavailable" ||
-        title === "Content Blocked" ||
-        title === "Integration Error"
+        title === rateLimitTitle ||
+        title === infoTitle ||
+        title === budgetTitle ||
+        title === featureTitle ||
+        title === contentTitle ||
+        title === integrationTitle
       ) {
         notification.warning({ ...COMMON_NOTIFICATION_PROPS, ...payload, duration: extra?.duration ?? 7 });
         return;
       }
-      if (title === "Server Error") {
+      if (title === serverTitle) {
         notification.error({ ...COMMON_NOTIFICATION_PROPS, ...payload, duration: extra?.duration ?? 8 });
         return;
       }
       if (
-        title === "Request Error" ||
-        title === "Authentication Error" ||
-        title === "Access Denied" ||
-        title === "Not Found" ||
-        title === "Error" ||
-        title === "Already Exists"
+        title === requestTitle ||
+        title === authTitle ||
+        title === accessTitle ||
+        title === notFoundTitle ||
+        title === errorTitle ||
+        title === existsTitle
       ) {
         notification.error({ ...COMMON_NOTIFICATION_PROPS, ...payload, duration: extra?.duration ?? 6 });
         return;
@@ -340,7 +371,7 @@ const NotificationManager = {
 
     // Non-error: success/info/warning classifier
     const cls = classifyGeneralMessage(description);
-    const payload = { ...base, message: cls?.title ?? "Info" };
+    const payload = { ...base, message: cls?.title ?? t("Info") };
 
     if (cls?.kind === "success") {
       notification.success({ ...COMMON_NOTIFICATION_PROPS, ...payload, duration: extra?.duration ?? 3.5 });

@@ -1,5 +1,7 @@
 import React from "react";
 import { TextInput } from "@tremor/react";
+import { useTranslate } from "@/i18n";
+import { T } from "@/i18n";
 
 interface routingStrategyArgs {
   ttl?: number;
@@ -18,18 +20,19 @@ interface LatencyBasedConfigurationProps {
 const LatencyBasedConfiguration: React.FC<LatencyBasedConfigurationProps> = ({
   routingStrategyArgs,
 }) => {
+  const t = useTranslate();
   const paramExplanation: { [key: string]: string } = {
-    ttl: "Sliding window to look back over when calculating the average latency of a deployment. Default - 1 hour (in seconds).",
+    ttl: t("Sliding window to look back over when calculating the average latency of a deployment. Default - 1 hour (in seconds)."),
     lowest_latency_buffer:
-      "Shuffle between deployments within this % of the lowest latency. Default - 0 (i.e. always pick lowest latency).",
+      t("Shuffle between deployments within this % of the lowest latency. Default - 0 (i.e. always pick lowest latency)."),
   };
 
   return (
     <>
       <div className="space-y-6">
         <div className="max-w-3xl">
-          <h3 className="text-sm font-medium text-gray-900">Latency-Based Configuration</h3>
-          <p className="text-xs text-gray-500 mt-1">Fine-tune latency-based routing behavior</p>
+          <h3 className="text-sm font-medium text-gray-900"><T>Latency-Based Configuration</T></h3>
+          <p className="text-xs text-gray-500 mt-1"><T>Fine-tune latency-based routing behavior</T></p>
         </div>
         
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
