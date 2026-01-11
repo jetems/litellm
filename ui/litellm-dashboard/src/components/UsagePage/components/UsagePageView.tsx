@@ -52,7 +52,7 @@ import { valueFormatterSpend } from "../utils/value_formatters";
 import EntityUsage, { EntityList } from "./EntityUsage/EntityUsage";
 import TopKeyView from "./EntityUsage/TopKeyView";
 import { UsageOption, UsageViewSelect } from "./UsageViewSelect/UsageViewSelect";
-import { useTranslate } from "@/i18n";
+import { useTranslate, useI18n } from "@/i18n";
 
 interface UsagePageProps {
   teams: Team[];
@@ -61,6 +61,7 @@ interface UsagePageProps {
 
 const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
   const t = useTranslate();
+  const { locale } = useI18n();
   const { accessToken, userRole, userId: userID, premiumUser } = useAuthorized();
   const [userSpendData, setUserSpendData] = useState<{
     results: DailyData[];
@@ -466,17 +467,28 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
                         {t("Project Spend")}{" "}
                         {dateValue.from && dateValue.to && (
                           <>
-                            {dateValue.from.toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                              year: dateValue.from.getFullYear() !== dateValue.to.getFullYear() ? "numeric" : undefined,
-                            })}
-                            {" - "}
-                            {dateValue.to.toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                            })}
+                            {locale === "zh-CN" ? (
+                              <>
+                                {dateValue.from.getFullYear()}年{dateValue.from.getMonth() + 1}月{dateValue.from.getDate()}日
+                                {" - "}
+                                {dateValue.to.getFullYear() !== dateValue.from.getFullYear() ? `${dateValue.to.getFullYear()}年` : ""}
+                                {dateValue.to.getMonth() + 1}月{dateValue.to.getDate()}日
+                              </>
+                            ) : (
+                              <>
+                                {dateValue.from.toLocaleDateString("en-US", {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: dateValue.from.getFullYear() !== dateValue.to.getFullYear() ? "numeric" : undefined,
+                                })}
+                                {" - "}
+                                {dateValue.to.toLocaleDateString("en-US", {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric",
+                                })}
+                              </>
+                            )}
                           </>
                         )}
                       </Text>

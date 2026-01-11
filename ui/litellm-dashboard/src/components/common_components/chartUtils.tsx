@@ -1,6 +1,7 @@
 import React from "react";
 import type { CustomTooltipProps } from "@tremor/react";
 import { SpendMetrics } from "../UsagePage/types";
+import { useTranslate } from "@/i18n";
 
 interface ChartDataPoint {
   date: string;
@@ -17,14 +18,16 @@ const colorNameToHex: { [key: string]: string } = {
 };
 
 export const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
+  const t = useTranslate();
   if (active && payload && payload.length) {
     const formatCategoryName = (name: string): string => {
-      return name
+      const formatted = name
         .replace("metrics.", "")
         .replace(/_/g, " ")
         .split(" ")
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(" ");
+      return t(formatted);
     };
 
     const getRawValue = (dataPoint: ChartDataPoint, key: string): number | undefined => {
@@ -50,7 +53,7 @@ export const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) =>
               ? isSpend
                 ? `$${rawValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                 : rawValue.toLocaleString()
-              : "N/A";
+              : t("N/A");
 
           const colorName = item.color as keyof typeof colorNameToHex;
           const hexColor = colorNameToHex[colorName] || item.color;
@@ -78,13 +81,15 @@ export const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) =>
 };
 
 export const CustomLegend = ({ categories, colors }: { categories: string[]; colors: string[] }) => {
+  const t = useTranslate();
   const formatCategoryName = (name: string): string => {
-    return name
+    const formatted = name
       .replace("metrics.", "")
       .replace(/_/g, " ")
       .split(" ")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
+    return t(formatted);
   };
 
   return (
