@@ -15,15 +15,34 @@ const TagFilteringToggle: React.FC<TagFilteringToggleProps> = ({
   onToggle,
 }) => {
   const t = useTranslate();
+
+  // Get translated UI field name
+  const getFieldName = (): React.ReactNode => {
+    const name = routerFieldsMetadata["enable_tag_filtering"]?.ui_field_name;
+    if (name) {
+      return t(name);
+    }
+    return <T>Enable Tag Filtering</T>;
+  };
+
+  // Get translated field description
+  const getFieldDescription = (): string => {
+    const desc = routerFieldsMetadata["enable_tag_filtering"]?.field_description;
+    if (desc) {
+      return t(desc);
+    }
+    return "";
+  };
+
   return (
     <div className="space-y-3 max-w-3xl">
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <label className="text-xs font-medium text-gray-700 uppercase tracking-wide">
-            {routerFieldsMetadata["enable_tag_filtering"]?.ui_field_name || <T>Enable Tag Filtering</T>}
+            {getFieldName()}
           </label>
           <p className="text-xs text-gray-500 mt-0.5">
-            {routerFieldsMetadata["enable_tag_filtering"]?.field_description || ""}
+            {getFieldDescription()}
             {routerFieldsMetadata["enable_tag_filtering"]?.link && (
               <>
                 {" "}
@@ -50,4 +69,5 @@ const TagFilteringToggle: React.FC<TagFilteringToggleProps> = ({
 };
 
 export default TagFilteringToggle;
+
 

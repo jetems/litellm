@@ -158,7 +158,7 @@ const GeneralSettings: React.FC<GeneralSettingsPageProps> = ({ accessToken, user
                             }}
                             className="mt-1"
                           >
-                            {value.field_description}
+                            {t(value.field_description)}
                           </p>
                         </TableCell>
                         <TableCell>

@@ -7,6 +7,8 @@ import AddFallbacks from "./add_fallbacks";
 import DeleteResourceModal from "./common_components/DeleteResourceModal";
 import NotificationsManager from "./molecules/notifications_manager";
 import { getCallbacksCall, setCallbacksCall } from "./networking";
+import { useTranslate } from "@/i18n";
+import { T } from "@/i18n";
 
 type FallbackEntry = { [modelName: string]: string[] };
 type Fallbacks = FallbackEntry[];
@@ -18,10 +20,10 @@ interface FallbacksProps {
   modelData: any;
 }
 
-async function testFallbackModelResponse(selectedModel: string, accessToken: string) {
+async function testFallbackModelResponse(selectedModel: string, accessToken: string, t: (key: string) => string) {
   const isLocal = process.env.NODE_ENV === "development";
   if (isLocal != true) {
-    console.log = function () {};
+    console.log = function () { };
   }
   const proxyBaseUrl = isLocal ? "http://localhost:4000" : window.location.origin;
   const client = new openai.OpenAI({
@@ -31,7 +33,7 @@ async function testFallbackModelResponse(selectedModel: string, accessToken: str
   });
 
   try {
-    NotificationsManager.info("Testing fallback model response...");
+    NotificationsManager.info(t("Testing fallback model response..."));
 
     const response = await client.chat.completions.create({
       model: selectedModel,
@@ -47,8 +49,12 @@ async function testFallbackModelResponse(selectedModel: string, accessToken: str
 
     NotificationsManager.success(
       <span>
-        Test model=<strong>{selectedModel}</strong>, received model=
-        <strong>{response.model}</strong>. See{" "}
+        {t("Test model=")}
+        <strong>{selectedModel}</strong>
+        {t(", received model=")}
+        <strong>{response.model}</strong>
+        {". "}
+        {t("See")}{" "}
         <a
           href="#"
           onClick={() => window.open("https://docs.litellm.ai/docs/proxy/reliability", "_blank")}
@@ -60,7 +66,7 @@ async function testFallbackModelResponse(selectedModel: string, accessToken: str
     );
   } catch (error) {
     NotificationsManager.fromBackend(
-      `Error occurred while generating model response. Please try again. Error: ${error}`,
+      t("Error occurred while generating model response. Please try again. Error: ") + `${error}`,
     );
   }
 }
@@ -70,6 +76,7 @@ const Fallbacks: React.FC<FallbacksProps> = ({ accessToken, userRole, userID, mo
   const [isDeleting, setIsDeleting] = useState(false);
   const [fallbackToDelete, setFallbackToDelete] = useState<FallbackEntry | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const t = useTranslate();
 
   useEffect(() => {
     if (!accessToken || !userRole || !userID) {
@@ -123,9 +130,9 @@ const Fallbacks: React.FC<FallbacksProps> = ({ accessToken, userRole, userID, mo
     try {
       await setCallbacksCall(accessToken, payload);
       setRouterSettings(updatedSettings);
-      NotificationsManager.success("Router settings updated successfully");
+      NotificationsManager.success(t("Router settings updated successfully"));
     } catch (error) {
-      NotificationsManager.fromBackend("Failed to update router settings: " + error);
+      NotificationsManager.fromBackend(t("Failed to update router settings: ") + error);
     } finally {
       setIsDeleting(false);
       setIsDeleteModalOpen(false);
@@ -153,9 +160,9 @@ const Fallbacks: React.FC<FallbacksProps> = ({ accessToken, userRole, userID, mo
       <Table>
         <TableHead>
           <TableRow>
-            <TableHeaderCell>Model Name</TableHeaderCell>
-            <TableHeaderCell>Fallbacks</TableHeaderCell>
-            <TableHeaderCell>Actions</TableHeaderCell>
+            <TableHeaderCell><T>Model Name</T></TableHeaderCell>
+            <TableHeaderCell><T>Fallbacks</T></TableHeaderCell>
+            <TableHeaderCell><T>Actions</T></TableHeaderCell>
           </TableRow>
         </TableHead>
 
@@ -167,15 +174,15 @@ const Fallbacks: React.FC<FallbacksProps> = ({ accessToken, userRole, userID, mo
                   <TableCell>{key}</TableCell>
                   <TableCell>{Array.isArray(value) ? value.join(", ") : value}</TableCell>
                   <TableCell>
-                    <Tooltip title="Test fallback">
+                    <Tooltip title={t("Test fallback")}>
                       <Icon
                         icon={PlayIcon}
                         size="sm"
-                        onClick={() => testFallbackModelResponse(Object.keys(item)[0], accessToken || "")}
+                        onClick={() => testFallbackModelResponse(Object.keys(item)[0], accessToken || "", t)}
                         className="cursor-pointer hover:text-blue-600"
                       />
                     </Tooltip>
-                    <Tooltip title="Delete fallback">
+                    <Tooltip title={t("Delete fallback")}>
                       <Icon
                         icon={TrashIcon}
                         size="sm"
@@ -191,12 +198,12 @@ const Fallbacks: React.FC<FallbacksProps> = ({ accessToken, userRole, userID, mo
       </Table>
       <DeleteResourceModal
         isOpen={isDeleteModalOpen}
-        title="Delete Fallback?"
-        message="Are you sure you want to delete this fallback? This action cannot be undone."
-        resourceInformationTitle="Fallback Information"
+        title={t("Delete Fallback?")}
+        message={t("Are you sure you want to delete this fallback? This action cannot be undone.")}
+        resourceInformationTitle={t("Fallback Information")}
         resourceInformation={[
           {
-            label: "Model Name",
+            label: t("Model Name"),
             value: fallbackToDelete ? Object.keys(fallbackToDelete)[0] : "",
             code: true,
           },
@@ -210,3 +217,4 @@ const Fallbacks: React.FC<FallbacksProps> = ({ accessToken, userRole, userID, mo
 };
 
 export default Fallbacks;
+

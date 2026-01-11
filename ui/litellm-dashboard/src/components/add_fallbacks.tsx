@@ -8,6 +8,8 @@ import React, { useEffect, useState } from "react";
 import NotificationManager from "./molecules/notifications_manager";
 import { setCallbacksCall } from "./networking";
 import { fetchAvailableModels, ModelGroup } from "./playground/llm_calls/fetch_models";
+import { useTranslate } from "@/i18n";
+import { T } from "@/i18n";
 
 interface AddFallbacksProps {
   models?: string[];
@@ -22,6 +24,7 @@ const AddFallbacks: React.FC<AddFallbacksProps> = ({ models, accessToken, router
   const [selectedModel, setSelectedModel] = useState("");
   const [modelInfo, setModelInfo] = useState<ModelGroup[]>([]);
   const [selectedFallbacks, setSelectedFallbacks] = useState<string[]>([]);
+  const t = useTranslate();
 
   useEffect(() => {
     const loadModels = async () => {
@@ -80,10 +83,10 @@ const AddFallbacks: React.FC<AddFallbacksProps> = ({ models, accessToken, router
       // Update routerSettings state
       setRouterSettings(updatedRouterSettings);
     } catch (error) {
-      NotificationManager.fromBackend("Failed to update router settings: " + error);
+      NotificationManager.fromBackend(t("Failed to update router settings: ") + error);
     }
 
-    NotificationManager.success("router settings updated successfully");
+    NotificationManager.success(t("Router settings updated successfully"));
 
     setIsModalVisible(false);
     form.resetFields();
@@ -94,12 +97,12 @@ const AddFallbacks: React.FC<AddFallbacksProps> = ({ models, accessToken, router
   return (
     <div>
       <Button className="mx-auto" onClick={() => setIsModalVisible(true)} icon={() => <span className="mr-1">+</span>}>
-        Add Fallbacks
+        <T>Add Fallbacks</T>
       </Button>
       <Modal
         title={
           <div className="pb-4 border-b border-gray-100">
-            <h2 className="text-xl font-semibold text-gray-900">Add Fallbacks</h2>
+            <h2 className="text-xl font-semibold text-gray-900"><T>Add Fallbacks</T></h2>
           </div>
         }
         open={isModalVisible}
@@ -116,8 +119,7 @@ const AddFallbacks: React.FC<AddFallbacksProps> = ({ models, accessToken, router
         <div className="mt-6">
           <div className="mb-6">
             <p className="text-gray-600">
-              Configure fallback models to improve reliability. When the primary model fails or is unavailable, requests
-              will automatically route to the specified fallback models in order.
+              <T>Configure fallback models to improve reliability. When the primary model fails or is unavailable, requests will automatically route to the specified fallback models in order.</T>
             </p>
           </div>
 
@@ -126,15 +128,15 @@ const AddFallbacks: React.FC<AddFallbacksProps> = ({ models, accessToken, router
               <Form.Item
                 label={
                   <span className="text-sm font-medium text-gray-700">
-                    Primary Model <span className="text-red-500">*</span>
+                    <T>Primary Model</T> <span className="text-red-500">*</span>
                   </span>
                 }
                 name="model_name"
-                rules={[{ required: true, message: "Please select the primary model that needs fallbacks" }]}
+                rules={[{ required: true, message: t("Please select the primary model that needs fallbacks") }]}
                 className="!mb-0"
               >
                 <Select
-                  placeholder="Select the model that needs fallback protection"
+                  placeholder={t("Select the model that needs fallback protection")}
                   value={selectedModel || undefined}
                   onChange={(value: string) => {
                     setSelectedModel(value);
@@ -156,7 +158,7 @@ const AddFallbacks: React.FC<AddFallbacksProps> = ({ models, accessToken, router
                     ),
                   )}
                 </Select>
-                <p className="text-sm text-gray-500 mt-1">This is the primary model that users will request</p>
+                <p className="text-sm text-gray-500 mt-1"><T>This is the primary model that users will request</T></p>
               </Form.Item>
 
               <div className="border-t border-gray-200 my-6"></div>
@@ -164,18 +166,18 @@ const AddFallbacks: React.FC<AddFallbacksProps> = ({ models, accessToken, router
               <Form.Item
                 label={
                   <span className="text-sm font-medium text-gray-700">
-                    Fallback Models (select multiple) <span className="text-red-500">*</span>
+                    <T>Fallback Models (select multiple)</T> <span className="text-red-500">*</span>
                   </span>
                 }
                 name="models"
-                rules={[{ required: true, message: "Please select at least one fallback model" }]}
+                rules={[{ required: true, message: t("Please select at least one fallback model") }]}
                 className="!mb-0"
               >
                 <div className="space-y-3">
                   {/* Show selected models in order */}
                   {selectedFallbacks.length > 0 && (
                     <div className="border border-gray-200 rounded-lg p-3 bg-gray-50">
-                      <p className="text-sm font-medium text-gray-700 mb-2">Fallback Order:</p>
+                      <p className="text-sm font-medium text-gray-700 mb-2"><T>Fallback Order:</T></p>
                       <div className="flex flex-wrap gap-2">
                         {selectedFallbacks.map((model, index) => (
                           <div
@@ -203,7 +205,7 @@ const AddFallbacks: React.FC<AddFallbacksProps> = ({ models, accessToken, router
 
                   {/* Model selector */}
                   <Select
-                    placeholder="Add a fallback model"
+                    placeholder={t("Add a fallback model")}
                     value={undefined}
                     onChange={(value: string) => {
                       if (value && !selectedFallbacks.includes(value)) {
@@ -227,17 +229,17 @@ const AddFallbacks: React.FC<AddFallbacksProps> = ({ models, accessToken, router
                   </Select>
                 </div>
                 <p className="text-sm text-gray-500 mt-1">
-                  <strong>Order matters:</strong> Models will be tried in the order shown above (1st, 2nd, 3rd, etc.)
+                  <strong><T>Order matters:</T></strong> <T>Models will be tried in the order shown above (1st, 2nd, 3rd, etc.)</T>
                 </p>
               </Form.Item>
             </div>
 
             <div className="flex items-center justify-end space-x-3 pt-6 border-t border-gray-100">
               <Button variant="secondary" onClick={handleCancel}>
-                Cancel
+                <T>Cancel</T>
               </Button>
               <Button variant="primary" type="submit">
-                Add Fallbacks
+                <T>Add Fallbacks</T>
               </Button>
             </div>
           </Form>
@@ -248,3 +250,4 @@ const AddFallbacks: React.FC<AddFallbacksProps> = ({ models, accessToken, router
 };
 
 export default AddFallbacks;
+
