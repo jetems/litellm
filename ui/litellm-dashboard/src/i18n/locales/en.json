@@ -1754,5 +1754,21 @@
     "Failed to update user": "Failed to update user",
     "Delete User?": "Delete User?",
     "Are you sure you want to delete this user? This action cannot be undone.": "Are you sure you want to delete this user? This action cannot be undone.",
-    "No teams": "No teams"
+    "No teams": "No teams",
+    "Max Budget in Team": "Max Budget in Team",
+    "Not set": "Not set",
+    "No teams assigned": "No teams assigned",
+    "Not specified": "Not specified",
+    "Enter team ID": "Enter team ID",
+    "Role": "Role",
+    "No schema information available": "No schema information available",
+    "No description available": "No description available",
+    "No settings available or you do not have permission to view them.": "No settings available or you do not have permission to view them.",
+    "Budget Duration": "Budget Duration",
+    "Default parameters to apply when a new user signs in via SSO or is created on the /user/new API endpoint": "Default parameters to apply when a new user signs in via SSO or is created on the /user/new API endpoint",
+    "Default role assigned to new users created": "Default role assigned to new users created",
+    "Default maximum budget (in USD) for new users created": "Default maximum budget (in USD) for new users created",
+    "Default budget duration for new users (e.g. 'daily', 'weekly', 'monthly')": "Default budget duration for new users (e.g. 'daily', 'weekly', 'monthly')",
+    "Default list of models that new users can access": "Default list of models that new users can access",
+    "Default teams for new users created": "Default teams for new users created"
 }

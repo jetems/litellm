@@ -33,13 +33,13 @@ const BudgetDurationDropdown: React.FC<BudgetDurationDropdownProps> = ({
   );
 };
 
-export const getBudgetDurationLabel = (value: string | null | undefined): string => {
-  if (!value) return "Not set";
+export const getBudgetDurationLabel = (value: string | null | undefined, t?: any): string => {
+  if (!value) return t ? t("Not set") : "Not set";
 
   const budgetDurationMap: Record<string, string> = {
-    "24h": "daily",
-    "7d": "weekly",
-    "30d": "monthly",
+    "24h": t ? t("daily") : "daily",
+    "7d": t ? t("weekly") : "weekly",
+    "30d": t ? t("monthly") : "monthly",
   };
 
   return budgetDurationMap[value] || value;

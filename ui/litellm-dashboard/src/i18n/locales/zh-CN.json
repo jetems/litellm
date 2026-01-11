@@ -1754,5 +1754,21 @@
     "Failed to update user": "更新用户失败",
     "Delete User?": "删除用户？",
     "Are you sure you want to delete this user? This action cannot be undone.": "您确定要删除此用户吗？此操作无法撤销。",
-    "No teams": "无团队"
+    "No teams": "无团队",
+    "Max Budget in Team": "团队最大预算",
+    "Not set": "未设置",
+    "No teams assigned": "未分配团队",
+    "Not specified": "未指定",
+    "Enter team ID": "输入团队 ID",
+    "Role": "角色",
+    "No schema information available": "无架构信息可用",
+    "No description available": "无描述可用",
+    "No settings available or you do not have permission to view them.": "无可用设置或您没有权限查看。",
+    "Budget Duration": "预算周期",
+    "Default parameters to apply when a new user signs in via SSO or is created on the /user/new API endpoint": "当新用户通过 SSO 登录或在 /user/new API 端点创建时应用的默认参数",
+    "Default role assigned to new users created": "分配给新创建用户的默认角色",
+    "Default maximum budget (in USD) for new users created": "新创建用户的默认最大预算（美元）",
+    "Default budget duration for new users (e.g. 'daily', 'weekly', 'monthly')": "新用户的默认预算周期（例如 'daily', 'weekly', 'monthly'）",
+    "Default list of models that new users can access": "新用户可以访问的默认模型列表",
+    "Default teams for new users created": "为新创建用户分配的默认团队"
 }
