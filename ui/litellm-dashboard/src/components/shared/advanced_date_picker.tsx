@@ -2,6 +2,7 @@ import { CalendarOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import { Button, DateRangePickerValue, Text } from "@tremor/react";
 import moment from "moment";
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslate, useI18n } from "@/i18n";
 
 interface AdvancedDatePickerProps {
   value: DateRangePickerValue;
@@ -17,48 +18,7 @@ interface RelativeTimeOption {
   getValue: () => { from: Date; to: Date };
 }
 
-const relativeTimeOptions: RelativeTimeOption[] = [
-  {
-    label: "Today",
-    shortLabel: "today",
-    getValue: () => ({
-      from: moment().startOf("day").toDate(),
-      to: moment().endOf("day").toDate(),
-    }),
-  },
-  {
-    label: "Last 7 days",
-    shortLabel: "7d",
-    getValue: () => ({
-      from: moment().subtract(7, "days").startOf("day").toDate(),
-      to: moment().endOf("day").toDate(),
-    }),
-  },
-  {
-    label: "Last 30 days",
-    shortLabel: "30d",
-    getValue: () => ({
-      from: moment().subtract(30, "days").startOf("day").toDate(),
-      to: moment().endOf("day").toDate(),
-    }),
-  },
-  {
-    label: "Month to date",
-    shortLabel: "MTD",
-    getValue: () => ({
-      from: moment().startOf("month").toDate(),
-      to: moment().endOf("day").toDate(),
-    }),
-  },
-  {
-    label: "Year to date",
-    shortLabel: "YTD",
-    getValue: () => ({
-      from: moment().startOf("year").toDate(),
-      to: moment().endOf("day").toDate(),
-    }),
-  },
-];
+
 
 /**
  * Advanced Date Range Picker with dropdown, relative times, and custom inputs
@@ -66,9 +26,57 @@ const relativeTimeOptions: RelativeTimeOption[] = [
 const AdvancedDatePicker: React.FC<AdvancedDatePickerProps> = ({
   value,
   onValueChange,
-  label = "Select Time Range",
+  label,
   showTimeRange = true,
 }) => {
+  const t = useTranslate();
+  const { locale } = useI18n();
+  const displayLabel = label ?? t("Select Time Range");
+
+  // Relative time options with translations
+  const relativeTimeOptions: RelativeTimeOption[] = [
+    {
+      label: t("Today"),
+      shortLabel: "today",
+      getValue: () => ({
+        from: moment().startOf("day").toDate(),
+        to: moment().endOf("day").toDate(),
+      }),
+    },
+    {
+      label: t("Last 7 days"),
+      shortLabel: "7d",
+      getValue: () => ({
+        from: moment().subtract(7, "days").startOf("day").toDate(),
+        to: moment().endOf("day").toDate(),
+      }),
+    },
+    {
+      label: t("Last 30 days"),
+      shortLabel: "30d",
+      getValue: () => ({
+        from: moment().subtract(30, "days").startOf("day").toDate(),
+        to: moment().endOf("day").toDate(),
+      }),
+    },
+    {
+      label: t("Month to date"),
+      shortLabel: "MTD",
+      getValue: () => ({
+        from: moment().startOf("month").toDate(),
+        to: moment().endOf("day").toDate(),
+      }),
+    },
+    {
+      label: t("Year to date"),
+      shortLabel: "YTD",
+      getValue: () => ({
+        from: moment().startOf("year").toDate(),
+        to: moment().endOf("day").toDate(),
+      }),
+    },
+  ];
+
   const [isOpen, setIsOpen] = useState(false);
   const [tempValue, setTempValue] = useState<DateRangePickerValue>(value);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -114,11 +122,11 @@ const AdvancedDatePicker: React.FC<AdvancedDatePickerProps> = ({
     const end = moment(endDate, "YYYY-MM-DD");
 
     if (!start.isValid() || !end.isValid()) {
-      return { isValid: false, error: "Invalid date format" };
+      return { isValid: false, error: t("Invalid date format") };
     }
 
     if (end.isBefore(start)) {
-      return { isValid: false, error: "End date cannot be before start date" };
+      return { isValid: false, error: t("End date cannot be before start date") };
     }
 
     return { isValid: true, error: "" };
@@ -155,14 +163,17 @@ const AdvancedDatePicker: React.FC<AdvancedDatePickerProps> = ({
   }, [isOpen]);
 
   const formatDisplayRange = useCallback((from: Date | undefined, to: Date | undefined) => {
-    if (!from || !to) return "Select date range";
+    if (!from || !to) return t("Select date range");
 
     const formatDateTime = (date: Date) => {
+      if (locale === "zh-CN") {
+        return moment(date).format("M月D日 HH:mm");
+      }
       return moment(date).format("D MMM, HH:mm");
     };
 
     return `${formatDateTime(from)} - ${formatDateTime(to)}`;
-  }, []);
+  }, [locale, t]);
 
   // CRITICAL: Apply the same date adjustment logic as the original component
   const adjustDateRange = useCallback((newValue: DateRangePickerValue): DateRangePickerValue => {
@@ -274,7 +285,7 @@ const AdvancedDatePicker: React.FC<AdvancedDatePickerProps> = ({
 
   return (
     <div className="flex items-center gap-3">
-      {label && <Text className="text-sm font-medium text-gray-700 whitespace-nowrap">{label}</Text>}
+      {displayLabel && <Text className="text-sm font-medium text-gray-700 whitespace-nowrap">{displayLabel}</Text>}
       <div className="relative" ref={dropdownRef}>
         {/* Main input display */}
         <div
@@ -304,7 +315,7 @@ const AdvancedDatePicker: React.FC<AdvancedDatePickerProps> = ({
               {/* Left side - Relative time options */}
               <div className="w-1/2 border-r border-gray-200">
                 <div className="p-3 border-b border-gray-200">
-                  <span className="text-sm font-semibold text-gray-900">Relative time</span>
+                  <span className="text-sm font-semibold text-gray-900">{t("Relative time")}</span>
                 </div>
                 <div className="h-[350px] overflow-y-auto">
                   {relativeTimeOptions.map((option) => {
@@ -312,18 +323,16 @@ const AdvancedDatePicker: React.FC<AdvancedDatePickerProps> = ({
                     return (
                       <div
                         key={option.label}
-                        className={`flex items-center justify-between px-5 py-4 cursor-pointer border-b border-gray-100 transition-colors ${
-                          isSelected ? "bg-blue-50 hover:bg-blue-100 border-blue-200" : "hover:bg-gray-50"
-                        }`}
+                        className={`flex items-center justify-between px-5 py-4 cursor-pointer border-b border-gray-100 transition-colors ${isSelected ? "bg-blue-50 hover:bg-blue-100 border-blue-200" : "hover:bg-gray-50"
+                          }`}
                         onClick={() => handleRelativeTimeSelect(option)}
                       >
                         <span className={`text-sm ${isSelected ? "text-blue-700 font-medium" : "text-gray-700"}`}>
                           {option.label}
                         </span>
                         <span
-                          className={`text-xs px-2 py-1 rounded capitalize ${
-                            isSelected ? "text-blue-700 bg-blue-100" : "text-gray-500 bg-gray-100"
-                          }`}
+                          className={`text-xs px-2 py-1 rounded capitalize ${isSelected ? "text-blue-700 bg-blue-100" : "text-gray-500 bg-gray-100"
+                            }`}
                         >
                           {option.shortLabel}
                         </span>
@@ -338,38 +347,36 @@ const AdvancedDatePicker: React.FC<AdvancedDatePickerProps> = ({
                 <div className="p-3.5 border-b border-gray-200">
                   <div className="flex items-center gap-2">
                     <CalendarOutlined className="text-gray-600" />
-                    <span className="text-sm font-semibold text-gray-900">Start and end dates</span>
+                    <span className="text-sm font-semibold text-gray-900">{t("Start and end dates")}</span>
                   </div>
                 </div>
 
                 <div className="p-6 space-y-6 pb-20">
                   {/* Start date */}
                   <div>
-                    <label className="text-sm text-gray-700 mb-1 block">Start date</label>
+                    <label className="text-sm text-gray-700 mb-1 block">{t("Start date")}</label>
                     <input
                       type="date"
                       value={startDate}
                       onChange={(e) => setStartDate(e.target.value)}
-                      className={`w-65 px-3 py-2 text-sm border rounded-md cursor-pointer hover:border-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${
-                        !validation.isValid
-                          ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                          : "border-gray-300"
-                      }`}
+                      className={`w-65 px-3 py-2 text-sm border rounded-md cursor-pointer hover:border-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${!validation.isValid
+                        ? "border-red-300 focus:border-red-500 focus:ring-red-200"
+                        : "border-gray-300"
+                        }`}
                     />
                   </div>
 
                   {/* End date */}
                   <div>
-                    <label className="text-sm text-gray-700 mb-1 block">End date</label>
+                    <label className="text-sm text-gray-700 mb-1 block">{t("End date")}</label>
                     <input
                       type="date"
                       value={endDate}
                       onChange={(e) => setEndDate(e.target.value)}
-                      className={`w-65 px-3 py-2 text-sm border rounded-md cursor-pointer hover:border-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${
-                        !validation.isValid
-                          ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                          : "border-gray-300"
-                      }`}
+                      className={`w-65 px-3 py-2 text-sm border rounded-md cursor-pointer hover:border-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${!validation.isValid
+                        ? "border-red-300 focus:border-red-500 focus:ring-red-200"
+                        : "border-gray-300"
+                        }`}
                     />
                   </div>
 
@@ -394,12 +401,16 @@ const AdvancedDatePicker: React.FC<AdvancedDatePickerProps> = ({
                   {tempValue.from && tempValue.to && validation.isValid && (
                     <div className="bg-blue-50 p-3 rounded-md space-y-1">
                       <div className="text-xs text-blue-800">
-                        <span className="font-medium">From:</span>{" "}
-                        {moment(tempValue.from).format("MMM D, YYYY [at] HH:mm:ss")}
+                        <span className="font-medium">{t("From")}:</span>{" "}
+                        {locale === "zh-CN"
+                          ? moment(tempValue.from).format("YYYY年M月D日 HH:mm:ss")
+                          : moment(tempValue.from).format("MMM D, YYYY [at] HH:mm:ss")}
                       </div>
                       <div className="text-xs text-blue-800">
-                        <span className="font-medium">To:</span>{" "}
-                        {moment(tempValue.to).format("MMM D, YYYY [at] HH:mm:ss")}
+                        <span className="font-medium">{t("To")}:</span>{" "}
+                        {locale === "zh-CN"
+                          ? moment(tempValue.to).format("YYYY年M月D日 HH:mm:ss")
+                          : moment(tempValue.to).format("MMM D, YYYY [at] HH:mm:ss")}
                       </div>
                     </div>
                   )}
@@ -408,10 +419,10 @@ const AdvancedDatePicker: React.FC<AdvancedDatePickerProps> = ({
                 <div className="absolute bottom-4 right-4">
                   <div className="flex gap-2">
                     <Button variant="secondary" onClick={handleCancel}>
-                      Cancel
+                      {t("Cancel")}
                     </Button>
                     <Button onClick={handleApply} disabled={!tempValue.from || !tempValue.to || !validation.isValid}>
-                      Apply
+                      {t("Apply")}
                     </Button>
                   </div>
                 </div>

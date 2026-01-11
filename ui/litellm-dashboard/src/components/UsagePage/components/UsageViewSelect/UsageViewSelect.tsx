@@ -10,7 +10,10 @@ import {
 } from "@ant-design/icons";
 import { Badge, Select } from "antd";
 import React from "react";
+import { useTranslate } from "@/i18n";
+
 export type UsageOption = "global" | "organization" | "team" | "customer" | "tag" | "agent" | "user-agent-activity";
+
 export interface UsageViewSelectProps {
   value: UsageOption;
   onChange: (value: UsageOption) => void;
@@ -19,6 +22,7 @@ export interface UsageViewSelectProps {
   description?: string;
   "data-id"?: string;
 }
+
 interface OptionConfig {
   value: UsageOption;
   label: string;
@@ -31,71 +35,80 @@ interface OptionConfig {
   descriptionForNonAdmin?: string;
   badgeText?: string;
 }
-const OPTIONS: OptionConfig[] = [
-  {
-    value: "global",
-    label: "Global Usage",
-    showForAdmin: "Global Usage",
-    showForNonAdmin: "Your Usage",
-    description: "View usage across all resources",
-    descriptionForAdmin: "View usage across all resources",
-    descriptionForNonAdmin: "View your usage",
-    icon: <GlobalOutlined style={{ fontSize: "16px" }} />,
-  },
-  {
-    value: "organization",
-    label: "Organization Usage",
-    showForAdmin: "Organization Usage",
-    showForNonAdmin: "Your Organization Usage",
-    description: "View organization-level usage",
-    descriptionForAdmin: "View usage across all organizations",
-    descriptionForNonAdmin: "View your organization's usage",
-    icon: <BankOutlined style={{ fontSize: "16px" }} />,
-  },
-  {
-    value: "team",
-    label: "Team Usage",
-    description: "View usage by team",
-    icon: <TeamOutlined style={{ fontSize: "16px" }} />,
-  },
-  {
-    value: "customer",
-    label: "Customer Usage",
-    description: "View usage by customer accounts",
-    icon: <ShoppingCartOutlined style={{ fontSize: "16px" }} />,
-    adminOnly: true,
-  },
-  {
-    value: "tag",
-    label: "Tag Usage",
-    description: "View usage grouped by tags",
-    icon: <TagsOutlined style={{ fontSize: "16px" }} />,
-    adminOnly: true,
-  },
-  {
-    value: "agent",
-    label: "Agent Usage (A2A)",
-    description: "View usage by AI agents",
-    icon: <RobotOutlined style={{ fontSize: "16px" }} />,
-    adminOnly: true,
-    badgeText: "New",
-  },
-  {
-    value: "user-agent-activity",
-    label: "User Agent Activity",
-    description: "View detailed user agent activity logs",
-    icon: <LineChartOutlined style={{ fontSize: "16px" }} />,
-    adminOnly: true,
-  },
-];
+
 export const UsageViewSelect: React.FC<UsageViewSelectProps> = ({
   value,
   onChange,
   isAdmin,
-  title = "Usage View",
-  description = "Select the usage data you want to view",
+  title,
+  description,
   "data-id": dataId,
 }) => {
+  const t = useTranslate();
+
+  // Apply translated defaults
+  const displayTitle = title ?? t("Usage View");
+  const displayDescription = description ?? t("Select the usage data you want to view");
+
+  // OPTIONS moved inside component to use translations
+  const OPTIONS: OptionConfig[] = [
+    {
+      value: "global",
+      label: t("Global Usage"),
+      showForAdmin: t("Global Usage"),
+      showForNonAdmin: t("Your Usage"),
+      description: t("View usage across all resources"),
+      descriptionForAdmin: t("View usage across all resources"),
+      descriptionForNonAdmin: t("View your usage"),
+      icon: <GlobalOutlined style={{ fontSize: "16px" }} />,
+    },
+    {
+      value: "organization",
+      label: t("Organization Usage"),
+      showForAdmin: t("Organization Usage"),
+      showForNonAdmin: t("Your Organization Usage"),
+      description: t("View organization-level usage"),
+      descriptionForAdmin: t("View usage across all organizations"),
+      descriptionForNonAdmin: t("View your organization's usage"),
+      icon: <BankOutlined style={{ fontSize: "16px" }} />,
+    },
+    {
+      value: "team",
+      label: t("Team Usage"),
+      description: t("View usage by team"),
+      icon: <TeamOutlined style={{ fontSize: "16px" }} />,
+    },
+    {
+      value: "customer",
+      label: t("Customer Usage"),
+      description: t("View usage by customer accounts"),
+      icon: <ShoppingCartOutlined style={{ fontSize: "16px" }} />,
+      adminOnly: true,
+    },
+    {
+      value: "tag",
+      label: t("Tag Usage"),
+      description: t("View usage grouped by tags"),
+      icon: <TagsOutlined style={{ fontSize: "16px" }} />,
+      adminOnly: true,
+    },
+    {
+      value: "agent",
+      label: t("Agent Usage (A2A)"),
+      description: t("View usage by AI agents"),
+      icon: <RobotOutlined style={{ fontSize: "16px" }} />,
+      adminOnly: true,
+      badgeText: t("New"),
+    },
+    {
+      value: "user-agent-activity",
+      label: t("User Agent Activity"),
+      description: t("View detailed user agent activity logs"),
+      icon: <LineChartOutlined style={{ fontSize: "16px" }} />,
+      adminOnly: true,
+    },
+  ];
+
   const getFilteredOptions = () => {
     return OPTIONS.filter((option) => {
       if (option.adminOnly && !isAdmin) {
@@ -120,7 +133,9 @@ export const UsageViewSelect: React.FC<UsageViewSelectProps> = ({
       };
     });
   };
+
   const filteredOptions = getFilteredOptions();
+
   return (
     <div className="w-full" data-id={dataId}>
       <div className="flex flex-wrap items-center justify-start gap-4">
@@ -129,8 +144,8 @@ export const UsageViewSelect: React.FC<UsageViewSelectProps> = ({
             <BarChartOutlined style={{ fontSize: "32px" }} />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-sm font-semibold text-gray-900 mb-0.5 leading-tight">{title}</h3>
-            <p className="text-xs text-gray-600 leading-tight">{description}</p>
+            <h3 className="text-sm font-semibold text-gray-900 mb-0.5 leading-tight">{displayTitle}</h3>
+            <p className="text-xs text-gray-600 leading-tight">{displayDescription}</p>
           </div>
         </div>
         <div className="flex-shrink-0">
