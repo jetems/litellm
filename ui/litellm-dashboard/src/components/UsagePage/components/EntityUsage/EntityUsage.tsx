@@ -410,7 +410,7 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
               {/* Total Spend Card */}
               <Col numColSpan={2}>
                 <Card>
-                  <Title>{capitalizedEntityLabel} {t("Spend Overview")}</Title>
+                  <Title>{t(capitalizedEntityLabel)} {t("Spend Overview")}</Title>
                   <Grid numItems={5} className="gap-4 mt-4">
                     <Card>
                       <Title>{t("Total Spend")}</Title>
@@ -473,10 +473,10 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
                           <p className="text-gray-600">{t("Failed")}: {data.metrics.failed_requests}</p>
                           <p className="text-gray-600">{t("Total Tokens")}: {data.metrics.total_tokens}</p>
                           <p className="text-gray-600">
-                            {t("Total")} {capitalizedEntityLabel}s: {entityCount}
+                            {t("Total")} {t(capitalizedEntityLabel)}s: {entityCount}
                           </p>
                           <div className="mt-2 border-t pt-2">
-                            <p className="font-semibold">{t("Spend by")} {capitalizedEntityLabel}:</p>
+                            <p className="font-semibold">{t("Spend by")} {t(capitalizedEntityLabel)}:</p>
                             {Object.entries(data.breakdown.entities || {})
                               .sort(([, a], [, b]) => {
                                 const spendA = (a as EntityMetrics).metrics.spend;
@@ -509,10 +509,10 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
                 <Card>
                   <div className="flex flex-col space-y-4">
                     <div className="flex flex-col space-y-2">
-                      <Title>{t("Spend Per")} {capitalizedEntityLabel}</Title>
+                      <Title>{t("Spend Per")} {t(capitalizedEntityLabel)}</Title>
                       <Subtitle className="text-xs">{t("Showing Top 5 by Spend")}</Subtitle>
                       <div className="flex items-center text-sm text-gray-500">
-                        <span>{t("Get Started by Tracking cost per")} {capitalizedEntityLabel} </span>
+                        <span>{t("Get Started by Tracking cost per")} {t(capitalizedEntityLabel)} </span>
                         <a
                           href="https://docs.litellm.ai/docs/proxy/enterprise#spend-tracking"
                           className="text-blue-500 hover:text-blue-700 ml-1"
@@ -556,7 +556,7 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
                           <Table>
                             <TableHead>
                               <TableRow>
-                                <TableHeaderCell>{capitalizedEntityLabel}</TableHeaderCell>
+                                <TableHeaderCell>{t(capitalizedEntityLabel)}</TableHeaderCell>
                                 <TableHeaderCell>{t("Spend")}</TableHeaderCell>
                                 <TableHeaderCell className="text-green-600">{t("Successful")}</TableHeaderCell>
                                 <TableHeaderCell className="text-red-600">{t("Failed")}</TableHeaderCell>

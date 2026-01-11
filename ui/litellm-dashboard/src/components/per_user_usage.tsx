@@ -17,6 +17,7 @@ import {
   TabPanel,
   TabPanels,
 } from "@tremor/react";
+import { useTranslate } from "@/i18n";
 import { perUserAnalyticsCall } from "./networking";
 
 interface PerUserMetrics {
@@ -45,6 +46,7 @@ interface PerUserUsageProps {
 }
 
 const PerUserUsage: React.FC<PerUserUsageProps> = ({ accessToken, selectedTags, formatAbbreviatedNumber }) => {
+  const t = useTranslate();
   // Maximum number of user agent categories to show in charts to prevent color palette overflow
   const MAX_USER_AGENTS = 8;
   const [perUserData, setPerUserData] = useState<PerUserAnalyticsResponse>({
@@ -95,13 +97,13 @@ const PerUserUsage: React.FC<PerUserUsageProps> = ({ accessToken, selectedTags, 
 
   return (
     <div className="mb-6">
-      <Title>Per User Usage</Title>
-      <Subtitle>Individual developer usage metrics</Subtitle>
+      <Title>{t("Per User Usage")}</Title>
+      <Subtitle>{t("Individual developer usage metrics")}</Subtitle>
 
       <TabGroup>
         <TabList className="mb-6">
-          <Tab>User Details</Tab>
-          <Tab>Usage Distribution</Tab>
+          <Tab>{t("User Details")}</Tab>
+          <Tab>{t("Usage Distribution")}</Tab>
         </TabList>
 
         <TabPanels>
@@ -110,13 +112,13 @@ const PerUserUsage: React.FC<PerUserUsageProps> = ({ accessToken, selectedTags, 
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableHeaderCell>User ID</TableHeaderCell>
-                  <TableHeaderCell>User Email</TableHeaderCell>
-                  <TableHeaderCell>User Agent</TableHeaderCell>
-                  <TableHeaderCell className="text-right">Success Generations</TableHeaderCell>
-                  <TableHeaderCell className="text-right">Total Tokens</TableHeaderCell>
-                  <TableHeaderCell className="text-right">Failed Requests</TableHeaderCell>
-                  <TableHeaderCell className="text-right">Total Cost</TableHeaderCell>
+                  <TableHeaderCell>{t("User ID")}</TableHeaderCell>
+                  <TableHeaderCell>{t("User Email")}</TableHeaderCell>
+                  <TableHeaderCell>{t("User Agent")}</TableHeaderCell>
+                  <TableHeaderCell className="text-right">{t("Success Generations")}</TableHeaderCell>
+                  <TableHeaderCell className="text-right">{t("Total Tokens")}</TableHeaderCell>
+                  <TableHeaderCell className="text-right">{t("Failed Requests")}</TableHeaderCell>
+                  <TableHeaderCell className="text-right">{t("Total Cost")}</TableHeaderCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -153,7 +155,7 @@ const PerUserUsage: React.FC<PerUserUsageProps> = ({ accessToken, selectedTags, 
                 <Text className="text-sm text-gray-500">Showing 10 of {perUserData.total_count} results</Text>
                 <div className="flex gap-2">
                   <Button size="sm" variant="secondary" onClick={handlePrevPage} disabled={currentPage === 1}>
-                    Previous
+                    {t("Previous")}
                   </Button>
                   <Button
                     size="sm"
@@ -161,7 +163,7 @@ const PerUserUsage: React.FC<PerUserUsageProps> = ({ accessToken, selectedTags, 
                     onClick={handleNextPage}
                     disabled={currentPage >= perUserData.total_pages}
                   >
-                    Next
+                    {t("Next")}
                   </Button>
                 </div>
               </div>
@@ -171,8 +173,8 @@ const PerUserUsage: React.FC<PerUserUsageProps> = ({ accessToken, selectedTags, 
           {/* Tab 2: Usage Distribution Histogram */}
           <TabPanel>
             <div className="mb-4">
-              <Title className="text-lg">User Usage Distribution</Title>
-              <Subtitle>Number of users by successful request frequency</Subtitle>
+              <Title className="text-lg">{t("User Usage Distribution")}</Title>
+              <Subtitle>{t("Number of users by successful request frequency")}</Subtitle>
             </div>
 
             <BarChart

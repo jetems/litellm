@@ -14,6 +14,7 @@ import {
   TabPanels,
 } from "@tremor/react";
 import { Select, Tooltip } from "antd";
+import { useTranslate } from "@/i18n";
 import { userAgentSummaryCall, tagDauCall, tagWauCall, tagMauCall, tagDistinctCall } from "./networking";
 import PerUserUsage from "./per_user_usage";
 import { DateRangePickerValue } from "@tremor/react";
@@ -62,6 +63,7 @@ interface UserAgentActivityProps {
 }
 
 const UserAgentActivity: React.FC<UserAgentActivityProps> = ({ accessToken, userRole, dateValue, onDateChange }) => {
+  const t = useTranslate();
   // Maximum number of categories to show in charts to prevent color palette overflow
   const MAX_CATEGORIES = 10;
 
@@ -375,16 +377,16 @@ const UserAgentActivity: React.FC<UserAgentActivityProps> = ({ accessToken, user
         <div className="space-y-6">
           <div className="flex justify-between items-start">
             <div>
-              <Title>Summary by User Agent</Title>
-              <Subtitle>Performance metrics for different user agents</Subtitle>
+              <Title>{t("Summary by User Agent")}</Title>
+              <Subtitle>{t("Performance metrics for different user agents")}</Subtitle>
             </div>
 
             {/* User Agent Filter */}
             <div className="w-96">
-              <Text className="text-sm font-medium block mb-2">Filter by User Agents</Text>
+              <Text className="text-sm font-medium block mb-2">{t("Filter by User Agents")}</Text>
               <Select
                 mode="multiple"
-                placeholder="All User Agents"
+                placeholder={t("All User Agents")}
                 value={selectedTags}
                 onChange={setSelectedTags}
                 style={{ width: "100%" }}
@@ -425,15 +427,15 @@ const UserAgentActivity: React.FC<UserAgentActivityProps> = ({ accessToken, user
                     </Tooltip>
                     <div className="mt-4 space-y-3">
                       <div>
-                        <Text className="text-sm text-gray-600">Success Requests</Text>
+                        <Text className="text-sm text-gray-600">{t("Success Requests")}</Text>
                         <Metric className="text-lg">{formatAbbreviatedNumber(tag.successful_requests)}</Metric>
                       </div>
                       <div>
-                        <Text className="text-sm text-gray-600">Total Tokens</Text>
+                        <Text className="text-sm text-gray-600">{t("Total Tokens")}</Text>
                         <Metric className="text-lg">{formatAbbreviatedNumber(tag.total_tokens)}</Metric>
                       </div>
                       <div>
-                        <Text className="text-sm text-gray-600">Total Cost</Text>
+                        <Text className="text-sm text-gray-600">{t("Total Cost")}</Text>
                         <Metric className="text-lg">${formatAbbreviatedNumber(tag.total_spend, 4)}</Metric>
                       </div>
                     </div>
@@ -443,18 +445,18 @@ const UserAgentActivity: React.FC<UserAgentActivityProps> = ({ accessToken, user
               {/* Fill remaining slots if less than 4 agents */}
               {Array.from({ length: Math.max(0, 4 - (summaryData.results || []).length) }).map((_, index) => (
                 <Card key={`empty-${index}`}>
-                  <Title>No Data</Title>
+                  <Title>{t("No Data")}</Title>
                   <div className="mt-4 space-y-3">
                     <div>
-                      <Text className="text-sm text-gray-600">Success Requests</Text>
+                      <Text className="text-sm text-gray-600">{t("Success Requests")}</Text>
                       <Metric className="text-lg">-</Metric>
                     </div>
                     <div>
-                      <Text className="text-sm text-gray-600">Total Tokens</Text>
+                      <Text className="text-sm text-gray-600">{t("Total Tokens")}</Text>
                       <Metric className="text-lg">-</Metric>
                     </div>
                     <div>
-                      <Text className="text-sm text-gray-600">Total Cost</Text>
+                      <Text className="text-sm text-gray-600">{t("Total Cost")}</Text>
                       <Metric className="text-lg">-</Metric>
                     </div>
                   </div>
@@ -469,16 +471,16 @@ const UserAgentActivity: React.FC<UserAgentActivityProps> = ({ accessToken, user
       <Card>
         <TabGroup>
           <TabList className="mb-6">
-            <Tab>DAU/WAU/MAU</Tab>
-            <Tab>Per User Usage (Last 30 Days)</Tab>
+            <Tab>{t("DAU/WAU/MAU")}</Tab>
+            <Tab>{t("Per User Usage (Last 30 Days)")}</Tab>
           </TabList>
 
           <TabPanels>
             {/* DAU/WAU/MAU Tab Panel */}
             <TabPanel>
               <div className="mb-6">
-                <Title>DAU, WAU & MAU per Agent</Title>
-                <Subtitle>Active users across different time periods</Subtitle>
+                <Title>{t("DAU, WAU & MAU per Agent")}</Title>
+                <Subtitle>{t("Active users across different time periods")}</Subtitle>
               </div>
 
               <TabGroup>
@@ -491,7 +493,7 @@ const UserAgentActivity: React.FC<UserAgentActivityProps> = ({ accessToken, user
                 <TabPanels>
                   <TabPanel>
                     <div className="mb-4">
-                      <Title className="text-lg">Daily Active Users - Last 7 Days</Title>
+                      <Title className="text-lg">{t("Daily Active Users - Last 7 Days")}</Title>
                     </div>
                     {dauLoading ? (
                       <ChartLoader isDateChanging={false} />
@@ -510,7 +512,7 @@ const UserAgentActivity: React.FC<UserAgentActivityProps> = ({ accessToken, user
 
                   <TabPanel>
                     <div className="mb-4">
-                      <Title className="text-lg">Weekly Active Users - Last 7 Weeks</Title>
+                      <Title className="text-lg">{t("Weekly Active Users - Last 7 Weeks")}</Title>
                     </div>
                     {wauLoading ? (
                       <ChartLoader isDateChanging={false} />
@@ -529,7 +531,7 @@ const UserAgentActivity: React.FC<UserAgentActivityProps> = ({ accessToken, user
 
                   <TabPanel>
                     <div className="mb-4">
-                      <Title className="text-lg">Monthly Active Users - Last 7 Months</Title>
+                      <Title className="text-lg">{t("Monthly Active Users - Last 7 Months")}</Title>
                     </div>
                     {mauLoading ? (
                       <ChartLoader isDateChanging={false} />

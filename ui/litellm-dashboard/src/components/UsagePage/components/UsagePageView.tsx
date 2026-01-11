@@ -835,8 +835,8 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
                 <Alert
                   banner
                   type="info"
-                  message="Agent usage (A2A) is a new feature."
-                  description="Spend is tracked from feature launch and previous data isn't backfilled, so only future usage appears here."
+                  message={t("Agent usage (A2A) is a new feature.")}
+                  description={t("Spend is tracked from feature launch and previous data isn't backfilled, so only future usage appears here.")}
                   closable
                   onClose={() => setShowAgentBanner(false)}
                   className="mb-5"

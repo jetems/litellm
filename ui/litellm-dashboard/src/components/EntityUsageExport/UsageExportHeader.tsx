@@ -2,6 +2,7 @@ import type { DateRangePickerValue } from "@tremor/react";
 import { Button, Text } from "@tremor/react";
 import { Select } from "antd";
 import React, { useState } from "react";
+import { useTranslate } from "@/i18n";
 import EntityUsageExportModal from "./EntityUsageExportModal";
 import type { EntitySpendData, EntityType } from "./types";
 
@@ -33,6 +34,7 @@ const UsageExportHeader: React.FC<UsageExportHeaderProps> = ({
   customTitle,
   compactLayout = false,
 }) => {
+  const t = useTranslate();
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   // Determine grid layout based on what's visible
@@ -81,7 +83,7 @@ const UsageExportHeader: React.FC<UsageExportHeaderProps> = ({
                 </svg>
               )}
             >
-              Export Data
+              {t("Export Data")}
             </Button>
           </div>
         </div>
