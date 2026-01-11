@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Select } from "antd";
 import { VectorStore } from "./types";
 import { vectorStoreListCall } from "../networking";
+import { useTranslate } from "@/i18n";
+
 interface VectorStoreSelectorProps {
   onChange: (selectedVectorStores: string[]) => void;
   value?: string[];
@@ -16,11 +18,12 @@ const VectorStoreSelector: React.FC<VectorStoreSelectorProps> = ({
   value,
   className,
   accessToken,
-  placeholder = "Select vector stores",
+  placeholder,
   disabled = false,
 }) => {
   const [vectorStores, setVectorStores] = useState<VectorStore[]>([]);
   const [loading, setLoading] = useState(false);
+  const t = useTranslate();
 
   useEffect(() => {
     const fetchVectorStores = async () => {
@@ -46,7 +49,7 @@ const VectorStoreSelector: React.FC<VectorStoreSelectorProps> = ({
     <div>
       <Select
         mode="multiple"
-        placeholder={placeholder}
+        placeholder={placeholder || t("Select vector stores")}
         onChange={onChange}
         value={value}
         loading={loading}
@@ -66,3 +69,4 @@ const VectorStoreSelector: React.FC<VectorStoreSelectorProps> = ({
 };
 
 export default VectorStoreSelector;
+

@@ -1645,7 +1645,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
                         >
                           <RobotOutlined style={{ fontSize: "12px", color: "#4b5563" }} />
                         </div>
-                        <strong className="text-sm capitalize">Assistant</strong>
+                        <strong className="text-sm capitalize">{t("Assistant")}</strong>
                       </div>
                       <MCPEventsDisplay events={mcpEvents} />
                     </div>
@@ -1905,7 +1905,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
                     )}
                     {/* Quick Code Interpreter toggle for Responses */}
                     {endpointType === EndpointType.RESPONSES && (
-                      <Tooltip title={codeInterpreter.enabled ? "Code Interpreter enabled (click to disable)" : "Enable Code Interpreter"}>
+                      <Tooltip title={codeInterpreter.enabled ? t("Code Interpreter enabled (click to disable)") : t("Enable Code Interpreter")}>
                         <button
                           className={`p-1.5 rounded-md transition-colors ${codeInterpreter.enabled
                             ? "bg-blue-100 text-blue-600"
@@ -1914,7 +1914,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
                           onClick={() => {
                             codeInterpreter.toggle();
                             if (!codeInterpreter.enabled) {
-                              NotificationsManager.success("Code Interpreter enabled!");
+                              NotificationsManager.success(t("Code Interpreter enabled!"));
                             }
                           }}
                         >
@@ -1934,16 +1934,16 @@ const ChatUI: React.FC<ChatUIProps> = ({
                         endpointType === EndpointType.EMBEDDINGS ||
                         endpointType === EndpointType.RESPONSES ||
                         endpointType === EndpointType.ANTHROPIC_MESSAGES
-                        ? "Type your message... (Shift+Enter for new line)"
+                        ? t("Type your message... (Shift+Enter for new line)")
                         : endpointType === EndpointType.A2A_AGENTS
-                          ? "Send a message to the A2A agent..."
+                          ? t("Send a message to the A2A agent...")
                           : endpointType === EndpointType.IMAGE_EDITS
-                            ? "Describe how you want to edit the image..."
+                            ? t("Describe how you want to edit the image...")
                             : endpointType === EndpointType.SPEECH
-                              ? "Enter text to convert to speech..."
+                              ? t("Enter text to convert to speech...")
                               : endpointType === EndpointType.TRANSCRIPTION
-                                ? "Optional: Add context or prompt for transcription..."
-                                : "Describe the image you want to generate..."
+                                ? t("Optional: Add context or prompt for transcription...")
+                                : t("Describe the image you want to generate...")
                     }
                     disabled={isLoading}
                     className="flex-1"
@@ -1977,7 +1977,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
                     className="bg-red-50 hover:bg-red-100 text-red-600 border-red-200"
                     icon={DeleteOutlined}
                   >
-                    Cancel
+                    {t("Cancel")}
                   </TremorButton>
                 )}
               </div>
@@ -1986,7 +1986,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
         </div>
       </Card>
       <Modal
-        title="Generated Code"
+        title={t("Generated Code")}
         visible={isGetCodeModalVisible}
         onCancel={() => setIsGetCodeModalVisible(false)}
         footer={null}
@@ -1994,24 +1994,24 @@ const ChatUI: React.FC<ChatUIProps> = ({
       >
         <div className="flex justify-between items-end my-4">
           <div>
-            <Text className="font-medium block mb-1 text-gray-700">SDK Type</Text>
+            <Text className="font-medium block mb-1 text-gray-700">{t("SDK Type")}</Text>
             <Select
               value={selectedSdk}
               onChange={(value) => setSelectedSdk(value as "openai" | "azure")}
               style={{ width: 150 }}
               options={[
-                { value: "openai", label: "OpenAI SDK" },
-                { value: "azure", label: "Azure SDK" },
+                { value: "openai", label: t("OpenAI SDK") },
+                { value: "azure", label: t("Azure SDK") },
               ]}
             />
           </div>
           <Button
             onClick={() => {
               navigator.clipboard.writeText(generatedCode);
-              NotificationsManager.success("Copied to clipboard!");
+              NotificationsManager.success(t("Copied to clipboard!"));
             }}
           >
-            Copy to Clipboard
+            {t("Copy to Clipboard")}
           </Button>
         </div>
         <SyntaxHighlighter
@@ -2030,12 +2030,12 @@ const ChatUI: React.FC<ChatUIProps> = ({
       </Modal>
       {apiKeySource === "custom" && (
         <Modal
-          title="Select MCP Tool"
+          title={t("Select MCP Tool")}
           visible={isMCPToolsModalVisible}
           onCancel={() => setIsMCPToolsModalVisible(false)}
           onOk={() => {
             setIsMCPToolsModalVisible(false);
-            NotificationsManager.success("MCP tool selection updated");
+            NotificationsManager.success(t("MCP tool selection updated"));
           }}
           width={800}
         >
@@ -2046,12 +2046,12 @@ const ChatUI: React.FC<ChatUIProps> = ({
           ) : (
             <div className="space-y-4">
               <Text className="text-gray-600 block mb-4">
-                Select the MCP tools you want to use in your conversation.
+                {t("Select the MCP tools you want to use in your conversation.")}
               </Text>
               <Select
                 mode="multiple"
                 style={{ width: "100%" }}
-                placeholder="Select MCP tools"
+                placeholder={t("Select MCP tools")}
                 value={selectedMCPTools}
                 onChange={(value) => setSelectedMCPTools(value)}
                 optionLabelProp="label"

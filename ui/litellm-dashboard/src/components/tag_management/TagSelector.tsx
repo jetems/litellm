@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Select } from "antd";
 import { Tag } from "./types";
 import { tagListCall } from "../networking";
+import { useTranslate } from "@/i18n";
 
 interface TagSelectorProps {
   onChange: (selectedTags: string[]) => void;
@@ -13,6 +14,7 @@ interface TagSelectorProps {
 const TagSelector: React.FC<TagSelectorProps> = ({ onChange, value, className, accessToken }) => {
   const [tags, setTags] = useState<Tag[]>([]);
   const [loading, setLoading] = useState(false);
+  const t = useTranslate();
 
   useEffect(() => {
     const fetchTags = async () => {
@@ -35,7 +37,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({ onChange, value, className, a
     <Select
       mode="tags"
       showSearch
-      placeholder="Select or create tags"
+      placeholder={t("Select or create tags")}
       onChange={onChange}
       value={value}
       loading={loading}
@@ -55,3 +57,4 @@ const TagSelector: React.FC<TagSelectorProps> = ({ onChange, value, className, a
 };
 
 export default TagSelector;
+
