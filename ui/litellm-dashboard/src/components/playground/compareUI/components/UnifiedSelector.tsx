@@ -5,6 +5,7 @@
 
 import { Select, Spin } from "antd";
 import { SelectorOption, EndpointConfig } from "../endpoint_config";
+import { useTranslate } from "@/i18n";
 
 interface UnifiedSelectorProps {
   value: string;
@@ -21,10 +22,30 @@ export function UnifiedSelector({
   config,
   onChange,
 }: UnifiedSelectorProps) {
+  const t = useTranslate();
+
+  const getPlaceholder = () => {
+    if (loading) {
+      return t(`Loading ${config.selectorLabel.toLowerCase()}s...`);
+    }
+    return t(config.selectorPlaceholder);
+  };
+
+  const getNotFoundContent = () => {
+    if (loading) {
+      return (
+        <div className="flex items-center justify-center py-2">
+          <Spin size="small" />
+        </div>
+      );
+    }
+    return t(`No ${config.selectorLabel.toLowerCase()}s available`);
+  };
+
   return (
     <Select
       value={value || undefined}
-      placeholder={loading ? `Loading ${config.selectorLabel.toLowerCase()}s...` : config.selectorPlaceholder}
+      placeholder={getPlaceholder()}
       onChange={onChange}
       loading={loading}
       showSearch
@@ -33,16 +54,7 @@ export function UnifiedSelector({
       }
       options={options}
       className="w-48"
-      notFoundContent={
-        loading ? (
-          <div className="flex items-center justify-center py-2">
-            <Spin size="small" />
-          </div>
-        ) : (
-          `No ${config.selectorLabel.toLowerCase()}s available`
-        )
-      }
+      notFoundContent={getNotFoundContent()}
     />
   );
 }
-
