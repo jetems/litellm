@@ -1,6 +1,7 @@
 import React from "react";
 import { Text } from "@tremor/react";
 import MCPServerSelector from "../mcp_server_management/MCPServerSelector";
+import { useTranslate } from "@/i18n";
 
 interface PremiumMCPSelectorProps {
   onChange: (value: { servers: string[]; accessGroups: string[] }) => void;
@@ -14,9 +15,11 @@ export function PremiumMCPSelector({
   onChange,
   value,
   accessToken,
-  placeholder = "Select MCP servers",
+  placeholder,
   premiumUser = false,
 }: PremiumMCPSelectorProps) {
+  const t = useTranslate();
+  const displayPlaceholder = placeholder || t("Select MCP servers");
   if (!premiumUser) {
     return (
       <div>
@@ -30,9 +33,10 @@ export function PremiumMCPSelector({
         </div>
         <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
           <Text className="text-sm text-yellow-800">
-            MCP server access control is a LiteLLM Enterprise feature. Get a trial key{" "}
+            {t("MCP server access control is a LiteLLM Enterprise feature.")}{" "}
+            {t("Get a trial key")}{" "}
             <a href="https://www.litellm.ai/#pricing" target="_blank" rel="noopener noreferrer" className="underline">
-              here
+              {t("here")}
             </a>
             .
           </Text>
@@ -41,7 +45,7 @@ export function PremiumMCPSelector({
     );
   }
 
-  return <MCPServerSelector onChange={onChange} value={value} accessToken={accessToken} placeholder={placeholder} />;
+  return <MCPServerSelector onChange={onChange} value={value} accessToken={accessToken} placeholder={displayPlaceholder} />;
 }
 
 export default PremiumMCPSelector;

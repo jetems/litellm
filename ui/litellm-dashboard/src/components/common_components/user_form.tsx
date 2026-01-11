@@ -4,6 +4,7 @@ import { Form, Select as AntSelect } from "antd";
 import TeamDropdown from "./team_dropdown";
 import { getPossibleUserRoles } from "../networking";
 import TextArea from "antd/es/input/TextArea";
+import { useTranslate } from "@/i18n";
 
 interface UserFormProps {
   form: any;
@@ -14,6 +15,7 @@ interface UserFormProps {
 }
 
 const UserForm: React.FC<UserFormProps> = ({ form, teams, possibleUIRoles, setPossibleUIRoles, accessToken }) => {
+  const t = useTranslate();
   React.useEffect(() => {
     // Fetch roles if they're not available and we have a setter
     if (!possibleUIRoles && setPossibleUIRoles && accessToken) {
@@ -25,11 +27,11 @@ const UserForm: React.FC<UserFormProps> = ({ form, teams, possibleUIRoles, setPo
 
   return (
     <>
-      <Form.Item label="User Email" name="user_email" rules={[{ required: true, message: "Please input user email" }]}>
+      <Form.Item label={t("User Email")} name="user_email" rules={[{ required: true, message: t("Please input user email") }]}>
         <TextInput placeholder="" />
       </Form.Item>
 
-      <Form.Item label="User Role" name="user_role" rules={[{ required: true, message: "Please select a role" }]}>
+      <Form.Item label={t("User Role")} name="user_role" rules={[{ required: true, message: t("Please select a role") }]}>
         <Select>
           {possibleUIRoles &&
             Object.entries(possibleUIRoles).map(([role, { ui_label, description }]) => (
@@ -45,12 +47,12 @@ const UserForm: React.FC<UserFormProps> = ({ form, teams, possibleUIRoles, setPo
         </Select>
       </Form.Item>
 
-      <Form.Item label="Team" name="team_id">
+      <Form.Item label={t("Team")} name="team_id">
         <TeamDropdown teams={teams} />
       </Form.Item>
 
-      <Form.Item label="Metadata" name="metadata">
-        <TextArea rows={4} placeholder="Enter metadata as JSON" />
+      <Form.Item label={t("Metadata")} name="metadata">
+        <TextArea rows={4} placeholder={t("Enter metadata as JSON")} />
       </Form.Item>
     </>
   );

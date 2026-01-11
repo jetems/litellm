@@ -1,6 +1,7 @@
 import React from "react";
 import { Text } from "@tremor/react";
 import VectorStoreSelector from "../vector_store_management/VectorStoreSelector";
+import { useTranslate } from "@/i18n";
 
 interface PremiumVectorStoreSelectorProps {
   onChange: (values: string[]) => void;
@@ -14,9 +15,11 @@ export function PremiumVectorStoreSelector({
   onChange,
   value,
   accessToken,
-  placeholder = "Select vector stores",
+  placeholder,
   premiumUser = false,
 }: PremiumVectorStoreSelectorProps) {
+  const t = useTranslate();
+  const displayPlaceholder = placeholder || t("Select vector stores");
   if (!premiumUser) {
     return (
       <div>
@@ -30,9 +33,10 @@ export function PremiumVectorStoreSelector({
         </div>
         <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
           <Text className="text-sm text-yellow-800">
-            Vector store access control is a LiteLLM Enterprise feature. Get a trial key{" "}
+            {t("Vector store access control is a LiteLLM Enterprise feature.")}{" "}
+            {t("Get a trial key")}{" "}
             <a href="https://www.litellm.ai/#pricing" target="_blank" rel="noopener noreferrer" className="underline">
-              here
+              {t("here")}
             </a>
             .
           </Text>
@@ -41,7 +45,7 @@ export function PremiumVectorStoreSelector({
     );
   }
 
-  return <VectorStoreSelector onChange={onChange} value={value} accessToken={accessToken} placeholder={placeholder} />;
+  return <VectorStoreSelector onChange={onChange} value={value} accessToken={accessToken} placeholder={displayPlaceholder} />;
 }
 
 export default PremiumVectorStoreSelector;

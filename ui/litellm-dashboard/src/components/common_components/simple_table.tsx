@@ -1,5 +1,6 @@
 import React from "react";
 import { Table, TableHead, TableRow, TableHeaderCell, TableBody, TableCell, Text } from "@tremor/react";
+import { useTranslate } from "@/i18n";
 
 export interface SimpleTableColumn<T> {
   header: string;
@@ -25,10 +26,13 @@ export function SimpleTable<T>({
   data,
   columns,
   isLoading = false,
-  loadingMessage = "Loading...",
-  emptyMessage = "No data",
+  loadingMessage,
+  emptyMessage,
   getRowKey,
 }: SimpleTableProps<T>) {
+  const t = useTranslate();
+  const displayLoadingMessage = loadingMessage || t("Loading...");
+  const displayEmptyMessage = emptyMessage || t("No data");
   return (
     <Table>
       <TableHead>
@@ -44,7 +48,7 @@ export function SimpleTable<T>({
         {isLoading ? (
           <TableRow>
             <TableCell colSpan={columns.length} className="text-center">
-              <Text className="text-gray-500">{loadingMessage}</Text>
+              <Text className="text-gray-500">{displayLoadingMessage}</Text>
             </TableCell>
           </TableRow>
         ) : data.length > 0 ? (
@@ -60,7 +64,7 @@ export function SimpleTable<T>({
         ) : (
           <TableRow>
             <TableCell colSpan={columns.length} className="text-center">
-              <Text className="text-gray-500">{emptyMessage}</Text>
+              <Text className="text-gray-500">{displayEmptyMessage}</Text>
             </TableCell>
           </TableRow>
         )}

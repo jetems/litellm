@@ -12,6 +12,7 @@ import {
   Card,
 } from "@tremor/react";
 import { Tooltip } from "antd";
+import { useTranslate } from "@/i18n";
 
 interface Column {
   header: string;
@@ -49,10 +50,12 @@ const DataTable: React.FC<DataTableProps> = ({
   data,
   columns,
   actions,
-  emptyMessage = "No data available",
+  emptyMessage,
   deleteModal,
   onItemClick,
 }) => {
+  const t = useTranslate();
+  const displayEmptyMessage = emptyMessage || t("No data available");
   const renderCell = (column: Column, row: any) => {
     const value = row[column.accessor];
 
@@ -66,7 +69,7 @@ const DataTable: React.FC<DataTableProps> = ({
         <div style={{ display: "flex", flexDirection: "column" }}>
           {value.length === 0 ? (
             <Badge size="xs" className="mb-1" color="red">
-              <Text>None</Text>
+              <Text>{t("None")}</Text>
             </Badge>
           ) : (
             value.map((item: any, index: number) => (
@@ -90,7 +93,7 @@ const DataTable: React.FC<DataTableProps> = ({
             {columns.map((column, index) => (
               <TableHeaderCell key={index}>{column.header}</TableHeaderCell>
             ))}
-            {actions && actions.length > 0 && <TableHeaderCell>Actions</TableHeaderCell>}
+            {actions && actions.length > 0 && <TableHeaderCell>{t("Actions")}</TableHeaderCell>}
           </TableRow>
         </TableHead>
 
@@ -139,7 +142,7 @@ const DataTable: React.FC<DataTableProps> = ({
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length + (actions ? 1 : 0)}>
-                <Text className="text-center">{emptyMessage}</Text>
+                <Text className="text-center">{displayEmptyMessage}</Text>
               </TableCell>
             </TableRow>
           )}
