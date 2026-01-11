@@ -27,6 +27,7 @@ import { getModelDisplayName } from "./key_team_helpers/fetch_available_models_t
 import { useQueryClient } from "@tanstack/react-query";
 import NotificationsManager from "./molecules/notifications_manager";
 import TeamDropdown from "./common_components/team_dropdown";
+import { useTranslate } from "../i18n";
 
 // Helper function to generate UUID compatible across all environments
 const generateUUID = (): string => {
@@ -66,6 +67,7 @@ const Createuser: React.FC<CreateuserProps> = ({
   onUserCreated,
   isEmbedded = false,
 }) => {
+  const t = useTranslate();
   const queryClient = useQueryClient();
   const [uiSettings, setUISettings] = useState<UISettings | null>(null);
   const [form] = Form.useForm();
@@ -121,7 +123,7 @@ const Createuser: React.FC<CreateuserProps> = ({
 
   const handleCreate = async (formValues: { user_id: string; models?: string[]; user_role: string }) => {
     try {
-      NotificationsManager.info("Making API Call");
+      NotificationsManager.info(t("Making API Call"));
       if (!isEmbedded) {
         setIsModalVisible(true);
       }
@@ -170,11 +172,11 @@ const Createuser: React.FC<CreateuserProps> = ({
         setIsInvitationLinkModalVisible(true);
       }
 
-      NotificationsManager.success("API user Created");
+      NotificationsManager.success(t("API user Created"));
       form.resetFields();
       localStorage.removeItem("userData" + userID);
     } catch (error: any) {
-      const errorMessage = error.response?.data?.detail || error?.message || "Error creating the user";
+      const errorMessage = error.response?.data?.detail || error?.message || t("Error creating the user");
       NotificationsManager.fromBackend(errorMessage);
       console.error("Error creating the user:", error);
     }
@@ -184,10 +186,10 @@ const Createuser: React.FC<CreateuserProps> = ({
   if (isEmbedded) {
     return (
       <Form form={form} onFinish={handleCreate} labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} labelAlign="left">
-        <Form.Item label="User Email" name="user_email">
+        <Form.Item label={t("User Email")} name="user_email">
           <TextInput placeholder="" />
         </Form.Item>
-        <Form.Item label="User Role" name="user_role">
+        <Form.Item label={t("User Role")} name="user_role">
           <Select2>
             {possibleUIRoles &&
               Object.entries(possibleUIRoles).map(([role, { ui_label, description }]) => (
@@ -202,18 +204,18 @@ const Createuser: React.FC<CreateuserProps> = ({
               ))}
           </Select2>
         </Form.Item>
-        <Form.Item label="Team" name="team_id">
-          <Select placeholder="Select Team" style={{ width: "100%" }}>
+        <Form.Item label={t("Team")} name="team_id">
+          <Select placeholder={t("Select Team")} style={{ width: "100%" }}>
             <TeamDropdown teams={teams} />
           </Select>
         </Form.Item>
 
-        <Form.Item label="Metadata" name="metadata">
-          <Input.TextArea rows={4} placeholder="Enter metadata as JSON" />
+        <Form.Item label={t("Metadata")} name="metadata">
+          <Input.TextArea rows={4} placeholder={t("Enter metadata as JSON")} />
         </Form.Item>
 
         <div style={{ textAlign: "right", marginTop: "10px" }}>
-          <Button htmlType="submit">Create User</Button>
+          <Button htmlType="submit">{t("Create User")}</Button>
         </div>
       </Form>
     );
@@ -223,27 +225,27 @@ const Createuser: React.FC<CreateuserProps> = ({
   return (
     <div className="flex gap-2">
       <Button2 className="mb-0" onClick={() => setIsModalVisible(true)}>
-        + Invite User
+        + {t("Invite User")}
       </Button2>
       <BulkCreateUsers accessToken={accessToken} teams={teams} possibleUIRoles={possibleUIRoles} />
       <Modal
-        title="Invite User"
+        title={t("Invite User")}
         visible={isModalVisible}
         width={800}
         footer={null}
         onOk={handleOk}
         onCancel={handleCancel}
       >
-        <Text className="mb-1">Create a User who can own keys</Text>
+        <Text className="mb-1">{t("Create a User who can own keys")}</Text>
         <Form form={form} onFinish={handleCreate} labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} labelAlign="left">
-          <Form.Item label="User Email" name="user_email">
+          <Form.Item label={t("User Email")} name="user_email">
             <TextInput placeholder="" />
           </Form.Item>
           <Form.Item
             label={
               <span>
-                Global Proxy Role{" "}
-                <Tooltip title="This is the role that the user will globally on the proxy. This role is independent of any team/org specific roles.">
+                {t("Global Proxy Role")}{" "}
+                <Tooltip title={t("This is the role that the user will globally on the proxy. This role is independent of any team/org specific roles.")}>
                   <InfoCircleOutlined />
                 </Tooltip>
               </span>
@@ -264,43 +266,42 @@ const Createuser: React.FC<CreateuserProps> = ({
                 ))}
             </Select2>
           </Form.Item>
-
           <Form.Item
-            label="Team"
+            label={t("Team")}
             className="gap-2"
             name="team_id"
-            help="If selected, user will be added as a 'user' role to the team."
+            help={t("If selected, user will be added as a 'user' role to the team.")}
           >
             <TeamDropdown teams={teams} />
           </Form.Item>
 
-          <Form.Item label="Metadata" name="metadata">
-            <Input.TextArea rows={4} placeholder="Enter metadata as JSON" />
+          <Form.Item label={t("Metadata")} name="metadata">
+            <Input.TextArea rows={4} placeholder={t("Enter metadata as JSON")} />
           </Form.Item>
           <Accordion>
             <AccordionHeader>
-              <Title>Personal Key Creation</Title>
+              <Title>{t("Personal Key Creation")}</Title>
             </AccordionHeader>
             <AccordionBody>
               <Form.Item
                 className="gap-2"
                 label={
                   <span>
-                    Models{" "}
-                    <Tooltip title="Models user has access to, outside of team scope.">
+                    {t("Models")}{" "}
+                    <Tooltip title={t("Models user has access to, outside of team scope.")}>
                       <InfoCircleOutlined style={{ marginLeft: "4px" }} />
                     </Tooltip>
                   </span>
                 }
                 name="models"
-                help="Models user has access to, outside of team scope."
+                help={t("Models user has access to, outside of team scope.")}
               >
-                <Select2 mode="multiple" placeholder="Select models" style={{ width: "100%" }}>
+                <Select2 mode="multiple" placeholder={t("Select models")} style={{ width: "100%" }}>
                   <Select2.Option key="all-proxy-models" value="all-proxy-models">
-                    All Proxy Models
+                    {t("All Proxy Models")}
                   </Select2.Option>
                   <Select2.Option key="no-default-models" value="no-default-models">
-                    No Default Models
+                    {t("No Default Models")}
                   </Select2.Option>
                   {userModels.map((model) => (
                     <Select2.Option key={model} value={model}>
@@ -312,7 +313,7 @@ const Createuser: React.FC<CreateuserProps> = ({
             </AccordionBody>
           </Accordion>
           <div style={{ textAlign: "right", marginTop: "10px" }}>
-            <Button htmlType="submit">Create User</Button>
+            <Button htmlType="submit">{t("Create User")}</Button>
           </div>
         </Form>
       </Modal>
