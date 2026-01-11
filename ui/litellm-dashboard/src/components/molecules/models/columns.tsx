@@ -174,9 +174,9 @@ export const columns = (
           <Tooltip title={t("Cost per 1M tokens")}>
             <div className="flex flex-col min-w-0 max-w-[120px]">
               {/* Input Cost - Primary */}
-              {inputCost && <div className="text-xs font-medium text-gray-900 truncate">In: ${inputCost}</div>}
+              {inputCost && <div className="text-xs font-medium text-gray-900 truncate">{t("In:")} ${inputCost}</div>}
               {/* Output Cost - Secondary */}
-              {outputCost && <div className="text-xs text-gray-500 truncate mt-0.5">Out: ${outputCost}</div>}
+              {outputCost && <div className="text-xs text-gray-500 truncate mt-0.5">{t("Out:")} ${outputCost}</div>}
             </div>
           </Tooltip>
         );

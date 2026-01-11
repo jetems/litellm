@@ -158,12 +158,12 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
 
             return (
               <div key={option.name} className="flex flex-col gap-2">
-                <label className="text-sm text-gray-600">{option.label || option.name}</label>
+                <label className="text-sm text-gray-600">{t(option.label || option.name)}</label>
                 {option.isSearchable ? (
                   <Select
                     showSearch
                     className="w-full"
-                    placeholder={`${t("Search")}${option.label || option.name}...`}
+                    placeholder={`${t("Search")} ${t(option.label || option.name)}...`}
                     value={tempValues[option.name] || undefined}
                     onChange={(value) => handleFilterChange(option.name, value)}
                     onDropdownVisibleChange={(open) => handleDropdownVisibleChange(open, option)}
@@ -185,7 +185,7 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
                 ) : option.options ? (
                   <Select
                     className="w-full"
-                    placeholder={`${t("Select")}${option.label || option.name}...`}
+                    placeholder={`${t("Select")} ${t(option.label || option.name)}...`}
                     value={tempValues[option.name] || undefined}
                     onChange={(value) => handleFilterChange(option.name, value)}
                     allowClear
@@ -199,7 +199,7 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
                 ) : (
                   <Input
                     className="w-full"
-                    placeholder={`${t("Enter")} ${option.label || option.name}...`}
+                    placeholder={`${t("Enter")} ${t(option.label || option.name)}...`}
                     value={tempValues[option.name] || ""}
                     onChange={(e) => handleFilterChange(option.name, e.target.value)}
                     allowClear

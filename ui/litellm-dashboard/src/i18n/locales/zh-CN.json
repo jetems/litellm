@@ -124,6 +124,7 @@
     "User": "用户",
     "Users": "用户",
     "User ID": "用户 ID",
+    "End User": "终端用户",
     "User Email": "用户邮箱",
     "User Role": "用户角色",
     "Add User": "添加用户",
@@ -177,6 +178,8 @@
     "Default": "默认",
     "Custom": "自定义",
     "Required": "必填",
+    "In:": "输入:",
+    "Out:": "输出:",
     "Optional": "可选",
     "All": "全部",
     "None": "无",
@@ -1725,6 +1728,5 @@
     "Success Generations": "成功生成",
     "User Usage Distribution": "用户用量分布",
     "Number of users by successful request frequency": "按成功请求频率划分的用户数量",
-    "Total Cost": "总成本",
-    "End User": "终端用户"
+    "Total Cost": "总成本"
 }

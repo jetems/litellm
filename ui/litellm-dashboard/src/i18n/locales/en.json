@@ -122,6 +122,7 @@
     "User": "User",
     "Users": "Users",
     "User ID": "User ID",
+    "End User": "End User",
     "User Email": "User Email",
     "User Role": "User Role",
     "Add User": "Add User",
@@ -177,6 +178,8 @@
     "Default": "Default",
     "Custom": "Custom",
     "Required": "Required",
+    "In:": "In:",
+    "Out:": "Out:",
     "Optional": "Optional",
     "All": "All",
     "None": "None",
@@ -1725,6 +1728,5 @@
     "Success Generations": "Success Generations",
     "User Usage Distribution": "User Usage Distribution",
     "Number of users by successful request frequency": "Number of users by successful request frequency",
-    "Total Cost": "Total Cost",
-    "End User": "End User"
+    "Total Cost": "Total Cost"
 }
