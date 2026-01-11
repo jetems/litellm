@@ -1595,12 +1595,18 @@
     "Specify which response fields to check": "指定要检查的响应字段",
     "Type field name or use + buttons above (e.g., results[*].text)": "输入字段名称或使用上方的 + 按钮（例如：results[*].text）",
     "Select pass through routes": "选择直通路由",
-    "Security": "安全",
     "When enabled, requests to this endpoint will require a valid LiteLLM Virtual Key": "启用后，对该端点的请求将需要有效的 LiteLLM 虚拟密钥",
     "Authentication (Premium)": "身份验证（高级版）",
     "Setting authentication for pass-through endpoints is a LiteLLM Enterprise feature.": "为直通端点设置身份验证是 LiteLLM 企业版功能。",
     "Select MCP servers": "选择 MCP 服务器",
     "MCP server access control is a LiteLLM Enterprise feature.": "MCP 服务器访问控制是 LiteLLM 企业版功能。",
-    "Select vector stores": "选择向量存储",
-    "Vector store access control is a LiteLLM Enterprise feature.": "向量存储访问控制是 LiteLLM 企业版功能。"
+    "Vector store access control is a LiteLLM Enterprise feature.": "向量存储访问控制是 LiteLLM 企业版功能。",
+    "Usage Status": "使用状态",
+    "Failed to load usage data": "加载使用数据失败",
+    "Over Limit": "超出限制",
+    "Near Limit": "接近限制",
+    "Over": "超限",
+    "OK": "正常",
+    "Used": "已使用",
+    "Remaining": "剩余"
 }

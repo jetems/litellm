@@ -1,7 +1,8 @@
 import { Badge } from "@tremor/react";
-import { AlertTriangle, ChevronDown, ChevronUp, Loader2, Minus, TrendingUp, UserCheck, Users } from "lucide-react";
-import { useEffect, useState } from "react";
+import { AlertTriangle, Loader2, TrendingUp, UserCheck, Users } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
 import { getRemainingUsers } from "./networking";
+import { useTranslate } from "@/i18n";
 
 // Simple utility function to combine class names
 const cn = (...classes: (string | boolean | undefined)[]) => {
@@ -10,7 +11,7 @@ const cn = (...classes: (string | boolean | undefined)[]) => {
 
 interface UsageIndicatorProps {
   accessToken: string | null;
-  width: number;
+  width?: number;
 }
 
 interface UsageData {
@@ -22,13 +23,13 @@ interface UsageData {
   total_teams_remaining: number | null;
 }
 
-export default function UsageIndicator({ accessToken, width = 220 }: UsageIndicatorProps) {
-  const position = "bottom-left";
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(false);
+export default function UsageIndicator({ accessToken }: UsageIndicatorProps) {
+  const t = useTranslate();
+  const [isOpen, setIsOpen] = useState(false);
   const [data, setData] = useState<UsageData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const popoverRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,7 +43,7 @@ export default function UsageIndicator({ accessToken, width = 220 }: UsageIndica
         setData(result);
       } catch (err) {
         console.error("Failed to fetch usage data:", err);
-        setError("Failed to load usage data");
+        setError(t("Failed to load usage data"));
       } finally {
         setIsLoading(false);
       }
@@ -50,6 +51,22 @@ export default function UsageIndicator({ accessToken, width = 220 }: UsageIndica
 
     fetchData();
   }, [accessToken]);
+
+  // Close popover when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (popoverRef.current && !popoverRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
 
   // Calculate derived values from data
   const getUsageMetrics = (data: UsageData | null) => {
@@ -84,12 +101,11 @@ export default function UsageIndicator({ accessToken, width = 220 }: UsageIndica
     // Combined status (worst case scenario)
     const isOverLimit = userIsOverLimit || teamIsOverLimit;
     const isNearLimit = (userIsNearLimit || teamIsNearLimit) && !isOverLimit;
-    const usagePercentage = Math.max(userUsagePercentage, teamUsagePercentage);
 
     return {
       isOverLimit,
       isNearLimit,
-      usagePercentage,
+      usagePercentage: Math.max(userUsagePercentage, teamUsagePercentage),
       userMetrics: {
         isOverLimit: userIsOverLimit,
         isNearLimit: userIsNearLimit,
@@ -103,7 +119,7 @@ export default function UsageIndicator({ accessToken, width = 220 }: UsageIndica
     };
   };
 
-  const { isOverLimit, isNearLimit, usagePercentage, userMetrics, teamMetrics } = getUsageMetrics(data);
+  const { isOverLimit, isNearLimit, userMetrics, teamMetrics } = getUsageMetrics(data);
 
   const getStatusColor = () => {
     if (isOverLimit) return "red";
@@ -111,434 +127,10 @@ export default function UsageIndicator({ accessToken, width = 220 }: UsageIndica
     return "green";
   };
 
-  const getStatusIcon = () => {
-    if (isOverLimit) return <AlertTriangle className="h-3 w-3" />;
-    if (isNearLimit) return <TrendingUp className="h-3 w-3" />;
-    return null;
-  };
-
-  // Minimized view - just a small restore button
-  const MinimizedView = () => {
-    const hasIssues = isOverLimit || isNearLimit;
-
-    return (
-      <div className="px-3 py-1" style={{ maxWidth: `${width}px` }}>
-        <button
-          onClick={() => setIsMinimized(false)}
-          className={cn(
-            "flex items-center gap-2 text-xs text-gray-400 hover:text-gray-600 transition-colors p-1 rounded w-full",
-            hasIssues && isOverLimit && "text-red-400 hover:text-red-600",
-            hasIssues && isNearLimit && "text-yellow-500 hover:text-yellow-700",
-          )}
-          title="Show usage details"
-        >
-          <Users className="h-3 w-3 flex-shrink-0" />
-          {hasIssues && <span className="flex-shrink-0">{getStatusIcon()}</span>}
-          <div className="flex items-center gap-1 truncate">
-            {data && data.total_users !== null && (
-              <span className="flex-shrink-0">
-                U:{data.total_users_used}/{data.total_users}
-              </span>
-            )}
-            {data && data.total_teams !== null && (
-              <span className="flex-shrink-0">
-                T:{data.total_teams_used}/{data.total_teams}
-              </span>
-            )}
-            {!data ||
-              (data.total_users === null && data.total_teams === null && <span className="truncate">Usage</span>)}
-          </div>
-        </button>
-      </div>
-    );
-  };
-
-  // Sidebar/nav style component
-  const NavStyleView = () => {
-    if (isMinimized) {
-      return <MinimizedView />;
-    }
-
-    if (isLoading) {
-      return (
-        <div className="flex items-center gap-3 px-3 py-2 text-gray-500" style={{ maxWidth: `${width}px` }}>
-          <Loader2 className="h-4 w-4 animate-spin flex-shrink-0" />
-          <span className="text-sm truncate">Loading...</span>
-        </div>
-      );
-    }
-
-    if (error || !data) {
-      return (
-        <div
-          className="flex items-center justify-between gap-3 px-3 py-2 text-gray-400 group"
-          style={{ maxWidth: `${width}px` }}
-        >
-          <div className="flex items-center gap-3 min-w-0 flex-1">
-            <Users className="h-4 w-4 flex-shrink-0" />
-            <span className="text-sm truncate">{error || "No data"}</span>
-          </div>
-          <button
-            onClick={() => setIsMinimized(true)}
-            className="opacity-0 group-hover:opacity-100 p-0.5 hover:bg-gray-100 rounded transition-all flex-shrink-0"
-            title="Minimize"
-          >
-            <Minus className="h-3 w-3" />
-          </button>
-        </div>
-      );
-    }
-
-    return (
-      <div className="px-3 py-2 group" style={{ maxWidth: `${width}px` }}>
-        {/* Main nav item style */}
-        <div className="flex items-center justify-between">
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className={cn(
-              "flex items-center gap-3 text-left hover:bg-gray-50 rounded-md px-0 py-1 transition-colors flex-1 min-w-0",
-              isOverLimit && "text-red-600",
-              isNearLimit && "text-yellow-600",
-            )}
-          >
-            <Users className="h-4 w-4 flex-shrink-0" />
-            <span className="text-sm font-medium truncate">Usage Status</span>
-            {(isOverLimit || isNearLimit) && (
-              <Badge color={getStatusColor()} className="text-xs px-1.5 py-0.5 flex-shrink-0">
-                {getStatusIcon()}
-              </Badge>
-            )}
-            {isExpanded ? (
-              <ChevronUp className="h-3 w-3 text-gray-400 ml-auto flex-shrink-0" />
-            ) : (
-              <ChevronDown className="h-3 w-3 text-gray-400 ml-auto flex-shrink-0" />
-            )}
-          </button>
-
-          {/* Minimize button */}
-          <button
-            onClick={() => setIsMinimized(true)}
-            className="opacity-0 group-hover:opacity-100 p-0.5 hover:bg-gray-100 rounded transition-all ml-1 flex-shrink-0"
-            title="Minimize"
-          >
-            <Minus className="h-3 w-3 text-gray-400" />
-          </button>
-        </div>
-
-        {/* Expanded details - simple and compact */}
-        {isExpanded && (
-          <div className="mt-2 pl-7 text-xs text-gray-600 space-y-3">
-            {/* Users section */}
-            {data.total_users !== null && (
-              <div>
-                <div className="mb-1 flex items-center gap-1">
-                  <Users className="h-3 w-3" />
-                  <span className="font-medium">
-                    {data.total_users_used}/{data.total_users}
-                  </span>
-                  <span className="text-gray-500">users</span>
-                </div>
-
-                {/* User progress bar */}
-                <div className="w-full bg-gray-200 rounded-full h-1 mb-1">
-                  <div
-                    className={cn(
-                      "h-1 rounded-full transition-all duration-300",
-                      userMetrics.isOverLimit && "bg-red-500",
-                      userMetrics.isNearLimit && "bg-yellow-500",
-                      !userMetrics.isOverLimit && !userMetrics.isNearLimit && "bg-green-500",
-                    )}
-                    style={{ width: `${Math.min(userMetrics.usagePercentage, 100)}%` }}
-                  />
-                </div>
-
-                {(userMetrics.isOverLimit || userMetrics.isNearLimit) && (
-                  <div
-                    className={cn(
-                      "flex items-center gap-1 text-xs",
-                      userMetrics.isOverLimit && "text-red-600",
-                      userMetrics.isNearLimit && "text-yellow-600",
-                    )}
-                  >
-                    {userMetrics.isOverLimit ? (
-                      <AlertTriangle className="h-3 w-3" />
-                    ) : (
-                      <TrendingUp className="h-3 w-3" />
-                    )}
-                    <span className="truncate">Users {userMetrics.isOverLimit ? "Over Limit" : "Near Limit"}</span>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Teams section */}
-            {data.total_teams !== null && (
-              <div>
-                <div className="mb-1 flex items-center gap-1">
-                  <UserCheck className="h-3 w-3" />
-                  <span className="font-medium">
-                    {data.total_teams_used}/{data.total_teams}
-                  </span>
-                  <span className="text-gray-500">teams</span>
-                </div>
-
-                {/* Team progress bar */}
-                <div className="w-full bg-gray-200 rounded-full h-1 mb-1">
-                  <div
-                    className={cn(
-                      "h-1 rounded-full transition-all duration-300",
-                      teamMetrics.isOverLimit && "bg-red-500",
-                      teamMetrics.isNearLimit && "bg-yellow-500",
-                      !teamMetrics.isOverLimit && !teamMetrics.isNearLimit && "bg-green-500",
-                    )}
-                    style={{ width: `${Math.min(teamMetrics.usagePercentage, 100)}%` }}
-                  />
-                </div>
-
-                {(teamMetrics.isOverLimit || teamMetrics.isNearLimit) && (
-                  <div
-                    className={cn(
-                      "flex items-center gap-1 text-xs",
-                      teamMetrics.isOverLimit && "text-red-600",
-                      teamMetrics.isNearLimit && "text-yellow-600",
-                    )}
-                  >
-                    {teamMetrics.isOverLimit ? (
-                      <AlertTriangle className="h-3 w-3" />
-                    ) : (
-                      <TrendingUp className="h-3 w-3" />
-                    )}
-                    <span className="truncate">Teams {teamMetrics.isOverLimit ? "Over Limit" : "Near Limit"}</span>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  // Optimized CardStyleView for 220px width
-  const CardStyleView = () => {
-    if (isMinimized) {
-      const hasIssues = isOverLimit || isNearLimit;
-      return (
-        <button
-          onClick={() => setIsMinimized(false)}
-          className={cn(
-            "bg-white border border-gray-200 rounded-lg shadow-sm p-3 hover:shadow-md transition-all w-full",
-          )}
-          title="Show usage details"
-        >
-          <div className="flex items-center gap-2">
-            <Users className="h-4 w-4 flex-shrink-0" />
-            {hasIssues && <span className="flex-shrink-0">{getStatusIcon()}</span>}
-            <div className="flex items-center gap-2 text-sm font-medium truncate">
-              {data && data.total_users !== null && (
-                <span
-                  className={cn(
-                    "flex-shrink-0 px-1.5 py-0.5 rounded text-xs border",
-                    userMetrics.isOverLimit && "bg-red-50 text-red-700 border-red-200",
-                    userMetrics.isNearLimit && "bg-yellow-50 text-yellow-700 border-yellow-200",
-                    !userMetrics.isOverLimit && !userMetrics.isNearLimit && "bg-gray-50 text-gray-700 border-gray-200",
-                  )}
-                >
-                  U: {data.total_users_used}/{data.total_users}
-                </span>
-              )}
-              {data && data.total_teams !== null && (
-                <span
-                  className={cn(
-                    "flex-shrink-0 px-1.5 py-0.5 rounded text-xs border",
-                    teamMetrics.isOverLimit && "bg-red-50 text-red-700 border-red-200",
-                    teamMetrics.isNearLimit && "bg-yellow-50 text-yellow-700 border-yellow-200",
-                    !teamMetrics.isOverLimit && !teamMetrics.isNearLimit && "bg-gray-50 text-gray-700 border-gray-200",
-                  )}
-                >
-                  T: {data.total_teams_used}/{data.total_teams}
-                </span>
-              )}
-              {!data ||
-                (data.total_users === null && data.total_teams === null && <span className="truncate">Usage</span>)}
-            </div>
-          </div>
-        </button>
-      );
-    }
-
-    if (isLoading) {
-      return (
-        <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 w-full">
-          <div className="flex items-center justify-center gap-2 py-2">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            <span className="text-sm text-gray-500 truncate">Loading...</span>
-          </div>
-        </div>
-      );
-    }
-
-    if (error || !data) {
-      return (
-        <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 group w-full">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex-1 min-w-0">
-              <span className="text-sm text-gray-500 truncate block">{error || "No data"}</span>
-            </div>
-            <button
-              onClick={() => setIsMinimized(true)}
-              className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-100 rounded transition-all flex-shrink-0"
-              title="Minimize"
-            >
-              <Minus className="h-3 w-3 text-gray-400" />
-            </button>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className={cn("bg-white border rounded-lg shadow-sm p-3 transition-all duration-200 group w-full")}>
-        <div className="flex items-center justify-between gap-2 mb-3">
-          <div className="flex items-center gap-2 min-w-0 flex-1">
-            <Users className="h-4 w-4 flex-shrink-0" />
-            <span className="font-medium text-sm truncate">Usage</span>
-          </div>
-          <button
-            onClick={() => setIsMinimized(true)}
-            className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-100 rounded transition-all flex-shrink-0"
-            title="Minimize"
-          >
-            <Minus className="h-3 w-3 text-gray-400" />
-          </button>
-        </div>
-
-        {/* Compact stats optimized for 220px */}
-        <div className="space-y-3 text-sm">
-          {/* Users section */}
-          {data.total_users !== null && (
-            <div
-              className={cn(
-                "space-y-1 border rounded-md p-2",
-                userMetrics.isOverLimit && "border-red-200 bg-red-50",
-                userMetrics.isNearLimit && "border-yellow-200 bg-yellow-50",
-              )}
-            >
-              <div className="flex items-center gap-2 text-xs text-gray-600 mb-1">
-                <Users className="h-3 w-3" />
-                <span className="font-medium">Users</span>
-                <span
-                  className={cn(
-                    "ml-1 px-1.5 py-0.5 rounded border",
-                    userMetrics.isOverLimit && "bg-red-50 text-red-700 border-red-200",
-                    userMetrics.isNearLimit && "bg-yellow-50 text-yellow-700 border-yellow-200",
-                    !userMetrics.isOverLimit && !userMetrics.isNearLimit && "bg-gray-50 text-gray-600 border-gray-200",
-                  )}
-                >
-                  {userMetrics.isOverLimit ? "Over limit" : userMetrics.isNearLimit ? "Near limit" : "OK"}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600 text-xs">Used:</span>
-                <span className="font-medium text-right">
-                  {data.total_users_used}/{data.total_users}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600 text-xs">Remaining:</span>
-                <span
-                  className={cn(
-                    "font-medium text-right",
-                    userMetrics.isOverLimit && "text-red-600",
-                    userMetrics.isNearLimit && "text-yellow-600",
-                  )}
-                >
-                  {data.total_users_remaining}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600 text-xs">Usage:</span>
-                <span className="font-medium text-right">{Math.round(userMetrics.usagePercentage)}%</span>
-              </div>
-
-              {/* User progress bar */}
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div
-                  className={cn(
-                    "h-2 rounded-full transition-all duration-300",
-                    userMetrics.isOverLimit && "bg-red-500",
-                    userMetrics.isNearLimit && "bg-yellow-500",
-                    !userMetrics.isOverLimit && !userMetrics.isNearLimit && "bg-green-500",
-                  )}
-                  style={{ width: `${Math.min(userMetrics.usagePercentage, 100)}%` }}
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Teams section */}
-          {data.total_teams !== null && (
-            <div
-              className={cn(
-                "space-y-1 border rounded-md p-2",
-                teamMetrics.isOverLimit && "border-red-200 bg-red-50",
-                teamMetrics.isNearLimit && "border-yellow-200 bg-yellow-50",
-              )}
-            >
-              <div className="flex items-center gap-2 text-xs text-gray-600 mb-1">
-                <UserCheck className="h-3 w-3" />
-                <span className="font-medium">Teams</span>
-                <span
-                  className={cn(
-                    "ml-1 px-1.5 py-0.5 rounded border",
-                    teamMetrics.isOverLimit && "bg-red-50 text-red-700 border-red-200",
-                    teamMetrics.isNearLimit && "bg-yellow-50 text-yellow-700 border-yellow-200",
-                    !teamMetrics.isOverLimit && !teamMetrics.isNearLimit && "bg-gray-50 text-gray-600 border-gray-200",
-                  )}
-                >
-                  {teamMetrics.isOverLimit ? "Over limit" : teamMetrics.isNearLimit ? "Near limit" : "OK"}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600 text-xs">Used:</span>
-                <span className="font-medium text-right">
-                  {data.total_teams_used}/{data.total_teams}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600 text-xs">Remaining:</span>
-                <span
-                  className={cn(
-                    "font-medium text-right",
-                    teamMetrics.isOverLimit && "text-red-600",
-                    teamMetrics.isNearLimit && "text-yellow-600",
-                  )}
-                >
-                  {data.total_teams_remaining}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600 text-xs">Usage:</span>
-                <span className="font-medium text-right">{Math.round(teamMetrics.usagePercentage)}%</span>
-              </div>
-
-              {/* Team progress bar */}
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div
-                  className={cn(
-                    "h-2 rounded-full transition-all duration-300",
-                    teamMetrics.isOverLimit && "bg-red-500",
-                    teamMetrics.isNearLimit && "bg-yellow-500",
-                    !teamMetrics.isOverLimit && !teamMetrics.isNearLimit && "bg-green-500",
-                  )}
-                  style={{ width: `${Math.min(teamMetrics.usagePercentage, 100)}%` }}
-                />
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    );
+  const getStatusBgColor = () => {
+    if (isOverLimit) return "bg-red-100 hover:bg-red-200 text-red-600";
+    if (isNearLimit) return "bg-yellow-100 hover:bg-yellow-200 text-yellow-600";
+    return "bg-gray-100 hover:bg-gray-200 text-gray-600";
   };
 
   // Don't render anything if no access token or if both total_users and total_teams are null
@@ -546,10 +138,194 @@ export default function UsageIndicator({ accessToken, width = 220 }: UsageIndica
     return null;
   }
 
-  // Fixed positioning with proper spacing from edges
   return (
-    <div className="fixed bottom-4 left-4 z-50" style={{ width: `${Math.min(width, 220)}px` }}>
-      <CardStyleView />
+    <div className="relative" ref={popoverRef}>
+      {/* Icon Button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={cn(
+          "p-2 rounded-lg transition-all duration-200 relative",
+          getStatusBgColor(),
+        )}
+        title={t("Usage Status")}
+      >
+        {isLoading ? (
+          <Loader2 className="h-5 w-5 animate-spin" />
+        ) : (
+          <Users className="h-5 w-5" />
+        )}
+        {/* Status indicator dot */}
+        {(isOverLimit || isNearLimit) && !isLoading && (
+          <span
+            className={cn(
+              "absolute -top-1 -right-1 h-3 w-3 rounded-full border-2 border-white",
+              isOverLimit && "bg-red-500",
+              isNearLimit && "bg-yellow-500",
+            )}
+          />
+        )}
+      </button>
+
+      {/* Popover */}
+      {isOpen && (
+        <div
+          className="absolute top-full right-0 mt-2 w-72 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
+        >
+          {/* Arrow */}
+          <div className="absolute -top-2 right-4 w-4 h-4 bg-white border-l border-t border-gray-200 rotate-45" />
+
+          {/* Content */}
+          <div className="relative bg-white rounded-lg p-4">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
+              <div className="flex items-center gap-2">
+                <Users className="h-4 w-4 text-gray-600" />
+                <span className="font-semibold text-gray-800">{t("Usage Status")}</span>
+              </div>
+              {(isOverLimit || isNearLimit) && (
+                <Badge color={getStatusColor()} className="text-xs">
+                  {isOverLimit ? (
+                    <span className="flex items-center gap-1">
+                      <AlertTriangle className="h-3 w-3" /> {t("Over Limit")}
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1">
+                      <TrendingUp className="h-3 w-3" /> {t("Near Limit")}
+                    </span>
+                  )}
+                </Badge>
+              )}
+            </div>
+
+            {error ? (
+              <div className="text-sm text-red-500 py-2">{error}</div>
+            ) : !data ? (
+              <div className="text-sm text-gray-500 py-2">{t("No data available")}</div>
+            ) : (
+              <div className="space-y-4">
+                {/* Users section */}
+                {data.total_users !== null && (
+                  <div
+                    className={cn(
+                      "p-3 rounded-lg border",
+                      userMetrics.isOverLimit && "border-red-200 bg-red-50",
+                      userMetrics.isNearLimit && "border-yellow-200 bg-yellow-50",
+                      !userMetrics.isOverLimit && !userMetrics.isNearLimit && "border-gray-200 bg-gray-50",
+                    )}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4 text-gray-600" />
+                        <span className="font-medium text-sm">{t("Users")}</span>
+                      </div>
+                      <span
+                        className={cn(
+                          "text-xs px-2 py-0.5 rounded-full font-medium",
+                          userMetrics.isOverLimit && "bg-red-100 text-red-700",
+                          userMetrics.isNearLimit && "bg-yellow-100 text-yellow-700",
+                          !userMetrics.isOverLimit && !userMetrics.isNearLimit && "bg-green-100 text-green-700",
+                        )}
+                      >
+                        {userMetrics.isOverLimit ? t("Over") : userMetrics.isNearLimit ? t("Warning") : t("OK")}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-xs mb-2">
+                      <div>
+                        <span className="text-gray-500 block">{t("Used")}</span>
+                        <span className="font-semibold">{data.total_users_used}/{data.total_users}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-500 block">{t("Remaining")}</span>
+                        <span className={cn(
+                          "font-semibold",
+                          userMetrics.isOverLimit && "text-red-600",
+                          userMetrics.isNearLimit && "text-yellow-600",
+                        )}>{data.total_users_remaining}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-500 block">{t("Usage")}</span>
+                        <span className="font-semibold">{Math.round(userMetrics.usagePercentage)}%</span>
+                      </div>
+                    </div>
+                    {/* Progress bar */}
+                    <div className="w-full bg-gray-200 rounded-full h-1.5">
+                      <div
+                        className={cn(
+                          "h-1.5 rounded-full transition-all duration-300",
+                          userMetrics.isOverLimit && "bg-red-500",
+                          userMetrics.isNearLimit && "bg-yellow-500",
+                          !userMetrics.isOverLimit && !userMetrics.isNearLimit && "bg-green-500",
+                        )}
+                        style={{ width: `${Math.min(userMetrics.usagePercentage, 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Teams section */}
+                {data.total_teams !== null && (
+                  <div
+                    className={cn(
+                      "p-3 rounded-lg border",
+                      teamMetrics.isOverLimit && "border-red-200 bg-red-50",
+                      teamMetrics.isNearLimit && "border-yellow-200 bg-yellow-50",
+                      !teamMetrics.isOverLimit && !teamMetrics.isNearLimit && "border-gray-200 bg-gray-50",
+                    )}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <UserCheck className="h-4 w-4 text-gray-600" />
+                        <span className="font-medium text-sm">{t("Teams")}</span>
+                      </div>
+                      <span
+                        className={cn(
+                          "text-xs px-2 py-0.5 rounded-full font-medium",
+                          teamMetrics.isOverLimit && "bg-red-100 text-red-700",
+                          teamMetrics.isNearLimit && "bg-yellow-100 text-yellow-700",
+                          !teamMetrics.isOverLimit && !teamMetrics.isNearLimit && "bg-green-100 text-green-700",
+                        )}
+                      >
+                        {teamMetrics.isOverLimit ? t("Over") : teamMetrics.isNearLimit ? t("Warning") : t("OK")}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-xs mb-2">
+                      <div>
+                        <span className="text-gray-500 block">{t("Used")}</span>
+                        <span className="font-semibold">{data.total_teams_used}/{data.total_teams}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-500 block">{t("Remaining")}</span>
+                        <span className={cn(
+                          "font-semibold",
+                          teamMetrics.isOverLimit && "text-red-600",
+                          teamMetrics.isNearLimit && "text-yellow-600",
+                        )}>{data.total_teams_remaining}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-500 block">{t("Usage")}</span>
+                        <span className="font-semibold">{Math.round(teamMetrics.usagePercentage)}%</span>
+                      </div>
+                    </div>
+                    {/* Progress bar */}
+                    <div className="w-full bg-gray-200 rounded-full h-1.5">
+                      <div
+                        className={cn(
+                          "h-1.5 rounded-full transition-all duration-300",
+                          teamMetrics.isOverLimit && "bg-red-500",
+                          teamMetrics.isNearLimit && "bg-yellow-500",
+                          !teamMetrics.isOverLimit && !teamMetrics.isNearLimit && "bg-green-500",
+                        )}
+                        style={{ width: `${Math.min(teamMetrics.usagePercentage, 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+

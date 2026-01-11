@@ -17,6 +17,8 @@ import { fetchProxySettings } from "@/utils/proxyUtils";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useI18n, useTranslate, type Locale } from "@/i18n";
 import { T } from "@/i18n";
+import UsageIndicator from "@/components/usage_indicator";
+import { isAdminRole } from "@/utils/roles";
 
 interface NavbarProps {
   userID: string | null;
@@ -219,6 +221,11 @@ const Navbar: React.FC<NavbarProps> = ({
           </div>
           {/* Right side nav items */}
           <div className="flex items-center space-x-5 ml-auto">
+            {/* Usage Indicator - only for admin */}
+            {!isPublicPage && isAdminRole(userRole || "") && (
+              <UsageIndicator accessToken={accessToken} />
+            )}
+
             <a
               href="https://docs.litellm.ai/docs/"
               target="_blank"

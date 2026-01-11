@@ -1595,12 +1595,18 @@
     "Specify which response fields to check": "Specify which response fields to check",
     "Type field name or use + buttons above (e.g., results[*].text)": "Type field name or use + buttons above (e.g., results[*].text)",
     "Select pass through routes": "Select pass through routes",
-    "Security": "Security",
     "When enabled, requests to this endpoint will require a valid LiteLLM Virtual Key": "When enabled, requests to this endpoint will require a valid LiteLLM Virtual Key",
     "Authentication (Premium)": "Authentication (Premium)",
     "Setting authentication for pass-through endpoints is a LiteLLM Enterprise feature.": "Setting authentication for pass-through endpoints is a LiteLLM Enterprise feature.",
     "Select MCP servers": "Select MCP servers",
     "MCP server access control is a LiteLLM Enterprise feature.": "MCP server access control is a LiteLLM Enterprise feature.",
-    "Select vector stores": "Select vector stores",
-    "Vector store access control is a LiteLLM Enterprise feature.": "Vector store access control is a LiteLLM Enterprise feature."
+    "Vector store access control is a LiteLLM Enterprise feature.": "Vector store access control is a LiteLLM Enterprise feature.",
+    "Usage Status": "Usage Status",
+    "Failed to load usage data": "Failed to load usage data",
+    "Over Limit": "Over Limit",
+    "Near Limit": "Near Limit",
+    "Over": "Over",
+    "OK": "OK",
+    "Used": "Used",
+    "Remaining": "Remaining"
 }

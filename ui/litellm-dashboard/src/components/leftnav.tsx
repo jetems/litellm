@@ -24,7 +24,6 @@ import {
 import { Badge, ConfigProvider, Layout, Menu } from "antd";
 import type { MenuProps } from "antd";
 import { all_admin_roles, internalUserRoles, isAdminRole, rolesWithWriteAccess } from "../utils/roles";
-import UsageIndicator from "./usage_indicator";
 import { useTranslate } from "@/i18n";
 const { Sider } = Layout;
 
@@ -423,7 +422,6 @@ const Sidebar: React.FC<SidebarProps> = ({ accessToken, setPage, userRole, defau
             items={buildMenuItems()}
           />
         </ConfigProvider>
-        {isAdminRole(userRole) && !collapsed && <UsageIndicator accessToken={accessToken} width={220} />}
       </Sider>
     </Layout>
   );
