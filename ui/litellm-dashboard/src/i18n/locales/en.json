@@ -1739,5 +1739,20 @@
     "Success Generations": "Success Generations",
     "User Usage Distribution": "User Usage Distribution",
     "Number of users by successful request frequency": "Number of users by successful request frequency",
-    "Total Cost": "Total Cost"
+    "Total Cost": "Total Cost",
+    "Filter by User ID": "Filter by User ID",
+    "Select Role": "Select Role",
+    "Filter by SSO ID": "Filter by SSO ID",
+    "Loading user data...": "Loading user data...",
+    "User not found": "User not found",
+    "No Keys": "No Keys",
+    "Edit user details": "Edit user details",
+    "Delete user": "Delete user",
+    "Reset Password": "Reset Password",
+    "Failed to generate password reset link": "Failed to generate password reset link",
+    "Failed to delete user": "Failed to delete user",
+    "Failed to update user": "Failed to update user",
+    "Delete User?": "Delete User?",
+    "Are you sure you want to delete this user? This action cannot be undone.": "Are you sure you want to delete this user? This action cannot be undone.",
+    "No teams": "No teams"
 }

@@ -281,6 +281,7 @@ const ViewUserDashboard: React.FC<ViewUserDashboardProps> = ({ accessToken, toke
   const possibleUIRoles = userRolesQuery.data;
 
   const tableColumns = columns(
+    t,
     possibleUIRoles,
     (user) => {
       setSelectedUser(user);

@@ -1739,5 +1739,20 @@
     "Success Generations": "成功生成",
     "User Usage Distribution": "用户用量分布",
     "Number of users by successful request frequency": "按成功请求频率划分的用户数量",
-    "Total Cost": "总成本"
+    "Total Cost": "总成本",
+    "Filter by User ID": "按用户 ID 筛选",
+    "Select Role": "选择角色",
+    "Filter by SSO ID": "按 SSO ID 筛选",
+    "Loading user data...": "加载用户数据中...",
+    "User not found": "未找到用户",
+    "No Keys": "无密钥",
+    "Edit user details": "编辑用户详情",
+    "Delete user": "删除用户",
+    "Reset Password": "重置密码",
+    "Failed to generate password reset link": "生成重置密码链接失败",
+    "Failed to delete user": "删除用户失败",
+    "Failed to update user": "更新用户失败",
+    "Delete User?": "删除用户？",
+    "Are you sure you want to delete this user? This action cannot be undone.": "您确定要删除此用户吗？此操作无法撤销。",
+    "No teams": "无团队"
 }

@@ -6,6 +6,7 @@ import { Skeleton } from "antd";
 import { UserInfo } from "./types";
 import UserInfoView from "./user_info_view";
 import { columns as createColumns } from "./columns";
+import { useTranslate } from "../../i18n";
 
 interface FilterState {
   email: string;
@@ -72,6 +73,7 @@ export function UserDataTable({
   currentPage,
   handlePageChange,
 }: UserDataTableProps) {
+  const t = useTranslate();
   const [sorting, setSorting] = React.useState<SortingState>([
     {
       id: currentSort?.sortBy || "created_at",
@@ -124,6 +126,7 @@ export function UserDataTable({
   const columns = React.useMemo(() => {
     if (possibleUIRoles) {
       return createColumns(
+        t,
         possibleUIRoles,
         handleEdit,
         handleDelete,
@@ -131,13 +134,13 @@ export function UserDataTable({
         handleUserClick,
         enableSelection
           ? {
-              selectedUsers,
-              onSelectUser: handleSelectUser,
-              onSelectAll: handleSelectAll,
-              isUserSelected,
-              isAllSelected,
-              isIndeterminate,
-            }
+            selectedUsers,
+            onSelectUser: handleSelectUser,
+            onSelectAll: handleSelectAll,
+            isUserSelected,
+            isAllSelected,
+            isIndeterminate,
+          }
           : undefined,
       );
     }
@@ -218,7 +221,7 @@ export function UserDataTable({
             <div className="relative w-64">
               <input
                 type="text"
-                placeholder="Search by email..."
+                placeholder={`${t("Search by email")}...`}
                 className="w-full px-3 py-2 pl-8 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 value={filters.email}
                 onChange={(e) => updateFilters({ email: e.target.value })}
@@ -251,7 +254,7 @@ export function UserDataTable({
                   d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
                 />
               </svg>
-              Filters
+              {t("Filters")}
               {(filters.user_id || filters.user_role || filters.team) && (
                 <span className="w-2 h-2 rounded-full bg-blue-500"></span>
               )}
@@ -272,7 +275,7 @@ export function UserDataTable({
                   d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                 />
               </svg>
-              Reset Filters
+              {t("Reset Filters")}
             </button>
           </div>
 
@@ -283,7 +286,7 @@ export function UserDataTable({
               <div className="relative w-64">
                 <input
                   type="text"
-                  placeholder="Filter by User ID"
+                  placeholder={t("Filter by User ID")}
                   className="w-full px-3 py-2 pl-8 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   value={filters.user_id}
                   onChange={(e) => updateFilters({ user_id: e.target.value })}
@@ -308,7 +311,7 @@ export function UserDataTable({
                 <Select
                   value={filters.user_role}
                   onValueChange={(value) => updateFilters({ user_role: value })}
-                  placeholder="Select Role"
+                  placeholder={t("Select Role")}
                 >
                   {possibleUIRoles &&
                     Object.entries(possibleUIRoles).map(([key, value]) => (
@@ -324,7 +327,7 @@ export function UserDataTable({
                 <Select
                   value={filters.team}
                   onValueChange={(value) => updateFilters({ team: value })}
-                  placeholder="Select Team"
+                  placeholder={t("Select Team")}
                 >
                   {teams?.map((team) => (
                     <SelectItem key={team.team_id} value={team.team_id}>
@@ -338,7 +341,7 @@ export function UserDataTable({
               <div className="relative w-64">
                 <input
                   type="text"
-                  placeholder="Filter by SSO ID"
+                  placeholder={t("Filter by SSO ID")}
                   className="w-full px-3 py-2 pl-8 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   value={filters.sso_user_id}
                   onChange={(e) => updateFilters({ sso_user_id: e.target.value })}
@@ -353,7 +356,7 @@ export function UserDataTable({
               <Skeleton.Input active style={{ width: 192, height: 20 }} />
             ) : (
               <span className="text-sm text-gray-700">
-                Showing{" "}
+                {t("Showing")}{" "}
                 {userListResponse && userListResponse.users && userListResponse.users.length > 0
                   ? (userListResponse.page - 1) * userListResponse.page_size + 1
                   : 0}{" "}
@@ -377,22 +380,20 @@ export function UserDataTable({
                   <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className={`px-3 py-1 text-sm border rounded-md ${
-                      currentPage === 1 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "hover:bg-gray-50"
-                    }`}
+                    className={`px-3 py-1 text-sm border rounded-md ${currentPage === 1 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "hover:bg-gray-50"
+                      }`}
                   >
-                    Previous
+                    {t("Previous")}
                   </button>
                   <button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={!userListResponse || currentPage >= userListResponse.total_pages}
-                    className={`px-3 py-1 text-sm border rounded-md ${
-                      !userListResponse || currentPage >= userListResponse.total_pages
+                    className={`px-3 py-1 text-sm border rounded-md ${!userListResponse || currentPage >= userListResponse.total_pages
                         ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                         : "hover:bg-gray-50"
-                    }`}
+                      }`}
                   >
-                    Next
+                    {t("Next")}
                   </button>
                 </>
               )}
@@ -412,11 +413,10 @@ export function UserDataTable({
                     {headerGroup.headers.map((header) => (
                       <TableHeaderCell
                         key={header.id}
-                        className={`py-1 h-8 ${
-                          header.id === "actions"
+                        className={`py-1 h-8 ${header.id === "actions"
                             ? "sticky right-0 bg-white shadow-[-4px_0_8px_-6px_rgba(0,0,0,0.1)]"
                             : ""
-                        } ${header.column.getCanSort() ? "cursor-pointer hover:bg-gray-50" : ""}`}
+                          } ${header.column.getCanSort() ? "cursor-pointer hover:bg-gray-50" : ""}`}
                         onClick={header.column.getToggleSortingHandler()}
                       >
                         <div className="flex items-center justify-between gap-2">
@@ -448,7 +448,7 @@ export function UserDataTable({
                   <TableRow>
                     <TableCell colSpan={columns.length} className="h-8 text-center">
                       <div className="text-center text-gray-500">
-                        <p>🚅 Loading users...</p>
+                        <p>🚅 {t("Loading users...")}</p>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -458,11 +458,10 @@ export function UserDataTable({
                       {row.getVisibleCells().map((cell) => (
                         <TableCell
                           key={cell.id}
-                          className={`py-0.5 max-h-8 overflow-hidden text-ellipsis whitespace-nowrap ${
-                            cell.column.id === "actions"
+                          className={`py-0.5 max-h-8 overflow-hidden text-ellipsis whitespace-nowrap ${cell.column.id === "actions"
                               ? "sticky right-0 bg-white shadow-[-4px_0_8px_-6px_rgba(0,0,0,0.1)]"
                               : ""
-                          }`}
+                            }`}
                           onClick={() => {
                             if (cell.column.id === "user_id") {
                               handleUserClick(cell.getValue() as string, false);
@@ -482,7 +481,7 @@ export function UserDataTable({
                   <TableRow>
                     <TableCell colSpan={columns.length} className="h-8 text-center">
                       <div className="text-center text-gray-500">
-                        <p>No users found</p>
+                        <p>{t("No users found")}</p>
                       </div>
                     </TableCell>
                   </TableRow>

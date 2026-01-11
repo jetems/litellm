@@ -18,6 +18,7 @@ import { CopyIcon, CheckIcon } from "lucide-react";
 import NotificationsManager from "../molecules/notifications_manager";
 import { getBudgetDurationLabel } from "../common_components/budget_duration_dropdown";
 import DeleteResourceModal from "../common_components/DeleteResourceModal";
+import { useTranslate } from "../../i18n";
 
 interface UserInfoViewProps {
   userId: string;
@@ -59,6 +60,7 @@ export default function UserInfoView({
   initialTab = 0,
   startInEditMode = false,
 }: UserInfoViewProps) {
+  const t = useTranslate();
   const [userData, setUserData] = useState<UserInfo | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeletingUser, setIsDeletingUser] = useState(false);
@@ -110,7 +112,7 @@ export default function UserInfoView({
       setInvitationLinkData(data);
       setIsInvitationLinkModalVisible(true);
     } catch (error) {
-      NotificationsManager.fromBackend("Failed to generate password reset link");
+      NotificationsManager.fromBackend(t("Failed to generate password reset link"));
     }
   };
 
@@ -126,7 +128,7 @@ export default function UserInfoView({
       onClose();
     } catch (error) {
       console.error("Error deleting user:", error);
-      NotificationsManager.fromBackend("Failed to delete user");
+      NotificationsManager.fromBackend(t("Failed to delete user"));
     } finally {
       setIsDeleteModalOpen(false);
       setIsDeletingUser(false);
@@ -161,7 +163,7 @@ export default function UserInfoView({
       setIsEditing(false);
     } catch (error) {
       console.error("Error updating user:", error);
-      NotificationsManager.fromBackend("Failed to update user");
+      NotificationsManager.fromBackend(t("Failed to update user"));
     }
   };
 
@@ -169,9 +171,9 @@ export default function UserInfoView({
     return (
       <div className="p-4">
         <Button icon={ArrowLeftIcon} variant="light" onClick={onClose} className="mb-4">
-          Back to Users
+          {t("Back to Users")}
         </Button>
-        <Text>Loading user data...</Text>
+        <Text>{t("Loading user data...")}</Text>
       </div>
     );
   }
@@ -180,9 +182,9 @@ export default function UserInfoView({
     return (
       <div className="p-4">
         <Button icon={ArrowLeftIcon} variant="light" onClick={onClose} className="mb-4">
-          Back to Users
+          {t("Back to Users")}
         </Button>
-        <Text>User not found</Text>
+        <Text>{t("User not found")}</Text>
       </div>
     );
   }
@@ -202,9 +204,9 @@ export default function UserInfoView({
       <div className="flex justify-between items-center mb-6">
         <div>
           <Button icon={ArrowLeftIcon} variant="light" onClick={onClose} className="mb-4">
-            Back to Users
+            {t("Back to Users")}
           </Button>
-          <Title>{userData.user_info?.user_email || "User"}</Title>
+          <Title>{userData.user_info?.user_email || t("User")}</Title>
           <div className="flex items-center cursor-pointer">
             <Text className="text-gray-500 font-mono">{userData.user_id}</Text>
             <AntdButton
@@ -212,18 +214,17 @@ export default function UserInfoView({
               size="small"
               icon={copiedStates["user-id"] ? <CheckIcon size={12} /> : <CopyIcon size={12} />}
               onClick={() => copyToClipboard(userData.user_id, "user-id")}
-              className={`left-2 z-10 transition-all duration-200 ${
-                copiedStates["user-id"]
-                  ? "text-green-600 bg-green-50 border-green-200"
-                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-              }`}
+              className={`left-2 z-10 transition-all duration-200 ${copiedStates["user-id"]
+                ? "text-green-600 bg-green-50 border-green-200"
+                : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                }`}
             />
           </div>
         </div>
         {userRole && rolesWithWriteAccess.includes(userRole) && (
           <div className="flex items-center space-x-2">
             <Button icon={RefreshIcon} variant="secondary" onClick={handleResetPassword} className="flex items-center">
-              Reset Password
+              {t("Reset Password")}
             </Button>
             <Button
               icon={TrashIcon}
@@ -231,7 +232,7 @@ export default function UserInfoView({
               onClick={() => setIsDeleteModalOpen(true)}
               className="flex items-center text-red-500 border-red-500 hover:text-red-600 hover:border-red-600"
             >
-              Delete User
+              {t("Delete User")}
             </Button>
           </div>
         )}
@@ -239,21 +240,21 @@ export default function UserInfoView({
 
       <DeleteResourceModal
         isOpen={isDeleteModalOpen}
-        title="Delete User?"
-        message="Are you sure you want to delete this user? This action cannot be undone."
-        resourceInformationTitle="User Information"
+        title={t("Delete User?")}
+        message={t("Are you sure you want to delete this user? This action cannot be undone.")}
+        resourceInformationTitle={t("User Information")}
         resourceInformation={[
-          { label: "Email", value: userData.user_info?.user_email },
-          { label: "User ID", value: userData.user_id, code: true },
+          { label: t("Email"), value: userData.user_info?.user_email },
+          { label: t("User ID"), value: userData.user_id, code: true },
           {
-            label: "Global Proxy Role",
+            label: t("Global Proxy Role"),
             value:
               (userData.user_info?.user_role && possibleUIRoles?.[userData.user_info.user_role]?.ui_label) ||
               userData.user_info?.user_role ||
               "-",
           },
           {
-            label: "Total Spend (USD)",
+            label: t("Total Spend (USD)"),
             value:
               userData.user_info?.spend !== null && userData.user_info?.spend !== undefined
                 ? userData.user_info.spend.toFixed(2)
@@ -267,8 +268,8 @@ export default function UserInfoView({
 
       <TabGroup defaultIndex={activeTab} onIndexChange={setActiveTab}>
         <TabList className="mb-4">
-          <Tab>Overview</Tab>
-          <Tab>Details</Tab>
+          <Tab>{t("Overview")}</Tab>
+          <Tab>{t("Details")}</Tab>
         </TabList>
 
         <TabPanels>
@@ -276,20 +277,20 @@ export default function UserInfoView({
           <TabPanel>
             <Grid numItems={1} numItemsSm={2} numItemsLg={3} className="gap-6">
               <Card>
-                <Text>Spend</Text>
+                <Text>{t("Spend")}</Text>
                 <div className="mt-2">
                   <Title>${formatNumberWithCommas(userData.user_info?.spend || 0, 4)}</Title>
                   <Text>
-                    of{" "}
+                    {t("of")}{" "}
                     {userData.user_info?.max_budget !== null
                       ? `$${formatNumberWithCommas(userData.user_info.max_budget, 4)}`
-                      : "Unlimited"}
+                      : t("Unlimited")}
                   </Text>
                 </div>
               </Card>
 
               <Card>
-                <Text>Teams</Text>
+                <Text>{t("Teams")}</Text>
                 <div className="mt-2">
                   {userData.teams?.length && userData.teams?.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
@@ -304,7 +305,7 @@ export default function UserInfoView({
                           className="cursor-pointer hover:bg-gray-200 transition-colors"
                           onClick={() => setIsTeamsExpanded(true)}
                         >
-                          +{userData.teams.length - 20} more
+                          +{userData.teams.length - 20} {t("more")}
                         </Badge>
                       )}
                       {isTeamsExpanded && userData.teams?.length > 20 && (
@@ -313,32 +314,32 @@ export default function UserInfoView({
                           className="cursor-pointer hover:bg-gray-200 transition-colors"
                           onClick={() => setIsTeamsExpanded(false)}
                         >
-                          Show Less
+                          {t("Show Less")}
                         </Badge>
                       )}
                     </div>
                   ) : (
-                    <Text>No teams</Text>
+                    <Text>{t("No teams")}</Text>
                   )}
                 </div>
               </Card>
 
               <Card>
-                <Text>Virtual Keys</Text>
+                <Text>{t("Virtual Keys")}</Text>
                 <div className="mt-2">
                   <Text>
-                    {userData.keys?.length || 0} {userData.keys?.length === 1 ? "Key" : "Keys"}
+                    {userData.keys?.length || 0} {userData.keys?.length === 1 ? t("Key") : t("Keys")}
                   </Text>
                 </div>
               </Card>
 
               <Card>
-                <Text>Personal Models</Text>
+                <Text>{t("Personal Models")}</Text>
                 <div className="mt-2">
                   {userData.user_info?.models?.length && userData.user_info?.models?.length > 0 ? (
                     userData.user_info?.models?.map((model, index) => <Text key={index}>{model}</Text>)
                   ) : (
-                    <Text>All proxy models</Text>
+                    <Text>{t("All proxy models")}</Text>
                   )}
                 </div>
               </Card>
@@ -349,9 +350,9 @@ export default function UserInfoView({
           <TabPanel>
             <Card>
               <div className="flex justify-between items-center mb-4">
-                <Title>User Settings</Title>
+                <Title>{t("User Settings")}</Title>
                 {!isEditing && userRole && rolesWithWriteAccess.includes(userRole) && (
-                  <Button onClick={() => setIsEditing(true)}>Edit Settings</Button>
+                  <Button onClick={() => setIsEditing(true)}>{t("Edit Settings")}</Button>
                 )}
               </div>
 
@@ -370,7 +371,7 @@ export default function UserInfoView({
               ) : (
                 <div className="space-y-4">
                   <div>
-                    <Text className="font-medium">User ID</Text>
+                    <Text className="font-medium">{t("User ID")}</Text>
                     <div className="flex items-center cursor-pointer">
                       <Text className="font-mono">{userData.user_id}</Text>
                       <AntdButton
@@ -378,50 +379,49 @@ export default function UserInfoView({
                         size="small"
                         icon={copiedStates["user-id"] ? <CheckIcon size={12} /> : <CopyIcon size={12} />}
                         onClick={() => copyToClipboard(userData.user_id, "user-id")}
-                        className={`left-2 z-10 transition-all duration-200 ${
-                          copiedStates["user-id"]
-                            ? "text-green-600 bg-green-50 border-green-200"
-                            : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-                        }`}
+                        className={`left-2 z-10 transition-all duration-200 ${copiedStates["user-id"]
+                          ? "text-green-600 bg-green-50 border-green-200"
+                          : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                          }`}
                       />
                     </div>
                   </div>
 
                   <div>
-                    <Text className="font-medium">Email</Text>
-                    <Text>{userData.user_info?.user_email || "Not Set"}</Text>
+                    <Text className="font-medium">{t("Email")}</Text>
+                    <Text>{userData.user_info?.user_email || t("Not Set")}</Text>
                   </div>
 
                   <div>
-                    <Text className="font-medium">User Alias</Text>
-                    <Text>{userData.user_info?.user_alias || "Not Set"}</Text>
+                    <Text className="font-medium">{t("User Alias")}</Text>
+                    <Text>{userData.user_info?.user_alias || t("Not Set")}</Text>
                   </div>
 
                   <div>
-                    <Text className="font-medium">Global Proxy Role</Text>
-                    <Text>{userData.user_info?.user_role || "Not Set"}</Text>
+                    <Text className="font-medium">{t("Global Proxy Role")}</Text>
+                    <Text>{userData.user_info?.user_role || t("Not Set")}</Text>
                   </div>
 
                   <div>
-                    <Text className="font-medium">Created</Text>
+                    <Text className="font-medium">{t("Created")}</Text>
                     <Text>
                       {userData.user_info?.created_at
                         ? new Date(userData.user_info.created_at).toLocaleString()
-                        : "Unknown"}
+                        : t("Unknown")}
                     </Text>
                   </div>
 
                   <div>
-                    <Text className="font-medium">Last Updated</Text>
+                    <Text className="font-medium">{t("Last Updated")}</Text>
                     <Text>
                       {userData.user_info?.updated_at
                         ? new Date(userData.user_info.updated_at).toLocaleString()
-                        : "Unknown"}
+                        : t("Unknown")}
                     </Text>
                   </div>
 
                   <div>
-                    <Text className="font-medium">Teams</Text>
+                    <Text className="font-medium">{t("Teams")}</Text>
                     <div className="flex flex-wrap gap-2 mt-1">
                       {userData.teams?.length && userData.teams?.length > 0 ? (
                         <>
@@ -439,7 +439,7 @@ export default function UserInfoView({
                               className="px-2 py-1 bg-gray-100 rounded text-xs cursor-pointer hover:bg-gray-200 transition-colors"
                               onClick={() => setIsTeamsExpanded(true)}
                             >
-                              +{userData.teams.length - 20} more
+                              +{userData.teams.length - 20} {t("more")}
                             </span>
                           )}
                           {isTeamsExpanded && userData.teams?.length > 20 && (
@@ -447,18 +447,18 @@ export default function UserInfoView({
                               className="px-2 py-1 bg-gray-100 rounded text-xs cursor-pointer hover:bg-gray-200 transition-colors"
                               onClick={() => setIsTeamsExpanded(false)}
                             >
-                              Show Less
+                              {t("Show Less")}
                             </span>
                           )}
                         </>
                       ) : (
-                        <Text>No teams</Text>
+                        <Text>{t("No teams")}</Text>
                       )}
                     </div>
                   </div>
 
                   <div>
-                    <Text className="font-medium">Personal Models</Text>
+                    <Text className="font-medium">{t("Personal Models")}</Text>
                     <div className="flex flex-wrap gap-2 mt-1">
                       {userData.user_info?.models?.length && userData.user_info?.models?.length > 0 ? (
                         userData.user_info?.models?.map((model, index) => (
@@ -467,13 +467,13 @@ export default function UserInfoView({
                           </span>
                         ))
                       ) : (
-                        <Text>All proxy models</Text>
+                        <Text>{t("All proxy models")}</Text>
                       )}
                     </div>
                   </div>
 
                   <div>
-                    <Text className="font-medium">Virtual Keys</Text>
+                    <Text className="font-medium">{t("Virtual Keys")}</Text>
                     <div className="flex flex-wrap gap-2 mt-1">
                       {userData.keys?.length && userData.keys?.length > 0 ? (
                         userData.keys.map((key, index) => (
@@ -482,27 +482,27 @@ export default function UserInfoView({
                           </span>
                         ))
                       ) : (
-                        <Text>No Virtual Keys</Text>
+                        <Text>{t("No Virtual Keys")}</Text>
                       )}
                     </div>
                   </div>
 
                   <div>
-                    <Text className="font-medium">Max Budget</Text>
+                    <Text className="font-medium">{t("Max Budget")}</Text>
                     <Text>
                       {userData.user_info?.max_budget !== null && userData.user_info?.max_budget !== undefined
                         ? `$${formatNumberWithCommas(userData.user_info.max_budget, 4)}`
-                        : "Unlimited"}
+                        : t("Unlimited")}
                     </Text>
                   </div>
 
                   <div>
-                    <Text className="font-medium">Budget Reset</Text>
+                    <Text className="font-medium">{t("Budget Reset")}</Text>
                     <Text>{getBudgetDurationLabel(userData.user_info?.budget_duration ?? null)}</Text>
                   </div>
 
                   <div>
-                    <Text className="font-medium">Metadata</Text>
+                    <Text className="font-medium">{t("Metadata")}</Text>
                     <pre className="bg-gray-100 p-2 rounded text-xs overflow-auto mt-1">
                       {JSON.stringify(userData.user_info?.metadata || {}, null, 2)}
                     </pre>

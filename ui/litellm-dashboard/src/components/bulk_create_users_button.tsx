@@ -373,11 +373,11 @@ const BulkCreateUsersButton: React.FC<BulkCreateUsersProps> = ({
                 current.map((u, i) =>
                   i === index
                     ? {
-                        ...u,
-                        status: "success",
-                        key: response.key || response.user_id,
-                        invitation_link: invitationUrl,
-                      }
+                      ...u,
+                      status: "success",
+                      key: response.key || response.user_id,
+                      invitation_link: invitationUrl,
+                    }
                     : u,
                 ),
               );
@@ -389,11 +389,11 @@ const BulkCreateUsersButton: React.FC<BulkCreateUsersProps> = ({
                 current.map((u, i) =>
                   i === index
                     ? {
-                        ...u,
-                        status: "success",
-                        key: response.key || response.user_id,
-                        invitation_link: invitationUrl,
-                      }
+                      ...u,
+                      status: "success",
+                      key: response.key || response.user_id,
+                      invitation_link: invitationUrl,
+                    }
                     : u,
                 ),
               );
@@ -404,11 +404,11 @@ const BulkCreateUsersButton: React.FC<BulkCreateUsersProps> = ({
               current.map((u, i) =>
                 i === index
                   ? {
-                      ...u,
-                      status: "success",
-                      key: response.key || response.user_id,
-                      error: t("User created but failed to generate invitation link"),
-                    }
+                    ...u,
+                    status: "success",
+                    key: response.key || response.user_id,
+                    error: t("User created but failed to generate invitation link"),
+                  }
                   : u,
               ),
             );
@@ -544,7 +544,7 @@ const BulkCreateUsersButton: React.FC<BulkCreateUsersProps> = ({
   return (
     <>
       <TremorButton className="mb-0" onClick={() => setIsModalVisible(true)}>
-        <T>+ Bulk Invite Users</T>
+        + <T>Bulk Invite Users</T>
       </TremorButton>
 
       <Modal

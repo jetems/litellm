@@ -15,6 +15,7 @@ interface SelectionOptions {
 }
 
 export const columns = (
+  t: any,
   possibleUIRoles: Record<string, Record<string, string>>,
   handleEdit: (user: UserInfo) => void,
   handleDelete: (user: UserInfo) => void,
@@ -25,7 +26,7 @@ export const columns = (
   // Backend sortable columns: user_id, user_email, created_at, spend, user_alias, user_role
   const baseColumns: ColumnDef<UserInfo>[] = [
     {
-      header: "User ID",
+      header: t("User ID"),
       accessorKey: "user_id",
       enableSorting: true,
       cell: ({ row }) => (
@@ -35,25 +36,25 @@ export const columns = (
       ),
     },
     {
-      header: "Email",
+      header: t("Email"),
       accessorKey: "user_email",
       enableSorting: true,
       cell: ({ row }) => <span className="text-xs">{row.original.user_email || "-"}</span>,
     },
     {
-      header: "Global Proxy Role",
+      header: t("Global Proxy Role"),
       accessorKey: "user_role",
       enableSorting: true,
       cell: ({ row }) => <span className="text-xs">{possibleUIRoles?.[row.original.user_role]?.ui_label || "-"}</span>,
     },
     {
-      header: "User Alias",
+      header: t("User Alias"),
       accessorKey: "user_alias",
       enableSorting: false,
       cell: ({ row }) => <span className="text-xs">{row.original.user_alias || "-"}</span>,
     },
     {
-      header: "Spend (USD)",
+      header: t("Spend (USD)"),
       accessorKey: "spend",
       enableSorting: true,
       cell: ({ row }) => (
@@ -61,18 +62,18 @@ export const columns = (
       ),
     },
     {
-      header: "Budget (USD)",
+      header: t("Budget (USD)"),
       accessorKey: "max_budget",
       enableSorting: false,
       cell: ({ row }) => (
-        <span className="text-xs">{row.original.max_budget !== null ? row.original.max_budget : "Unlimited"}</span>
+        <span className="text-xs">{row.original.max_budget !== null ? row.original.max_budget : t("Unlimited")}</span>
       ),
     },
     {
       header: () => (
         <div className="flex items-center gap-2">
-          <span>SSO ID</span>
-          <Tooltip title="SSO ID is the ID of the user in the SSO provider. If the user is not using SSO, this will be null.">
+          <span>{t("SSO ID")}</span>
+          <Tooltip title={t("SSO ID is the ID of the user in the SSO provider. If the user is not using SSO, this will be null.")}>
             <InformationCircleIcon className="w-4 h-4" />
           </Tooltip>
         </div>
@@ -84,25 +85,25 @@ export const columns = (
       ),
     },
     {
-      header: "Virtual Keys",
+      header: t("Virtual Keys"),
       accessorKey: "key_count",
       enableSorting: false,
       cell: ({ row }) => (
         <Grid numItems={2}>
           {row.original.key_count > 0 ? (
             <Badge size="xs" color="indigo">
-              {row.original.key_count} {row.original.key_count === 1 ? "Key" : "Keys"}
+              {row.original.key_count} {row.original.key_count === 1 ? t("Key") : t("Keys")}
             </Badge>
           ) : (
             <Badge size="xs" color="gray">
-              No Keys
+              {t("No Keys")}
             </Badge>
           )}
         </Grid>
       ),
     },
     {
-      header: "Created At",
+      header: t("Created At"),
       accessorKey: "created_at",
       enableSorting: true,
       cell: ({ row }) => (
@@ -112,7 +113,7 @@ export const columns = (
       ),
     },
     {
-      header: "Updated At",
+      header: t("Updated At"),
       accessorKey: "updated_at",
       enableSorting: false,
       cell: ({ row }) => (
@@ -123,11 +124,11 @@ export const columns = (
     },
     {
       id: "actions",
-      header: "Actions",
+      header: t("Actions"),
       enableSorting: false,
       cell: ({ row }) => (
         <div className="flex gap-2">
-          <Tooltip title="Edit user details">
+          <Tooltip title={t("Edit user details")}>
             <Icon
               icon={PencilAltIcon}
               size="sm"
@@ -135,7 +136,7 @@ export const columns = (
               className="cursor-pointer hover:text-blue-600"
             />
           </Tooltip>
-          <Tooltip title="Delete user">
+          <Tooltip title={t("Delete user")}>
             <Icon
               icon={TrashIcon}
               size="sm"
@@ -143,7 +144,7 @@ export const columns = (
               className="cursor-pointer hover:text-red-600"
             />
           </Tooltip>
-          <Tooltip title="Reset Password">
+          <Tooltip title={t("Reset Password")}>
             <Icon
               icon={RefreshIcon}
               size="sm"
