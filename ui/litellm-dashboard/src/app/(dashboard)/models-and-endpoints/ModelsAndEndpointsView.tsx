@@ -1,7 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { Col, Grid, Text } from "@tremor/react";
 import React, { useEffect, useRef, useState } from "react";
-import { useTranslate } from "@/i18n";
+import { useTranslate, useI18n } from "@/i18n";
 
 import { handleAddModelSubmit } from "@/components/add_model/handle_add_model_submit";
 
@@ -93,9 +93,11 @@ const ModelsAndEndpointsView: React.FC<ModelDashboardProps> = ({
   premiumUser,
   teams,
 }) => {
+  const t = useTranslate();
+  const { locale } = useI18n();
   const [addModelForm] = Form.useForm();
   const [modelMap, setModelMap] = useState<any>(null);
-  const [lastRefreshed, setLastRefreshed] = useState("");
+  const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
 
   const [providerModels, setProviderModels] = useState<Array<string>>([]); // Explicitly typing providerModels as a string array
 
@@ -206,9 +208,9 @@ const ModelsAndEndpointsView: React.FC<ModelDashboardProps> = ({
     },
     onChange(info) {
       if (info.file.status === "done") {
-        NotificationsManager.success(`${info.file.name} file uploaded successfully`);
+        NotificationsManager.success(`${info.file.name} ${t("file uploaded successfully")}`);
       } else if (info.file.status === "error") {
-        NotificationsManager.fromBackend(`${info.file.name} file upload failed.`);
+        NotificationsManager.fromBackend(`${info.file.name} ${t("file upload failed.")}`);
       }
     },
   };
@@ -216,7 +218,7 @@ const ModelsAndEndpointsView: React.FC<ModelDashboardProps> = ({
   const handleRefreshClick = () => {
     // Update the 'lastRefreshed' state to the current date and time
     const currentDate = new Date();
-    setLastRefreshed(currentDate.toLocaleString());
+    setLastRefreshed(currentDate);
     // Invalidate and refetch models data using React Query
     queryClient.invalidateQueries({ queryKey: ["models", "list"] });
     refetchModels();
@@ -237,17 +239,17 @@ const ModelsAndEndpointsView: React.FC<ModelDashboardProps> = ({
         if (globalRetryPolicy) {
           payload.router_settings.retry_policy = globalRetryPolicy;
         }
-        NotificationsManager.success("Global retry settings saved successfully");
+        NotificationsManager.success(t("Global retry settings saved successfully"));
       } else {
         if (modelGroupRetryPolicy) {
           payload.router_settings.model_group_retry_policy = modelGroupRetryPolicy;
         }
-        NotificationsManager.success(`Retry settings saved successfully for ${selectedModelGroup}`);
+        NotificationsManager.success(`${t("Retry settings saved successfully for")} ${selectedModelGroup}`);
       }
 
       await setCallbacksCall(accessToken, payload);
     } catch (error) {
-      NotificationsManager.fromBackend("Failed to save retry settings");
+      NotificationsManager.fromBackend(t("Failed to save retry settings"));
     }
   };
 
@@ -398,11 +400,11 @@ const ModelsAndEndpointsView: React.FC<ModelDashboardProps> = ({
   }, [accessToken, token, userRole, userID, modelDataResponse]);
 
   if (!modelData || isLoadingModels) {
-    return <div>Loading...</div>;
+    return <div>{t("Loading...")}</div>;
   }
 
   if (!accessToken || !token || !userRole || !userID) {
-    return <div>Loading...</div>;
+    return <div>{t("Loading...")}</div>;
   }
   let all_models_on_proxy: any[] = [];
   let all_providers: string[] = [];
@@ -515,7 +517,7 @@ const ModelsAndEndpointsView: React.FC<ModelDashboardProps> = ({
       let remainingItems = sortedPayload.length - 5;
       sortedPayload = sortedPayload.slice(0, 5);
       sortedPayload.push({
-        dataKey: `${remainingItems} other deployments`,
+        dataKey: `${remainingItems} ${t("other deployments")}`,
         value: payload.slice(5).reduce((acc: number, curr: any) => acc + curr.value, 0),
         color: "gray",
       });
@@ -523,7 +525,7 @@ const ModelsAndEndpointsView: React.FC<ModelDashboardProps> = ({
 
     return (
       <div className="w-150 rounded-tremor-default border border-tremor-border bg-tremor-background p-2 text-tremor-default shadow-tremor-dropdown">
-        {date && <p className="text-tremor-content-emphasis mb-2">Date: {date}</p>}
+        {date && <p className="text-tremor-content-emphasis mb-2">{t("Date")}: {date}</p>}
         {sortedPayload.map((category: any, idx: number) => {
           const roundedValue = parseFloat(category.value.toFixed(5));
           const displayValue = roundedValue === 0 && category.value > 0 ? "<0.00001" : roundedValue.toFixed(5);
@@ -553,8 +555,8 @@ const ModelsAndEndpointsView: React.FC<ModelDashboardProps> = ({
             ?.map((field: any) => {
               return `${field.name.join(".")}: ${field.errors.join(", ")}`;
             })
-            .join(" | ") || "Unknown validation error";
-        NotificationsManager.fromBackend(`Please fill in the following required fields: ${errorMessages}`);
+            .join(" | ") || t("Unknown validation error");
+        NotificationsManager.fromBackend(`${t("Please fill in the following required fields:")} ${errorMessages}`);
       });
   };
 
@@ -647,7 +649,7 @@ const ModelsAndEndpointsView: React.FC<ModelDashboardProps> = ({
                 </div>
 
                 <div className="flex items-center space-x-2">
-                  {lastRefreshed && <Text>{t("Last Refreshed:")} {lastRefreshed}</Text>}
+                  {lastRefreshed && <Text>{t("Last Refreshed:")} {lastRefreshed.toLocaleString(locale)}</Text>}
                   <Icon
                     icon={RefreshIcon} // Modify as necessary for correct icon name
                     variant="shadow"
