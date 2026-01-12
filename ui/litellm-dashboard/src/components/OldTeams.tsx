@@ -521,7 +521,15 @@ const Teams: React.FC<TeamProps> = ({
   const handleRefreshClick = () => {
     // Update the 'lastRefreshed' state to the current date and time
     const currentDate = new Date();
-    setLastRefreshed(currentDate.toLocaleString());
+    setLastRefreshed(currentDate.toLocaleString(undefined, {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    }));
   };
 
   const handleFilterChange = (key: keyof FilterState, value: string) => {
@@ -659,7 +667,7 @@ const Teams: React.FC<TeamProps> = ({
               <TabPanels>
                 <TabPanel>
                   <Text>
-                    Click on &ldquo;Team ID&rdquo; to view team details <b>and</b> manage team members.
+                    {t("Click on 'Team ID' to view team details and manage team members.")}
                   </Text>
                   <Grid numItems={1} className="gap-2 pt-2 pb-2 h-[75vh] w-full mt-2">
                     <Col numColSpan={1}>
@@ -672,7 +680,7 @@ const Teams: React.FC<TeamProps> = ({
                               <div className="relative w-64">
                                 <input
                                   type="text"
-                                  placeholder="Search by Team Name..."
+                                  placeholder={t("Search by Team Name...")}
                                   className="w-full px-3 py-2 pl-8 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                   value={filters.team_alias}
                                   onChange={(e) => handleFilterChange("team_alias", e.target.value)}
@@ -735,7 +743,7 @@ const Teams: React.FC<TeamProps> = ({
                                 <div className="relative w-64">
                                   <input
                                     type="text"
-                                    placeholder="Enter Team ID"
+                                    placeholder={t("Enter Team ID")}
                                     className="w-full px-3 py-2 pl-8 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     value={filters.team_id}
                                     onChange={(e) => handleFilterChange("team_id", e.target.value)}
@@ -760,7 +768,7 @@ const Teams: React.FC<TeamProps> = ({
                                   <Select
                                     value={filters.organization_id || ""}
                                     onValueChange={(value) => handleFilterChange("organization_id", value)}
-                                    placeholder="Select Organization"
+                                    placeholder={t("Select Organization")}
                                   >
                                     {organizations?.map((org) => (
                                       <SelectItem key={org.organization_id} value={org.organization_id || ""}>
@@ -989,8 +997,8 @@ const Teams: React.FC<TeamProps> = ({
                               <TableRow>
                                 <TableCell colSpan={9} className="text-center">
                                   <div className="flex flex-col items-center justify-center py-4">
-                                    <Text className="text-lg font-medium mb-2">No teams found</Text>
-                                    <Text className="text-sm">Adjust your filters or create a new team</Text>
+                                    <Text className="text-lg font-medium mb-2">{t("No teams found")}</Text>
+                                    <Text className="text-sm">{t("Adjust your filters or create a new team")}</Text>
                                   </div>
                                 </TableCell>
                               </TableRow>

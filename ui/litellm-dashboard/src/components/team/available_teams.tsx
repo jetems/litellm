@@ -13,6 +13,7 @@ import {
 } from "@tremor/react";
 import { availableTeamListCall, teamMemberAddCall } from "../networking";
 import NotificationsManager from "../molecules/notifications_manager";
+import { useTranslate } from "@/i18n";
 
 interface AvailableTeam {
   team_id: string;
@@ -28,6 +29,7 @@ interface AvailableTeamsProps {
 }
 
 const AvailableTeamsPanel: React.FC<AvailableTeamsProps> = ({ accessToken, userID }) => {
+  const t = useTranslate();
   const [availableTeams, setAvailableTeams] = useState<AvailableTeam[]>([]);
 
   useEffect(() => {
@@ -55,12 +57,12 @@ const AvailableTeamsPanel: React.FC<AvailableTeamsProps> = ({ accessToken, userI
         role: "user",
       });
 
-      NotificationsManager.success("Successfully joined team");
+      NotificationsManager.success(t("Successfully joined team"));
       // Update available teams list
       setAvailableTeams((teams) => teams.filter((team) => team.team_id !== teamId));
     } catch (error) {
       console.error("Error joining team:", error);
-      NotificationsManager.fromBackend("Failed to join team");
+      NotificationsManager.fromBackend(t("Failed to join team"));
     }
   };
 
@@ -69,11 +71,11 @@ const AvailableTeamsPanel: React.FC<AvailableTeamsProps> = ({ accessToken, userI
       <Table>
         <TableHead>
           <TableRow>
-            <TableHeaderCell>Team Name</TableHeaderCell>
-            <TableHeaderCell>Description</TableHeaderCell>
-            <TableHeaderCell>Members</TableHeaderCell>
-            <TableHeaderCell>Models</TableHeaderCell>
-            <TableHeaderCell>Actions</TableHeaderCell>
+            <TableHeaderCell>{t("Team Name")}</TableHeaderCell>
+            <TableHeaderCell>{t("Description")}</TableHeaderCell>
+            <TableHeaderCell>{t("Members")}</TableHeaderCell>
+            <TableHeaderCell>{t("Models")}</TableHeaderCell>
+            <TableHeaderCell>{t("Actions")}</TableHeaderCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -83,16 +85,16 @@ const AvailableTeamsPanel: React.FC<AvailableTeamsProps> = ({ accessToken, userI
                 <Text>{team.team_alias}</Text>
               </TableCell>
               <TableCell>
-                <Text>{team.description || "No description available"}</Text>
+                <Text>{team.description || t("No description available")}</Text>
               </TableCell>
               <TableCell>
-                <Text>{team.members_with_roles.length} members</Text>
+                <Text>{team.members_with_roles.length} {t("members")}</Text>
               </TableCell>
               <TableCell>
                 <div className="flex flex-col">
                   {!team.models || team.models.length === 0 ? (
                     <Badge size="xs" color="red">
-                      <Text>All Proxy Models</Text>
+                      <Text>{t("All Proxy Models")}</Text>
                     </Badge>
                   ) : (
                     team.models.map((model, index) => (
@@ -105,7 +107,7 @@ const AvailableTeamsPanel: React.FC<AvailableTeamsProps> = ({ accessToken, userI
               </TableCell>
               <TableCell>
                 <Button size="xs" variant="secondary" onClick={() => handleJoinTeam(team.team_id)}>
-                  Join Team
+                  {t("Join Team")}
                 </Button>
               </TableCell>
             </TableRow>
@@ -113,7 +115,7 @@ const AvailableTeamsPanel: React.FC<AvailableTeamsProps> = ({ accessToken, userI
           {availableTeams.length === 0 && (
             <TableRow>
               <TableCell colSpan={5} className="text-center">
-                <Text>No available teams to join</Text>
+                <Text>{t("No available teams to join")}</Text>
               </TableCell>
             </TableRow>
           )}
