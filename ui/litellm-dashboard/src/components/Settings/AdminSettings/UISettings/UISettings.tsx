@@ -5,8 +5,10 @@ import { useUpdateUISettings } from "@/app/(dashboard)/hooks/uiSettings/useUpdat
 import useAuthorized from "@/app/(dashboard)/hooks/useAuthorized";
 import NotificationManager from "@/components/molecules/notifications_manager";
 import { Alert, Card, Skeleton, Space, Switch, Typography } from "antd";
+import { useTranslate } from "@/i18n";
 
 export default function UISettings() {
+  const t = useTranslate();
   const { accessToken } = useAuthorized();
   const { data, isLoading, isError, error } = useUISettings(accessToken);
   const { mutate: updateSettings, isPending: isUpdating, error: updateError } = useUpdateUISettings(accessToken);
@@ -21,7 +23,7 @@ export default function UISettings() {
       { disable_model_add_for_internal_users: checked },
       {
         onSuccess: () => {
-          NotificationManager.success("UI settings updated successfully");
+          NotificationManager.success(t("UI settings updated successfully"));
         },
         onError: (error) => {
           NotificationManager.fromBackend(error);
@@ -31,13 +33,13 @@ export default function UISettings() {
   };
 
   return (
-    <Card title="UI Settings">
+    <Card title={t("UI Settings")}>
       {isLoading ? (
         <Skeleton active />
       ) : isError ? (
         <Alert
           type="error"
-          message="Could not load UI settings"
+          message={t("Could not load UI settings")}
           description={error instanceof Error ? error.message : undefined}
         />
       ) : (
@@ -49,7 +51,7 @@ export default function UISettings() {
           {updateError && (
             <Alert
               type="error"
-              message="Could not update UI settings"
+              message={t("Could not update UI settings")}
               description={updateError instanceof Error ? updateError.message : undefined}
             />
           )}
@@ -60,10 +62,10 @@ export default function UISettings() {
               disabled={isUpdating}
               loading={isUpdating}
               onChange={handleToggle}
-              aria-label={property?.description ?? "Disable model add for internal users"}
+              aria-label={property?.description ?? t("Disable model add for internal users")}
             />
             <Space direction="vertical" size={4}>
-              <Typography.Text strong>Disable model add for internal users</Typography.Text>
+              <Typography.Text strong>{t("Disable model add for internal users")}</Typography.Text>
               {property?.description && <Typography.Text type="secondary">{property.description}</Typography.Text>}
             </Space>
           </Space>

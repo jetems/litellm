@@ -4,6 +4,7 @@ import { Text, TextInput } from "@tremor/react";
 import { getSSOSettings, updateSSOSettings } from "./networking";
 import NotificationsManager from "./molecules/notifications_manager";
 import { parseErrorMessage } from "./shared/errorUtils";
+import { useTranslate } from "@/i18n";
 
 interface SSOModalsProps {
   isAddSSOModalVisible: boolean;
@@ -113,6 +114,7 @@ const SSOModals: React.FC<SSOModalsProps> = ({
   accessToken,
   ssoConfigured = false, // Default to false if not provided
 }) => {
+  const t = useTranslate();
   const [isClearConfirmModalVisible, setIsClearConfirmModalVisible] = useState(false);
 
   // Load existing SSO settings when modal opens
@@ -173,7 +175,7 @@ const SSOModals: React.FC<SSOModalsProps> = ({
   // Enhanced form submission handler
   const handleFormSubmit = async (formValues: Record<string, any>) => {
     if (!accessToken) {
-      NotificationsManager.fromBackend("No access token available");
+      NotificationsManager.fromBackend(t("No access token available"));
       return;
     }
 
@@ -184,14 +186,14 @@ const SSOModals: React.FC<SSOModalsProps> = ({
       // Continue with the original flow (show instructions)
       handleShowInstructions(formValues);
     } catch (error: unknown) {
-      NotificationsManager.fromBackend("Failed to save SSO settings: " + parseErrorMessage(error));
+      NotificationsManager.fromBackend(t("Failed to save SSO settings:") + " " + parseErrorMessage(error));
     }
   };
 
   // Handle clearing SSO settings
   const handleClearSSO = async () => {
     if (!accessToken) {
-      NotificationsManager.fromBackend("No access token available");
+      NotificationsManager.fromBackend(t("No access token available"));
       return;
     }
 
@@ -224,10 +226,10 @@ const SSOModals: React.FC<SSOModalsProps> = ({
       // Close the main SSO modal and trigger refresh
       handleAddSSOOk();
 
-      NotificationsManager.success("SSO settings cleared successfully");
+      NotificationsManager.success(t("SSO settings cleared successfully"));
     } catch (error) {
       console.error("Failed to clear SSO settings:", error);
-      NotificationsManager.fromBackend("Failed to clear SSO settings");
+      NotificationsManager.fromBackend(t("Failed to clear SSO settings"));
     }
   };
 
@@ -241,7 +243,7 @@ const SSOModals: React.FC<SSOModalsProps> = ({
         key={field.name}
         label={field.label}
         name={field.name}
-        rules={[{ required: true, message: `Please enter the ${field.label.toLowerCase()}` }]}
+        rules={[{ required: true, message: t("Please enter the") + ` ${field.label.toLowerCase()}` }]}
       >
         {field.name.includes("client") ? <Input.Password /> : <TextInput placeholder={field.placeholder} />}
       </Form.Item>
@@ -251,7 +253,7 @@ const SSOModals: React.FC<SSOModalsProps> = ({
   return (
     <>
       <Modal
-        title={ssoConfigured ? "Edit SSO Settings" : "Add SSO"}
+        title={ssoConfigured ? t("Edit SSO Settings") : t("Add SSO")}
         visible={isAddSSOModalVisible}
         width={800}
         footer={null}
@@ -269,7 +271,7 @@ const SSOModals: React.FC<SSOModalsProps> = ({
             <Form.Item
               label="SSO Provider"
               name="sso_provider"
-              rules={[{ required: true, message: "Please select an SSO provider" }]}
+              rules={[{ required: true, message: t("Please select an SSO provider") }]}
             >
               <Select>
                 {Object.entries(ssoProviderLogoMap).map(([value, logo]) => (
@@ -307,7 +309,7 @@ const SSOModals: React.FC<SSOModalsProps> = ({
             <Form.Item
               label="Proxy Admin Email"
               name="user_email"
-              rules={[{ required: true, message: "Please enter the email of the proxy admin" }]}
+              rules={[{ required: true, message: t("Please enter the email of the proxy admin") }]}
             >
               <TextInput />
             </Form.Item>
@@ -316,16 +318,16 @@ const SSOModals: React.FC<SSOModalsProps> = ({
               name="proxy_base_url"
               normalize={(value) => value?.trim()}
               rules={[
-                { required: true, message: "Please enter the proxy base url" },
+                { required: true, message: t("Please enter the proxy base url") },
                 {
                   pattern: /^https?:\/\/.+/,
-                  message: "URL must start with http:// or https://",
+                  message: t("URL must start with http:// or https://"),
                 },
                 {
                   validator: (_, value) => {
                     // Only check for trailing slash if the URL starts with http:// or https://
                     if (value && /^https?:\/\/.+/.test(value) && value.endsWith("/")) {
-                      return Promise.reject("URL must not end with a trailing slash");
+                      return Promise.reject(t("URL must not end with a trailing slash"));
                     }
                     return Promise.resolve();
                   },
@@ -362,22 +364,22 @@ const SSOModals: React.FC<SSOModalsProps> = ({
                   e.currentTarget.style.borderColor = "#6366f1";
                 }}
               >
-                Clear
+                {t("Clear")}
               </Button2>
             )}
-            <Button2 htmlType="submit">Save</Button2>
+            <Button2 htmlType="submit">{t("Save")}</Button2>
           </div>
         </Form>
       </Modal>
 
       {/* Clear Confirmation Modal */}
       <Modal
-        title="Confirm Clear SSO Settings"
+        title={t("Confirm Clear SSO Settings")}
         visible={isClearConfirmModalVisible}
         onOk={handleClearSSO}
         onCancel={() => setIsClearConfirmModalVisible(false)}
-        okText="Yes, Clear"
-        cancelText="Cancel"
+        okText={t("Yes, Clear")}
+        cancelText={t("Cancel")}
         okButtonProps={{
           danger: true,
           style: {
@@ -386,25 +388,25 @@ const SSOModals: React.FC<SSOModalsProps> = ({
           },
         }}
       >
-        <p>Are you sure you want to clear all SSO settings? This action cannot be undone.</p>
-        <p>Users will no longer be able to login using SSO after this change.</p>
+        <p>{t("Are you sure you want to clear all SSO settings? This action cannot be undone.")}</p>
+        <p>{t("Users will no longer be able to login using SSO after this change.")}</p>
       </Modal>
 
       <Modal
-        title="SSO Setup Instructions"
+        title={t("SSO Setup Instructions")}
         visible={isInstructionsModalVisible}
         width={800}
         footer={null}
         onOk={handleInstructionsOk}
         onCancel={handleInstructionsCancel}
       >
-        <p>Follow these steps to complete the SSO setup:</p>
-        <Text className="mt-2">1. DO NOT Exit this TAB</Text>
-        <Text className="mt-2">2. Open a new tab, visit your proxy base url</Text>
-        <Text className="mt-2">3. Confirm your SSO is configured correctly and you can login on the new Tab</Text>
-        <Text className="mt-2">4. If Step 3 is successful, you can close this tab</Text>
+        <p>{t("Follow these steps to complete the SSO setup:")}</p>
+        <Text className="mt-2">{t("1. DO NOT Exit this TAB")}</Text>
+        <Text className="mt-2">{t("2. Open a new tab, visit your proxy base url")}</Text>
+        <Text className="mt-2">{t("3. Confirm your SSO is configured correctly and you can login on the new Tab")}</Text>
+        <Text className="mt-2">{t("4. If Step 3 is successful, you can close this tab")}</Text>
         <div style={{ textAlign: "right", marginTop: "10px" }}>
-          <Button2 onClick={handleInstructionsOk}>Done</Button2>
+          <Button2 onClick={handleInstructionsOk}>{t("Done")}</Button2>
         </div>
       </Modal>
     </>
