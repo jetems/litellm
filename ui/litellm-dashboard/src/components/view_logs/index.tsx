@@ -150,7 +150,7 @@ export default function SpendLogsTable({
   const LiveTailControls = () => {
     return (
       <div className="flex items-center gap-2">
-        <span className="text-sm font-medium text-gray-900">Live Tail</span>
+        <span className="text-sm font-medium text-gray-900">{t("Live Tail")}</span>
         <Switch color="green" checked={isLiveTail} defaultChecked={true} onChange={setIsLiveTail} />
       </div>
     );
@@ -392,8 +392,8 @@ export default function SpendLogsTable({
       label: "Status",
       isSearchable: false,
       options: [
-        { label: "Success", value: "success" },
-        { label: "Failure", value: "failure" },
+        { label: t("Success"), value: "success" },
+        { label: t("Failure"), value: "failure" },
       ],
     },
     {
@@ -458,11 +458,11 @@ export default function SpendLogsTable({
   };
 
   const quickSelectOptions = [
-    { label: "Last 15 Minutes", value: 15, unit: "minutes" },
-    { label: "Last Hour", value: 1, unit: "hours" },
-    { label: "Last 4 Hours", value: 4, unit: "hours" },
-    { label: "Last 24 Hours", value: 24, unit: "hours" },
-    { label: "Last 7 Days", value: 7, unit: "days" },
+    { label: t("Last 15 Minutes"), value: 15, unit: "minutes" },
+    { label: t("Last Hour"), value: 1, unit: "hours" },
+    { label: t("Last 4 Hours"), value: 4, unit: "hours" },
+    { label: t("Last 24 Hours"), value: 24, unit: "hours" },
+    { label: t("Last 7 Days"), value: 7, unit: "days" },
   ];
 
   const selectedOption = quickSelectOptions.find(
@@ -484,16 +484,16 @@ export default function SpendLogsTable({
               <h1 className="text-xl font-semibold">
                 {selectedSessionId ? (
                   <>
-                    Session: <span className="font-mono">{selectedSessionId}</span>
+                    {t("Session")}: <span className="font-mono">{selectedSessionId}</span>
                     <button
                       className="ml-4 px-3 py-1 text-sm border rounded hover:bg-gray-50"
                       onClick={() => setSelectedSessionId(null)}
                     >
-                      ← Back to All Logs
+                      {t("← Back to All Logs")}
                     </button>
                   </>
                 ) : (
-                  "Request Logs"
+                  t("Request Logs")
                 )}
               </h1>
             </div>
@@ -507,7 +507,7 @@ export default function SpendLogsTable({
                 teams={allTeams}
                 onClose={() => setSelectedKeyIdInfoView(null)}
                 premiumUser={premiumUser}
-                backButtonText="Back to Logs"
+                backButtonText={t("Back to Logs")}
               />
             ) : selectedSessionId ? (
               <div className="bg-white rounded-lg shadow">
@@ -533,7 +533,7 @@ export default function SpendLogsTable({
                         <div className="relative w-64 min-w-0 flex-shrink-0">
                           <input
                             type="text"
-                            placeholder="Search by Request ID"
+                            placeholder={t("Search by Request ID")}
                             className="w-full px-3 py-2 pl-8 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -599,7 +599,7 @@ export default function SpendLogsTable({
                                       }`}
                                     onClick={() => setIsCustomDate(!isCustomDate)}
                                   >
-                                    Custom Range
+                                    {t("Custom Range")}
                                   </button>
                                 </div>
                               </div>
@@ -611,7 +611,7 @@ export default function SpendLogsTable({
                           <button
                             onClick={handleRefresh}
                             className="px-3 py-2 text-sm border rounded-md hover:bg-gray-50 flex items-center gap-2"
-                            title="Refresh data"
+                            title={t("Refresh data")}
                           >
                             <svg
                               className={`w-4 h-4 ${logs.isFetching ? "animate-spin" : ""}`}
@@ -626,7 +626,7 @@ export default function SpendLogsTable({
                                 d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                               />
                             </svg>
-                            <span>Refresh</span>
+                            <span>{t("Refresh")}</span>
                           </button>
                         </div>
 
@@ -643,7 +643,7 @@ export default function SpendLogsTable({
                                 className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                               />
                             </div>
-                            <span className="text-gray-500">to</span>
+                            <span className="text-gray-500">{t("to")}</span>
                             <div>
                               <input
                                 type="datetime-local"
@@ -661,32 +661,32 @@ export default function SpendLogsTable({
 
                       <div className="flex items-center space-x-4">
                         <span className="text-sm text-gray-700 whitespace-nowrap">
-                          Showing {logs.isLoading ? "..." : filteredLogs ? (currentPage - 1) * pageSize + 1 : 0} -{" "}
+                          {t("Showing")} {logs.isLoading ? "..." : filteredLogs ? (currentPage - 1) * pageSize + 1 : 0} -{" "}
                           {logs.isLoading
                             ? "..."
                             : filteredLogs
                               ? Math.min(currentPage * pageSize, filteredLogs.total)
                               : 0}{" "}
-                          of {logs.isLoading ? "..." : filteredLogs ? filteredLogs.total : 0} results
+                          {t("of")} {logs.isLoading ? "..." : filteredLogs ? filteredLogs.total : 0} {t("results")}
                         </span>
                         <div className="flex items-center space-x-2">
                           <span className="text-sm text-gray-700 min-w-[90px]">
-                            Page {logs.isLoading ? "..." : currentPage} of{" "}
+                            {t("Page")} {logs.isLoading ? "..." : currentPage} {t("of")}{" "}
                             {logs.isLoading ? "..." : filteredLogs ? filteredLogs.total_pages : 1}
                           </span>
                           <button
                             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                             disabled={logs.isLoading || currentPage === 1}
-                            className="px-3 py-1 text-sm border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-3 py-1 text-sm border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                           >
-                            Previous
+                            {t("Previous")}
                           </button>
                           <button
                             onClick={() => setCurrentPage((p) => Math.min(filteredLogs.total_pages || 1, p + 1))}
                             disabled={logs.isLoading || currentPage === (filteredLogs.total_pages || 1)}
-                            className="px-3 py-1 text-sm border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-3 py-1 text-sm border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                           >
-                            Next
+                            {t("Next")}
                           </button>
                         </div>
                       </div>
@@ -695,13 +695,13 @@ export default function SpendLogsTable({
                   {isLiveTail && currentPage === 1 && (
                     <div className="mb-4 px-4 py-2 bg-green-50 border border-greem-200 rounded-md flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-green-700">Auto-refreshing every 15 seconds</span>
+                        <span className="text-sm text-green-700">{t("Auto-refreshing every 15 seconds")}</span>
                       </div>
                       <button
                         onClick={() => setIsLiveTail(false)}
                         className="text-sm text-green-600 hover:text-green-800"
                       >
-                        Stop
+                        {t("Stop")}
                       </button>
                     </div>
                   )}
@@ -910,8 +910,8 @@ export function RequestViewer({ row }: { row: Row<LogEntry> }) {
               <span className="font-medium w-1/3">Status:</span>
               <span
                 className={`px-2 py-1 rounded-md text-xs font-medium inline-block text-center w-16 ${(row.original.metadata?.status || "Success").toLowerCase() !== "failure"
-                    ? "bg-green-100 text-green-800"
-                    : "bg-red-100 text-red-800"
+                  ? "bg-green-100 text-green-800"
+                  : "bg-red-100 text-red-800"
                   }`}
               >
                 {(row.original.metadata?.status || "Success").toLowerCase() !== "failure" ? "Success" : "Failure"}

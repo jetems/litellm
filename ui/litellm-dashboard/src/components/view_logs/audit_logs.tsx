@@ -7,6 +7,7 @@ import { AuditLogEntry, auditLogColumns } from "./columns";
 import { Text } from "@tremor/react";
 import { Team } from "../key_team_helpers/key_list";
 import { formatNumberWithCommas } from "@/utils/dataUtils";
+import { useTranslate } from "@/i18n";
 
 interface AuditLogsProps {
   accessToken: string | null;
@@ -30,6 +31,7 @@ export default function AuditLogs({
   premiumUser,
   allTeams,
 }: AuditLogsProps) {
+  const t = useTranslate();
   const [startTime, setStartTime] = useState<string>(moment().subtract(24, "hours").format("YYYY-MM-DDTHH:mm"));
 
   const actionFilterRef = useRef<HTMLDivElement>(null);
@@ -278,16 +280,16 @@ export default function AuditLogs({
           </svg>
         </div>
         <div>
-          <h4 className="text-sm font-medium text-blue-800">Audit Logs Not Available</h4>
+          <h4 className="text-sm font-medium text-blue-800">{t("Audit Logs Not Available")}</h4>
           <p className="text-sm text-blue-700 mt-1">
-            To enable audit logging, add the following configuration to your LiteLLM proxy configuration file:
+            {t("To enable audit logging, add the following configuration to your LiteLLM proxy configuration file:")}
           </p>
           <pre className="mt-2 bg-white p-3 rounded border border-blue-200 text-xs font-mono overflow-auto">
             {`litellm_settings:
   store_audit_logs: true`}
           </pre>
           <p className="text-xs text-blue-700 mt-2">
-            Note: This will only affect new requests after the configuration change and proxy restart.
+            {t("Note: This will only affect new requests after the configuration change and proxy restart.")}
           </p>
         </div>
       </div>
@@ -411,11 +413,11 @@ export default function AuditLogs({
       return (
         <div className="-mx-4 p-4 bg-slate-100 border-y border-slate-300 grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <h4 className="font-semibold mb-2 text-sm text-slate-700">Before Value:</h4>
+            <h4 className="font-semibold mb-2 text-sm text-slate-700">{t("Before Value")}:</h4>
             {renderValue(displayBeforeValue, table_name === "LiteLLM_VerificationToken")}
           </div>
           <div>
-            <h4 className="font-semibold mb-2 text-sm text-slate-700">Updated Value:</h4>
+            <h4 className="font-semibold mb-2 text-sm text-slate-700">{t("Updated Value")}:</h4>
             {renderValue(displayUpdatedValue, table_name === "LiteLLM_VerificationToken")}
           </div>
         </div>
@@ -428,16 +430,16 @@ export default function AuditLogs({
   if (!premiumUser) {
     return (
       <div style={{ textAlign: "center", marginTop: "20px" }}>
-        <h1 style={{ display: "block", marginBottom: "10px" }}>✨ Enterprise Feature.</h1>
+        <h1 style={{ display: "block", marginBottom: "10px" }}>{t("✨ Enterprise Feature.")}</h1>
         <Text style={{ display: "block", marginBottom: "10px" }}>
-          This is a LiteLLM Enterprise feature, and requires a valid key to use.
+          {t("This is a LiteLLM Enterprise feature, and requires a valid key to use.")}
         </Text>
         <Text style={{ display: "block", marginBottom: "20px", fontStyle: "italic" }}>
-          Here&apos;s a preview of what Audit Logs offer:
+          {t("Here's a preview of what Audit Logs offer:")}
         </Text>
         <img
           src={auditLogsPreviewImg}
-          alt="Audit Logs Preview"
+          alt={t("Audit Logs Preview")}
           style={{
             maxWidth: "100%",
             maxHeight: "700px",
@@ -463,7 +465,7 @@ export default function AuditLogs({
       {/* <FilterComponent options={auditLogFilterOptions} onApplyFilters={handleFilterChange} onResetFilters={handleFilterReset} /> */}
       <div className="bg-white rounded-lg shadow">
         <div className="border-b px-6 py-4">
-          <h1 className="text-xl font-semibold py-4">Audit Logs</h1>
+          <h1 className="text-xl font-semibold py-4">{t("Audit Logs")}</h1>
 
           {/* Show Audit Logs Info Message when no data */}
           <AuditLogsInfoMessage show={showAuditLogsInfo} />
@@ -474,7 +476,7 @@ export default function AuditLogs({
                 <div className="flex items-center">
                   <input
                     type="text"
-                    placeholder="Search by Object ID..."
+                    placeholder={t("Search by Object ID...")}
                     value={objectIdSearch}
                     onChange={(e) => setObjectIdSearch(e.target.value)}
                     className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -516,11 +518,11 @@ export default function AuditLogs({
                   className="px-3 py-2 text-sm border rounded-md hover:bg-gray-50 flex items-center gap-2 bg-white w-40 text-left justify-between"
                 >
                   <span>
-                    {selectedActionFilter === "all" && "All Actions"}
-                    {selectedActionFilter === "created" && "Created"}
-                    {selectedActionFilter === "updated" && "Updated"}
-                    {selectedActionFilter === "deleted" && "Deleted"}
-                    {selectedActionFilter === "rotated" && "Rotated"}
+                    {selectedActionFilter === "all" && t("All Actions")}
+                    {selectedActionFilter === "created" && t("Created")}
+                    {selectedActionFilter === "updated" && t("Updated")}
+                    {selectedActionFilter === "deleted" && t("Deleted")}
+                    {selectedActionFilter === "rotated" && t("Rotated")}
                   </span>
                   <svg
                     className="w-4 h-4 text-gray-500"
@@ -536,19 +538,18 @@ export default function AuditLogs({
                   <div className="absolute left-0 mt-2 w-40 bg-white rounded-lg shadow-lg border p-1 z-50">
                     <div className="space-y-1">
                       {[
-                        { label: "All Actions", value: "all" },
-                        { label: "Created", value: "created" },
-                        { label: "Updated", value: "updated" },
-                        { label: "Deleted", value: "deleted" },
-                        { label: "Rotated", value: "rotated" },
+                        { label: t("All Actions"), value: "all" },
+                        { label: t("Created"), value: "created" },
+                        { label: t("Updated"), value: "updated" },
+                        { label: t("Deleted"), value: "deleted" },
+                        { label: t("Rotated"), value: "rotated" },
                       ].map((option) => (
                         <button
                           key={option.value}
-                          className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 rounded-md ${
-                            selectedActionFilter === option.value
+                          className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 rounded-md ${selectedActionFilter === option.value
                               ? "bg-blue-50 text-blue-600 font-medium"
                               : "font-normal"
-                          }`}
+                            }`}
                           onClick={() => {
                             setSelectedActionFilter(option.value);
                             setActionFilterOpen(false);
@@ -573,10 +574,10 @@ export default function AuditLogs({
                   className="px-3 py-2 text-sm border rounded-md hover:bg-gray-50 flex items-center gap-2 bg-white w-40 text-left justify-between"
                 >
                   <span>
-                    {selectedTableFilter === "all" && "All Tables"}
-                    {selectedTableFilter === "keys" && "Keys"}
-                    {selectedTableFilter === "teams" && "Teams"}
-                    {selectedTableFilter === "users" && "Users"}
+                    {selectedTableFilter === "all" && t("All Tables")}
+                    {selectedTableFilter === "keys" && t("Keys")}
+                    {selectedTableFilter === "teams" && t("Teams")}
+                    {selectedTableFilter === "users" && t("Users")}
                   </span>
                   <svg
                     className="w-4 h-4 text-gray-500"
@@ -592,18 +593,17 @@ export default function AuditLogs({
                   <div className="absolute left-0 mt-2 w-40 bg-white rounded-lg shadow-lg border p-1 z-50">
                     <div className="space-y-1">
                       {[
-                        { label: "All Tables", value: "all" },
-                        { label: "Keys", value: "keys" },
-                        { label: "Teams", value: "teams" },
-                        { label: "Users", value: "users" },
+                        { label: t("All Tables"), value: "all" },
+                        { label: t("Keys"), value: "keys" },
+                        { label: t("Teams"), value: "teams" },
+                        { label: t("Users"), value: "users" },
                       ].map((option) => (
                         <button
                           key={option.value}
-                          className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 rounded-md ${
-                            selectedTableFilter === option.value
+                          className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 rounded-md ${selectedTableFilter === option.value
                               ? "bg-blue-50 text-blue-600 font-medium"
                               : "font-normal"
-                          }`}
+                            }`}
                           onClick={() => {
                             setSelectedTableFilter(option.value);
                             setTableFilterOpen(false);
@@ -618,13 +618,13 @@ export default function AuditLogs({
               </div>
 
               <span className="text-sm text-gray-700">
-                Showing {allLogsQuery.isLoading ? "..." : currentDisplayItemsStart} -{" "}
-                {allLogsQuery.isLoading ? "..." : currentDisplayItemsEnd} of{" "}
-                {allLogsQuery.isLoading ? "..." : totalFilteredItems} results
+                {t("Showing")} {allLogsQuery.isLoading ? "..." : currentDisplayItemsStart} -{" "}
+                {allLogsQuery.isLoading ? "..." : currentDisplayItemsEnd} {t("of")}{" "}
+                {allLogsQuery.isLoading ? "..." : totalFilteredItems} {t("results")}
               </span>
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-gray-700">
-                  Page {allLogsQuery.isLoading ? "..." : clientCurrentPage} of{" "}
+                  {t("Page")} {allLogsQuery.isLoading ? "..." : clientCurrentPage} {t("of")}{" "}
                   {allLogsQuery.isLoading ? "..." : totalFilteredPages}
                 </span>
                 <button
@@ -632,14 +632,14 @@ export default function AuditLogs({
                   disabled={allLogsQuery.isLoading || clientCurrentPage === 1}
                   className="px-3 py-1 text-sm border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Previous
+                  {t("Previous")}
                 </button>
                 <button
                   onClick={() => setClientCurrentPage((p) => Math.min(totalFilteredPages, p + 1))}
                   disabled={allLogsQuery.isLoading || clientCurrentPage === totalFilteredPages}
                   className="px-3 py-1 text-sm border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Next
+                  {t("Next")}
                 </button>
               </div>
             </div>
