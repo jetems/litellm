@@ -1,6 +1,7 @@
 import React from "react";
 import { Button as TremorButton, Text } from "@tremor/react";
 import { Input, Modal } from "antd";
+import { useTranslate } from "@/i18n";
 
 interface PublishModalProps {
   visible: boolean;
@@ -19,33 +20,34 @@ const PublishModal: React.FC<PublishModalProps> = ({
   onPublish,
   onCancel,
 }) => {
+  const t = useTranslate();
   return (
     <Modal
-      title="Publish Prompt"
+      title={t("Publish Prompt")}
       open={visible}
       onCancel={onCancel}
       footer={[
         <div key="footer" className="flex justify-end gap-2">
           <TremorButton variant="secondary" onClick={onCancel}>
-            Cancel
+            {t("Cancel")}
           </TremorButton>
           <TremorButton onClick={onPublish} loading={isSaving}>
-            Publish
+            {t("Publish")}
           </TremorButton>
         </div>
       ]}
     >
       <div className="py-4">
-        <Text className="mb-2">Name</Text>
+        <Text className="mb-2">{t("Name")}</Text>
         <Input
           value={promptName}
           onChange={(e) => onNameChange(e.target.value)}
-          placeholder="Enter prompt name"
+          placeholder={t("Enter prompt name")}
           onPressEnter={onPublish}
           autoFocus
         />
         <Text className="text-gray-500 text-xs mt-2">
-          Published prompts can be used in API calls and are versioned for easy tracking.
+          {t("Published prompts can be used in API calls and are versioned for easy tracking.")}
         </Text>
       </div>
     </Modal>

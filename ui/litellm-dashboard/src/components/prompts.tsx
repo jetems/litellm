@@ -100,11 +100,11 @@ const PromptsPanel: React.FC<PromptsProps> = ({ accessToken, userRole }) => {
     setIsDeleting(true);
     try {
       await deletePromptCall(accessToken, promptToDelete.id);
-      NotificationsManager.success(`Prompt "${promptToDelete.name}" deleted successfully`);
+      NotificationsManager.success(`${t("Prompt deleted successfully")}: "${promptToDelete.name}"`);
       fetchPrompts(); // Refresh the list
     } catch (error) {
       console.error("Error deleting prompt:", error);
-      NotificationsManager.fromBackend("Failed to delete prompt");
+      NotificationsManager.fromBackend(t("Failed to delete prompt"));
     } finally {
       setIsDeleting(false);
       setPromptToDelete(null);
@@ -141,7 +141,7 @@ const PromptsPanel: React.FC<PromptsProps> = ({ accessToken, userRole }) => {
                 + {t("Add New Prompt")}
               </Button>
               <Button onClick={handleAddPromptFromFile} disabled={!accessToken} variant="secondary">
-                Upload .prompt File
+                {t("Upload .prompt File")}
               </Button>
             </div>
           </div>
@@ -166,16 +166,16 @@ const PromptsPanel: React.FC<PromptsProps> = ({ accessToken, userRole }) => {
 
       {promptToDelete && (
         <Modal
-          title="Delete Prompt"
+          title={t("Delete Prompt")}
           open={promptToDelete !== null}
           onOk={handleDeleteConfirm}
           onCancel={handleDeleteCancel}
           confirmLoading={isDeleting}
-          okText="Delete"
+          okText={t("Delete")}
           okButtonProps={{ danger: true }}
         >
-          <p>Are you sure you want to delete prompt: {promptToDelete.name} ?</p>
-          <p>This action cannot be undone.</p>
+          <p>{t("Are you sure you want to delete prompt:")} {promptToDelete.name} ?</p>
+          <p>{t("This action cannot be undone.")}</p>
         </Modal>
       )}
     </div>

@@ -5,6 +5,7 @@ import { Button as TremorButton, Text } from "@tremor/react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { coy } from "react-syntax-highlighter/dist/esm/styles/prism";
 import NotificationsManager from "../../molecules/notifications_manager";
+import { useTranslate } from "@/i18n";
 
 interface PromptCodeSnippetsProps {
   promptId: string;
@@ -26,6 +27,7 @@ const PromptCodeSnippets: React.FC<PromptCodeSnippetsProps> = ({
   version = "1",
   proxySettings,
 }) => {
+  const t = useTranslate();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<"curl" | "python" | "javascript">("curl");
   const [selectedTab, setSelectedTab] = useState("basic");
@@ -53,7 +55,7 @@ const PromptCodeSnippets: React.FC<PromptCodeSnippetsProps> = ({
   // Generate code based on selected language and tab
   const generateCode = () => {
     const hasVariables = Object.keys(promptVariables).length > 0;
-    
+
     if (selectedLanguage === "curl") {
       if (selectedTab === "basic") {
         return `curl -X POST '${apiBase}/chat/completions' \\
@@ -215,11 +217,11 @@ main();`;
         icon={CodeOutlined}
         onClick={showModal}
       >
-        Get Code
+        {t("Get Code")}
       </TremorButton>
 
       <Modal
-        title="Generated Code"
+        title={t("Generated Code")}
         open={isModalVisible}
         onCancel={handleCancel}
         footer={null}
@@ -227,7 +229,7 @@ main();`;
       >
         <div className="flex justify-between items-center mb-4">
           <div>
-            <Text className="font-medium block mb-1 text-gray-700">Language</Text>
+            <Text className="font-medium block mb-1 text-gray-700">{t("Language")}</Text>
             <Select
               value={selectedLanguage}
               onChange={(value) => setSelectedLanguage(value as "curl" | "python" | "javascript")}
@@ -242,20 +244,20 @@ main();`;
           <AntdButton
             onClick={() => {
               navigator.clipboard.writeText(generatedCode);
-              NotificationsManager.success("Copied to clipboard!");
+              NotificationsManager.success(t("Copied to clipboard!"));
             }}
           >
-            Copy to Clipboard
+            {t("Copy to Clipboard")}
           </AntdButton>
         </div>
 
-        <Tabs 
+        <Tabs
           activeKey={selectedTab}
           onChange={setSelectedTab}
           items={[
-            { label: "Basic", key: "basic" },
-            { label: "With Messages", key: "messages" },
-            { label: "With Version", key: "version" },
+            { label: t("Basic"), key: "basic" },
+            { label: t("With Messages"), key: "messages" },
+            { label: t("With Version"), key: "version" },
           ]}
         />
 

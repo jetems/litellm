@@ -13,19 +13,21 @@ import ConversationPanel from "./conversation_panel";
 import PublishModal from "./PublishModal";
 import DotpromptViewTab from "./DotpromptViewTab";
 import VersionHistorySidePanel from "./VersionHistorySidePanel";
+import { useTranslate } from "@/i18n";
 
 const PromptEditorView: React.FC<PromptEditorViewProps> = ({ onClose, onSuccess, accessToken, initialPromptData }) => {
+  const t = useTranslate();
   const getInitialPrompt = (): PromptType => {
     if (initialPromptData) {
       try {
         return parseExistingPrompt(initialPromptData);
       } catch (error) {
         console.error("Error parsing existing prompt:", error);
-        NotificationsManager.fromBackend("Failed to parse prompt data");
+        NotificationsManager.fromBackend(t("Failed to parse prompt data"));
       }
     }
     return {
-      name: "New prompt",
+      name: t("New prompt"),
       model: "gpt-4o",
       config: {
         temperature: 1,
@@ -36,7 +38,7 @@ const PromptEditorView: React.FC<PromptEditorViewProps> = ({ onClose, onSuccess,
       messages: [
         {
           role: "user",
-          content: "Enter task specifics. Use {{template_variables}} for dynamic inputs",
+          content: t("Enter task specifics. Use {{template_variables}} for dynamic inputs"),
         },
       ],
     };
@@ -45,27 +47,27 @@ const PromptEditorView: React.FC<PromptEditorViewProps> = ({ onClose, onSuccess,
   const [prompt, setPrompt] = useState<PromptType>(getInitialPrompt());
   const [editMode, setEditMode] = useState<boolean>(!!initialPromptData);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
-  
+
   // Construct versioned ID from prompt_id and version field
   const getInitialVersionId = () => {
     if (!initialPromptData?.prompt_spec) return undefined;
     const baseId = initialPromptData.prompt_spec.prompt_id;
-    const version = initialPromptData.prompt_spec.version || 
-                   (initialPromptData.prompt_spec.litellm_params as any)?.prompt_id;
-    
+    const version = initialPromptData.prompt_spec.version ||
+      (initialPromptData.prompt_spec.litellm_params as any)?.prompt_id;
+
     // If version is a number, construct versioned ID
     if (typeof version === 'number') {
       return `${baseId}.v${version}`;
     }
-    
+
     // If version is a string with version suffix, use it
     if (typeof version === 'string' && (version.includes('.v') || version.includes('_v'))) {
       return version;
     }
-    
+
     return baseId;
   };
-  
+
   const [activeVersionId, setActiveVersionId] = useState<string | undefined>(getInitialVersionId());
 
   const [showToolModal, setShowToolModal] = useState(false);
@@ -141,7 +143,7 @@ const PromptEditorView: React.FC<PromptEditorViewProps> = ({ onClose, onSuccess,
       setShowToolModal(false);
       setEditingToolIndex(null);
     } catch (error) {
-      NotificationsManager.fromBackend("Invalid JSON format");
+      NotificationsManager.fromBackend(t("Invalid JSON format"));
     }
   };
 
@@ -171,7 +173,7 @@ const PromptEditorView: React.FC<PromptEditorViewProps> = ({ onClose, onSuccess,
       // NotificationsManager.success(`Loaded version v${versionNum}`);
     } catch (error) {
       console.error("Error loading version:", error);
-      NotificationsManager.fromBackend("Failed to load prompt version");
+      NotificationsManager.fromBackend(t("Failed to load prompt version"));
     }
   };
 
@@ -185,12 +187,12 @@ const PromptEditorView: React.FC<PromptEditorViewProps> = ({ onClose, onSuccess,
 
   const handleSave = async () => {
     if (!accessToken) {
-      NotificationsManager.fromBackend("Access token is required");
+      NotificationsManager.fromBackend(t("Access token is required"));
       return;
     }
 
     if (!prompt.name || prompt.name.trim() === "") {
-      NotificationsManager.fromBackend("Please enter a valid prompt name");
+      NotificationsManager.fromBackend(t("Please enter a valid prompt name"));
       return;
     }
 
@@ -213,16 +215,16 @@ const PromptEditorView: React.FC<PromptEditorViewProps> = ({ onClose, onSuccess,
 
       if (editMode && initialPromptData?.prompt_spec?.prompt_id) {
         await updatePromptCall(accessToken, initialPromptData.prompt_spec.prompt_id, promptData);
-        NotificationsManager.success("Prompt updated successfully!");
+        NotificationsManager.success(t("Prompt updated successfully!"));
       } else {
         await createPromptCall(accessToken, promptData);
-        NotificationsManager.success("Prompt created successfully!");
+        NotificationsManager.success(t("Prompt created successfully!"));
       }
       onSuccess();
       onClose();
     } catch (error) {
       console.error("Error saving prompt:", error);
-      NotificationsManager.fromBackend(editMode ? "Failed to update prompt" : "Failed to save prompt");
+      NotificationsManager.fromBackend(editMode ? t("Failed to update prompt") : t("Failed to save prompt"));
     } finally {
       setIsSaving(false);
       setShowNameModal(false);
@@ -246,7 +248,7 @@ const PromptEditorView: React.FC<PromptEditorViewProps> = ({ onClose, onSuccess,
       prompt.developerMessage,
       ...prompt.messages.map(m => m.content)
     ].join(' ');
-    
+
     const variableRegex = /\{\{(\w+)\}\}/g;
     let match;
     while ((match = variableRegex.exec(allContent)) !== null) {
@@ -300,20 +302,18 @@ const PromptEditorView: React.FC<PromptEditorViewProps> = ({ onClose, onSuccess,
 
               <div className="ml-auto inline-flex items-center bg-gray-200 rounded-full p-0.5">
                 <button
-                  className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
-                    viewMode === "pretty" ? "bg-white text-gray-900 shadow-sm" : "text-gray-600"
-                  }`}
+                  className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${viewMode === "pretty" ? "bg-white text-gray-900 shadow-sm" : "text-gray-600"
+                    }`}
                   onClick={() => setViewMode("pretty")}
                 >
-                  PRETTY
+                  {t("PRETTY")}
                 </button>
                 <button
-                  className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
-                    viewMode === "dotprompt" ? "bg-white text-gray-900 shadow-sm" : "text-gray-600"
-                  }`}
+                  className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${viewMode === "dotprompt" ? "bg-white text-gray-900 shadow-sm" : "text-gray-600"
+                    }`}
                   onClick={() => setViewMode("dotprompt")}
                 >
-                  DOTPROMPT
+                  {t("DOTPROMPT")}
                 </button>
               </div>
             </div>

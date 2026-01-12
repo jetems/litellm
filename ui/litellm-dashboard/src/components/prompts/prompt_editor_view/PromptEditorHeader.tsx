@@ -3,6 +3,7 @@ import { Button as TremorButton } from "@tremor/react";
 import { Input } from "antd";
 import { ArrowLeftIcon, SaveIcon, ClockIcon } from "lucide-react";
 import PromptCodeSnippets from "./PromptCodeSnippets";
+import { useTranslate } from "@/i18n";
 
 interface PromptEditorHeaderProps {
   promptName: string;
@@ -36,11 +37,12 @@ const PromptEditorHeader: React.FC<PromptEditorHeaderProps> = ({
   accessToken,
   proxySettings,
 }) => {
+  const t = useTranslate();
   return (
     <div className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
       <div className="flex items-center space-x-3">
         <TremorButton icon={ArrowLeftIcon} variant="light" onClick={onBack} size="xs">
-          Back
+          {t("Back")}
         </TremorButton>
         <Input
           value={promptName}
@@ -53,8 +55,8 @@ const PromptEditorHeader: React.FC<PromptEditorHeaderProps> = ({
             {version}
           </span>
         )}
-        <span className="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded">Draft</span>
-        <span className="text-xs text-gray-400">Unsaved changes</span>
+        <span className="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded">{t("Draft")}</span>
+        <span className="text-xs text-gray-400">{t("Unsaved changes")}</span>
       </div>
       <div className="flex items-center space-x-2">
         <PromptCodeSnippets
@@ -71,7 +73,7 @@ const PromptEditorHeader: React.FC<PromptEditorHeaderProps> = ({
             variant="secondary"
             onClick={onShowHistory}
           >
-            History
+            {t("History")}
           </TremorButton>
         )}
         <TremorButton
@@ -80,7 +82,7 @@ const PromptEditorHeader: React.FC<PromptEditorHeaderProps> = ({
           loading={isSaving}
           disabled={isSaving}
         >
-          {editMode ? "Update" : "Save"}
+          {editMode ? t("Update") : t("Save")}
         </TremorButton>
       </div>
     </div>

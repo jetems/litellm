@@ -2,6 +2,7 @@ import React from "react";
 import { ArrowUpOutlined } from "@ant-design/icons";
 import { Button as TremorButton } from "@tremor/react";
 import { Input } from "antd";
+import { useTranslate } from "@/i18n";
 
 const { TextArea } = Input;
 
@@ -24,6 +25,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
   onKeyDown,
   onCancel,
 }) => {
+  const t = useTranslate();
   return (
     <div className="flex items-center gap-2">
       <div className="flex items-center flex-1 bg-white border border-gray-300 rounded-xl px-3 py-1 min-h-[44px]">
@@ -31,7 +33,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
           value={inputMessage}
           onChange={(e) => onInputChange(e.target.value)}
           onKeyDown={onKeyDown}
-          placeholder="Type your message... (Shift+Enter for new line)"
+          placeholder={t("Type your message... (Shift+Enter for new line)")}
           disabled={isLoading}
           className="flex-1"
           autoSize={{ minRows: 1, maxRows: 4 }}
@@ -60,7 +62,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
           onClick={onCancel}
           className="bg-red-50 hover:bg-red-100 text-red-600 border-red-200"
         >
-          Cancel
+          {t("Cancel")}
         </TremorButton>
       )}
     </div>

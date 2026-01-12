@@ -14,6 +14,7 @@ import {
 } from "@tanstack/react-table";
 import { getProviderLogoAndName } from "@/components/provider_info_helpers";
 import { extractModel, getProviderFromModelHub } from "./prompt_utils";
+import { useTranslate } from "@/i18n";
 
 interface PromptTableProps {
   promptsList: PromptSpec[];
@@ -38,13 +39,14 @@ const PromptTable: React.FC<PromptTableProps> = ({
   accessToken,
   isAdmin,
 }) => {
+  const t = useTranslate();
   const [sorting, setSorting] = useState<SortingState>([{ id: "created_at", desc: true }]);
   const [modelHubData, setModelHubData] = useState<Map<string, ModelGroupInfo>>(new Map());
 
   useEffect(() => {
     const fetchModelHubData = async () => {
       if (!accessToken) return;
-      
+
       try {
         const response = await modelHubCall(accessToken);
         if (response?.data) {
@@ -75,7 +77,7 @@ const PromptTable: React.FC<PromptTableProps> = ({
 
   const columns: ColumnDef<PromptSpec>[] = [
     {
-      header: "Prompt ID",
+      header: t("Prompt ID"),
       accessorKey: "prompt_id",
       cell: (info: any) => {
         const fullId = String(info.getValue() || "");
@@ -92,7 +94,7 @@ const PromptTable: React.FC<PromptTableProps> = ({
                 {displayId}
               </Button>
             </Tooltip>
-            <Tooltip title="Copy prompt ID">
+            <Tooltip title={t("Copy prompt ID")}>
               <CopyOutlined
                 onClick={(e) => {
                   e.stopPropagation();
@@ -106,27 +108,27 @@ const PromptTable: React.FC<PromptTableProps> = ({
       },
     },
     {
-      header: "Model",
+      header: t("Model"),
       accessorKey: "model",
       cell: ({ row }) => {
         const prompt = row.original;
         const model = extractModel(prompt);
-        
+
         if (!model) {
           return <span className="text-xs text-gray-400">-</span>;
         }
-        
+
         const provider = getProviderFromModelHub(model, modelHubData);
         const { logo } = getProviderLogoAndName(provider || "");
-        
+
         return (
           <Tooltip title={model}>
             <div className="flex items-center space-x-2">
               {/* Provider Icon */}
               <div className="flex-shrink-0">
                 {provider && logo ? (
-                  <img 
-                    src={logo} 
+                  <img
+                    src={logo}
                     alt={`${provider} logo`}
                     className="w-4 h-4"
                     onError={(e) => {
@@ -152,7 +154,7 @@ const PromptTable: React.FC<PromptTableProps> = ({
                   </div>
                 )}
               </div>
-              
+
               {/* Model Name */}
               <span className="max-w-[15ch] truncate block">{model}</span>
             </div>
@@ -161,7 +163,7 @@ const PromptTable: React.FC<PromptTableProps> = ({
       },
     },
     {
-      header: "Created At",
+      header: t("Created At"),
       accessorKey: "created_at",
       cell: ({ row }) => {
         const prompt = row.original;
@@ -173,7 +175,7 @@ const PromptTable: React.FC<PromptTableProps> = ({
       },
     },
     {
-      header: "Updated At",
+      header: t("Updated At"),
       accessorKey: "updated_at",
       cell: ({ row }) => {
         const prompt = row.original;
@@ -185,7 +187,7 @@ const PromptTable: React.FC<PromptTableProps> = ({
       },
     },
     {
-      header: "Type",
+      header: t("Type"),
       accessorKey: "prompt_info.prompt_type",
       cell: ({ row }) => {
         const prompt = row.original;
@@ -198,34 +200,34 @@ const PromptTable: React.FC<PromptTableProps> = ({
     },
     ...(isAdmin
       ? [
-          {
-            header: "Actions",
-            id: "actions",
-            enableSorting: false,
-            cell: ({ row }: any) => {
-              const prompt = row.original;
-              const promptName = prompt.prompt_id || "Unknown Prompt";
+        {
+          header: t("Actions"),
+          id: "actions",
+          enableSorting: false,
+          cell: ({ row }: any) => {
+            const prompt = row.original;
+            const promptName = prompt.prompt_id || "Unknown Prompt";
 
-              return (
-                <div className="flex items-center gap-1">
-                  <Tooltip title="Delete prompt">
-                    <Button
-                      size="xs"
-                      variant="light"
-                      color="red"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDeleteClick?.(prompt.prompt_id, promptName);
-                      }}
-                      icon={TrashIcon}
-                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                    />
-                  </Tooltip>
-                </div>
-              );
-            },
+            return (
+              <div className="flex items-center gap-1">
+                <Tooltip title={t("Delete prompt")}>
+                  <Button
+                    size="xs"
+                    variant="light"
+                    color="red"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteClick?.(prompt.prompt_id, promptName);
+                    }}
+                    icon={TrashIcon}
+                    className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                  />
+                </Tooltip>
+              </div>
+            );
           },
-        ]
+        },
+      ]
       : []),
   ];
 
@@ -279,7 +281,7 @@ const PromptTable: React.FC<PromptTableProps> = ({
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-8 text-center">
                   <div className="text-center text-gray-500">
-                    <p>Loading...</p>
+                    <p>{t("Loading...")}</p>
                   </div>
                 </TableCell>
               </TableRow>
@@ -297,7 +299,7 @@ const PromptTable: React.FC<PromptTableProps> = ({
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-8 text-center">
                   <div className="text-center text-gray-500">
-                    <p>No prompts found</p>
+                    <p>{t("No prompts found")}</p>
                   </div>
                 </TableCell>
               </TableRow>

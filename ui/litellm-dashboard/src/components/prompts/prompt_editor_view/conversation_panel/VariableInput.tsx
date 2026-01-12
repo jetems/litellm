@@ -1,5 +1,6 @@
 import React from "react";
 import { Input } from "antd";
+import { useTranslate } from "@/i18n";
 
 interface VariableInputProps {
   extractedVariables: string[];
@@ -12,6 +13,7 @@ const VariableInput: React.FC<VariableInputProps> = ({
   variables,
   onVariableChange,
 }) => {
+  const t = useTranslate();
   if (extractedVariables.length === 0) {
     return null;
   }
@@ -19,7 +21,7 @@ const VariableInput: React.FC<VariableInputProps> = ({
   return (
     <div className="p-4 border-b border-gray-200 bg-blue-50">
       <h3 className="text-sm font-semibold text-gray-700 mb-3">
-        Fill in template variables to start testing
+        {t("Fill in template variables to start testing")}
       </h3>
       <div className="space-y-2">
         {extractedVariables.map((varName) => (
@@ -30,7 +32,7 @@ const VariableInput: React.FC<VariableInputProps> = ({
             <Input
               value={variables[varName] || ""}
               onChange={(e) => onVariableChange(varName, e.target.value)}
-              placeholder={`Enter value for ${varName}`}
+              placeholder={`${t("Enter value for")} ${varName}`}
               size="small"
             />
           </div>

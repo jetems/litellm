@@ -1,6 +1,7 @@
 import { Drawer, List, Skeleton, Tag, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import { getPromptVersions, PromptSpec } from "../../networking";
+import { useTranslate } from "@/i18n";
 
 const { Text } = Typography;
 
@@ -21,6 +22,7 @@ const VersionHistorySidePanel: React.FC<VersionHistorySidePanelProps> = ({
   activeVersionId,
   onSelectVersion,
 }) => {
+  const t = useTranslate();
   const [versions, setVersions] = useState<PromptSpec[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -49,7 +51,7 @@ const VersionHistorySidePanel: React.FC<VersionHistorySidePanelProps> = ({
     if (prompt.version) {
       return `v${prompt.version}`;
     }
-    
+
     // Fallback: try to extract from litellm_params.prompt_id
     const versionedId = (prompt.litellm_params as any)?.prompt_id || prompt.prompt_id;
     if (versionedId.includes(".v")) {
@@ -68,7 +70,7 @@ const VersionHistorySidePanel: React.FC<VersionHistorySidePanelProps> = ({
 
   return (
     <Drawer
-      title="Version History"
+      title={t("Version History")}
       placement="right"
       onClose={onClose}
       open={isOpen}
@@ -79,14 +81,14 @@ const VersionHistorySidePanel: React.FC<VersionHistorySidePanelProps> = ({
       {loading ? (
         <Skeleton active paragraph={{ rows: 4 }} />
       ) : versions.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">No version history available.</div>
+        <div className="text-center py-8 text-gray-500">{t("No version history available.")}</div>
       ) : (
         <List
           dataSource={versions}
           renderItem={(item, index) => {
             // Use version field for comparison since all items have the same prompt_id
             const itemVersionNum = item.version || parseInt(getVersionNumber(item).replace('v', ''));
-            
+
             // Extract version number from activeVersionId (may have .vX suffix)
             let activeVersionNum: number | null = null;
             if (activeVersionId) {
@@ -96,16 +98,15 @@ const VersionHistorySidePanel: React.FC<VersionHistorySidePanelProps> = ({
                 activeVersionNum = parseInt(activeVersionId.split('_v')[1]);
               }
             }
-            
+
             // Default to latest (first item) if no activeVersionId
             const isSelected = activeVersionNum ? itemVersionNum === activeVersionNum : index === 0;
-            
+
             return (
               <div
                 key={`${item.prompt_id}-v${item.version || itemVersionNum}`}
-                className={`mb-4 p-4 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
-                  isSelected ? "border-blue-500 bg-blue-50" : "border-gray-200 bg-white hover:border-blue-300"
-                }`}
+                className={`mb-4 p-4 rounded-lg border cursor-pointer transition-all hover:shadow-md ${isSelected ? "border-blue-500 bg-blue-50" : "border-gray-200 bg-white hover:border-blue-300"
+                  }`}
                 onClick={() => onSelectVersion?.(item)}
               >
                 <div className="flex justify-between items-start mb-2">
@@ -113,11 +114,11 @@ const VersionHistorySidePanel: React.FC<VersionHistorySidePanelProps> = ({
                     <Tag className="m-0">
                       {getVersionNumber(item)}
                     </Tag>
-                    {index === 0 && <Tag color="blue" className="m-0">Latest</Tag>}
+                    {index === 0 && <Tag color="blue" className="m-0">{t("Latest")}</Tag>}
                   </div>
                   {isSelected && (
                     <Tag color="green" className="m-0">
-                      Active
+                      {t("Active")}
                     </Tag>
                   )}
                 </div>
@@ -125,7 +126,7 @@ const VersionHistorySidePanel: React.FC<VersionHistorySidePanelProps> = ({
                 <div className="flex flex-col gap-1">
                   <Text className="text-sm text-gray-600 font-medium">{formatDate(item.created_at)}</Text>
                   <Text type="secondary" className="text-xs">
-                    {item.prompt_info?.prompt_type === "db" ? "Saved to Database" : "Config Prompt"}
+                    {item.prompt_info?.prompt_type === "db" ? t("Saved to Database") : t("Config Prompt")}
                   </Text>
                 </div>
               </div>
