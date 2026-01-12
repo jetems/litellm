@@ -25,7 +25,7 @@ import { adminGlobalCacheActivity, cachingHealthCheckCall } from "./networking";
 // Import the new component
 import { CacheHealthTab } from "./cache_health";
 import CacheSettings from "./cache_settings";
-import { useTranslate } from "@/i18n";
+import { useTranslate, useI18n } from "@/i18n";
 import { T } from "@/i18n";
 
 const formatDateWithoutTZ = (date: Date | undefined) => {
@@ -100,6 +100,7 @@ const deepParse = (input: any) => {
 
 const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole, userID, premiumUser }) => {
   const t = useTranslate();
+  const { locale } = useI18n();
   const [filteredData, setFilteredData] = useState<uiData[]>([]);
   const [selectedApiKeys, setSelectedApiKeys] = useState<string[]>([]);
   const [selectedModels, setSelectedModels] = useState<string[]>([]);
@@ -131,8 +132,9 @@ const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole
     fetchData();
 
     const currentDate = new Date();
-    setLastRefreshed(currentDate.toLocaleString());
-  }, [accessToken]);
+    const jsLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
+    setLastRefreshed(currentDate.toLocaleString(jsLocale));
+  }, [accessToken, locale]);
 
   const uniqueApiKeys = Array.from(new Set(data.map((item) => item?.api_key ?? "")));
   const uniqueModels = Array.from(new Set(data.map((item) => item?.model ?? "")));
@@ -237,7 +239,8 @@ const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole
   const handleRefreshClick = () => {
     // Update the 'lastRefreshed' state to the current date and time
     const currentDate = new Date();
-    setLastRefreshed(currentDate.toLocaleString());
+    const jsLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
+    setLastRefreshed(currentDate.toLocaleString(jsLocale));
   };
 
   const runCachingHealthCheck = async () => {

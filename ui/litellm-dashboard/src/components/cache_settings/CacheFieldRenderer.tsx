@@ -2,6 +2,7 @@
 
 import useAuthorized from "@/app/(dashboard)/hooks/useAuthorized";
 import { NumberInput, TextInput } from "@tremor/react";
+import { useTranslate } from "@/i18n";
 import { Select } from "antd";
 import React, { useEffect, useState } from "react";
 import { fetchAvailableModels, ModelGroup } from "../playground/llm_calls/fetch_models";
@@ -13,6 +14,7 @@ interface CacheFieldRendererProps {
 }
 
 const CacheFieldRenderer: React.FC<CacheFieldRendererProps> = ({ field, currentValue }) => {
+  const t = useTranslate();
   const [modelInfo, setModelInfo] = useState<ModelGroup[]>([]);
   const [selectedModel, setSelectedModel] = useState<string>(currentValue || "");
   const { accessToken } = useAuthorized();
@@ -39,7 +41,7 @@ const CacheFieldRenderer: React.FC<CacheFieldRendererProps> = ({ field, currentV
   if (field.field_type === "Boolean") {
     return (
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">{field.ui_field_name}</label>
+        <label className="text-sm font-medium text-gray-700">{t(field.ui_field_name)}</label>
         <div className="flex items-center">
           <input
             type="checkbox"
@@ -47,7 +49,7 @@ const CacheFieldRenderer: React.FC<CacheFieldRendererProps> = ({ field, currentV
             defaultChecked={currentValue === true || currentValue === "true"}
             className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
           />
-          <span className="ml-2 text-sm text-gray-500">{field.field_description}</span>
+          <span className="ml-2 text-sm text-gray-500">{t(field.field_description)}</span>
         </div>
       </div>
     );
@@ -56,14 +58,14 @@ const CacheFieldRenderer: React.FC<CacheFieldRendererProps> = ({ field, currentV
   if (field.field_type === "Integer" || field.field_type === "Float") {
     return (
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">{field.ui_field_name}</label>
+        <label className="text-sm font-medium text-gray-700">{t(field.ui_field_name)}</label>
         <NumericalInput
           name={field.field_name}
           type="number"
           defaultValue={currentValue}
-          placeholder={field.field_description}
+          placeholder={t(field.field_description)}
         />
-        <p className="text-xs text-gray-500">{field.field_description}</p>
+        <p className="text-xs text-gray-500">{t(field.field_description)}</p>
       </div>
     );
   }
@@ -71,15 +73,15 @@ const CacheFieldRenderer: React.FC<CacheFieldRendererProps> = ({ field, currentV
   if (field.field_type === "List") {
     return (
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">{field.ui_field_name}</label>
+        <label className="text-sm font-medium text-gray-700">{t(field.ui_field_name)}</label>
         <textarea
           name={field.field_name}
           defaultValue={typeof currentValue === "object" ? JSON.stringify(currentValue, null, 2) : currentValue}
-          placeholder={field.field_description}
+          placeholder={t(field.field_description)}
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
           rows={4}
         />
-        <p className="text-xs text-gray-500">{field.field_description}</p>
+        <p className="text-xs text-gray-500">{t(field.field_description)}</p>
       </div>
     );
   }
@@ -94,12 +96,12 @@ const CacheFieldRenderer: React.FC<CacheFieldRendererProps> = ({ field, currentV
 
     return (
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">{field.ui_field_name}</label>
+        <label className="text-sm font-medium text-gray-700">{t(field.ui_field_name)}</label>
         <Select
           value={selectedModel}
           onChange={setSelectedModel}
           showSearch={true}
-          placeholder="Search and select a model..."
+          placeholder={t("Search and select a model...")}
           options={embeddingModels}
           style={{ width: "100%" }}
           className="rounded-md"
@@ -107,7 +109,7 @@ const CacheFieldRenderer: React.FC<CacheFieldRendererProps> = ({ field, currentV
         />
         {/* Hidden input to capture the value for form submission */}
         <input type="hidden" name={field.field_name} value={selectedModel} />
-        {field.field_description && <p className="text-xs text-gray-500">{field.field_description}</p>}
+        {field.field_description && <p className="text-xs text-gray-500">{t(field.field_description)}</p>}
       </div>
     );
   }
@@ -116,14 +118,14 @@ const CacheFieldRenderer: React.FC<CacheFieldRendererProps> = ({ field, currentV
   if (field.field_type === "Integer" || field.field_type === "Float") {
     return (
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">{field.ui_field_name}</label>
+        <label className="text-sm font-medium text-gray-700">{t(field.ui_field_name)}</label>
         <NumberInput
           name={field.field_name}
           defaultValue={currentValue}
-          placeholder={field.field_description}
+          placeholder={t(field.field_description)}
           step={field.field_type === "Float" ? 0.01 : 1}
         />
-        {field.field_description && <p className="text-xs text-gray-500">{field.field_description}</p>}
+        {field.field_description && <p className="text-xs text-gray-500">{t(field.field_description)}</p>}
       </div>
     );
   }
@@ -134,14 +136,14 @@ const CacheFieldRenderer: React.FC<CacheFieldRendererProps> = ({ field, currentV
 
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium text-gray-700">{field.ui_field_name}</label>
+      <label className="text-sm font-medium text-gray-700">{t(field.ui_field_name)}</label>
       <TextInput
         name={field.field_name}
         type={inputType}
         defaultValue={currentValue}
-        placeholder={field.field_description}
+        placeholder={t(field.field_description)}
       />
-      {field.field_description && <p className="text-xs text-gray-500">{field.field_description}</p>}
+      {field.field_description && <p className="text-xs text-gray-500">{t(field.field_description)}</p>}
     </div>
   );
 };

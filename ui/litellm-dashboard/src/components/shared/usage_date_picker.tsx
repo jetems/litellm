@@ -1,6 +1,8 @@
 import React, { useCallback, useState, useRef } from "react";
 import { DateRangePicker, DateRangePickerValue, Text } from "@tremor/react";
-import { useTranslate } from "@/i18n";
+import { useTranslate, useI18n } from "@/i18n";
+import { zhCN, enUS } from "date-fns/locale";
+import { subDays, startOfMonth, startOfYear, startOfToday, endOfDay } from "date-fns";
 
 interface UsageDatePickerProps {
   value: DateRangePickerValue;
@@ -16,11 +18,51 @@ interface UsageDatePickerProps {
 const UsageDatePicker: React.FC<UsageDatePickerProps> = ({
   value,
   onValueChange,
-  label = "Select Time Range",
+  label,
   className = "",
   showTimeRange = true,
 }) => {
   const t = useTranslate();
+  const { locale } = useI18n();
+
+  const presets = [
+    {
+      label: t("Today"),
+      dateRange: {
+        from: startOfToday(),
+        to: endOfDay(new Date()),
+      },
+    },
+    {
+      label: t("Last 7 days"),
+      dateRange: {
+        from: subDays(new Date(), 7),
+        to: new Date(),
+      },
+    },
+    {
+      label: t("Last 30 days"),
+      dateRange: {
+        from: subDays(new Date(), 30),
+        to: new Date(),
+      },
+    },
+    {
+      label: t("Month to Date"),
+      dateRange: {
+        from: startOfMonth(new Date()),
+        to: new Date(),
+      },
+    },
+    {
+      label: t("Year to Date"),
+      dateRange: {
+        from: startOfYear(new Date()),
+        to: new Date(),
+      },
+    },
+  ];
+
   const displayLabel = label ?? t("Select Time Range");
   const [showSelectedFeedback, setShowSelectedFeedback] = useState(false);
   const datePickerRef = useRef<HTMLDivElement>(null);
@@ -75,13 +117,15 @@ const UsageDatePicker: React.FC<UsageDatePickerProps> = ({
   const formatTimeRange = useCallback((from: Date | undefined, to: Date | undefined) => {
     if (!from || !to) return "";
 
+    const jsLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
+
     const formatDateTime = (date: Date) => {
-      return date.toLocaleString("en-US", {
+      return date.toLocaleString(jsLocale, {
         month: "short",
         day: "numeric",
         hour: "2-digit",
         minute: "2-digit",
-        hour12: true,
+        hour12: locale !== "zh-CN",
         timeZoneName: "short",
       });
     };
@@ -89,27 +133,27 @@ const UsageDatePicker: React.FC<UsageDatePickerProps> = ({
     const isSameDay = from.toDateString() === to.toDateString();
 
     if (isSameDay) {
-      const dateStr = from.toLocaleDateString("en-US", {
+      const dateStr = from.toLocaleDateString(jsLocale, {
         month: "short",
         day: "numeric",
         year: "numeric",
       });
-      const startTime = from.toLocaleTimeString("en-US", {
+      const startTime = from.toLocaleTimeString(jsLocale, {
         hour: "2-digit",
         minute: "2-digit",
-        hour12: true,
+        hour12: locale !== "zh-CN",
       });
-      const endTime = to.toLocaleTimeString("en-US", {
+      const endTime = to.toLocaleTimeString(jsLocale, {
         hour: "2-digit",
         minute: "2-digit",
-        hour12: true,
+        hour12: locale !== "zh-CN",
         timeZoneName: "short",
       });
       return `${dateStr}: ${startTime} - ${endTime}`;
     } else {
       return `${formatDateTime(from)} - ${formatDateTime(to)}`;
     }
-  }, []);
+  }, [locale]);
 
   return (
     <div className={className}>
@@ -125,6 +169,10 @@ const UsageDatePicker: React.FC<UsageDatePickerProps> = ({
             placeholder={t("Select date range")}
             enableClear={false}
             style={{ zIndex: 100 }}
+            locale={locale === "zh-CN" ? zhCN : enUS}
+            selectPlaceholder={t("Select range")}
+            // @ts-ignore
+            presets={presets}
           />
         </div>
 
