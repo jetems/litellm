@@ -9,6 +9,7 @@ import NotificationsManager from "../molecules/notifications_manager";
 import { useQuery } from "@tanstack/react-query";
 import SearchConnectionTest from "./search_connection_test";
 import Image from "next/image";
+import { useTranslate } from "@/i18n";
 
 const { TextArea } = Input;
 
@@ -60,6 +61,7 @@ const CreateSearchTool: React.FC<CreateSearchToolProps> = ({
   isModalVisible,
   setModalVisible,
 }) => {
+  const t = useTranslate();
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
   const [formValues, setFormValues] = useState<Record<string, any>>({});
@@ -97,8 +99,8 @@ const CreateSearchTool: React.FC<CreateSearchToolProps> = ({
         },
         search_tool_info: formValues.description
           ? {
-              description: formValues.description,
-            }
+            description: formValues.description,
+          }
           : undefined,
       };
 
@@ -107,14 +109,14 @@ const CreateSearchTool: React.FC<CreateSearchToolProps> = ({
       if (accessToken != null) {
         const response = await createSearchTool(accessToken, payload);
 
-        NotificationsManager.success("Search tool created successfully");
+        NotificationsManager.success(t("Search tool created successfully"));
         form.resetFields();
         setFormValues({});
         setModalVisible(false);
         onCreateSuccess(response);
       }
     } catch (error) {
-      NotificationsManager.error("Error creating search tool: " + error);
+      NotificationsManager.error(t("Error creating search tool: ") + error);
     } finally {
       setIsLoading(false);
     }
@@ -130,14 +132,14 @@ const CreateSearchTool: React.FC<CreateSearchToolProps> = ({
     try {
       // Validate required fields for testing
       await form.validateFields(["search_provider", "api_key"]);
-      
+
       setIsTestingConnection(true);
       // Generate a new test ID (using timestamp for uniqueness)
       setConnectionTestId(`test-${Date.now()}`);
       // Show the modal with the fresh test
       setIsTestModalVisible(true);
     } catch (error) {
-      NotificationsManager.error("Please fill in Search Provider and API Key before testing");
+      NotificationsManager.error(t("Please fill in Search Provider and API Key before testing"));
     }
   };
 
@@ -157,7 +159,7 @@ const CreateSearchTool: React.FC<CreateSearchToolProps> = ({
       title={
         <div className="flex items-center space-x-3 pb-4 border-b border-gray-100">
           <span className="text-2xl">🔍</span>
-          <h2 className="text-xl font-semibold text-gray-900">Add New Search Tool</h2>
+          <h2 className="text-xl font-semibold text-gray-900">{t("Add New Search Tool")}</h2>
         </div>
       }
       open={isModalVisible}
@@ -182,23 +184,23 @@ const CreateSearchTool: React.FC<CreateSearchToolProps> = ({
             <Form.Item
               label={
                 <span className="text-sm font-medium text-gray-700 flex items-center">
-                  Search Tool Name
-                  <Tooltip title="A unique name to identify this search tool configuration (e.g., 'perplexity-search', 'tavily-news-search').">
+                  {t("Search Tool Name")}
+                  <Tooltip title={t("A unique name to identify this search tool configuration (e.g., 'perplexity-search', 'tavily-news-search').")}>
                     <InfoCircleOutlined className="ml-2 text-blue-400 hover:text-blue-600 cursor-help" />
                   </Tooltip>
                 </span>
               }
               name="search_tool_name"
               rules={[
-                { required: true, message: "Please enter a search tool name" },
+                { required: true, message: t("Please enter a search tool name") },
                 {
                   pattern: /^[a-zA-Z0-9_-]+$/,
-                  message: "Name can only contain letters, numbers, hyphens, and underscores",
+                  message: t("Name can only contain letters, numbers, hyphens, and underscores"),
                 },
               ]}
             >
               <TextInput
-                placeholder="e.g., perplexity-search, my-tavily-tool"
+                placeholder={t("e.g., perplexity-search, my-tavily-tool")}
                 className="rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500"
               />
             </Form.Item>
@@ -206,17 +208,17 @@ const CreateSearchTool: React.FC<CreateSearchToolProps> = ({
             <Form.Item
               label={
                 <span className="text-sm font-medium text-gray-700 flex items-center">
-                  Search Provider
-                  <Tooltip title="Select the search provider you want to use. Each provider has different capabilities and pricing.">
+                  {t("Search Provider")}
+                  <Tooltip title={t("Select the search provider you want to use. Each provider has different capabilities and pricing.")}>
                     <InfoCircleOutlined className="ml-2 text-blue-400 hover:text-blue-600 cursor-help" />
                   </Tooltip>
                 </span>
               }
               name="search_provider"
-              rules={[{ required: true, message: "Please select a search provider" }]}
+              rules={[{ required: true, message: t("Please select a search provider") }]}
             >
               <Select
-                placeholder="Select a search provider"
+                placeholder={t("Select a search provider")}
                 className="rounded-lg"
                 size="large"
                 loading={isLoadingProviders}
@@ -225,8 +227,8 @@ const CreateSearchTool: React.FC<CreateSearchToolProps> = ({
                 optionLabelProp="label"
               >
                 {availableProviders.map((provider) => (
-                  <Select.Option 
-                    key={provider.provider_name} 
+                  <Select.Option
+                    key={provider.provider_name}
                     value={provider.provider_name}
                     label={
                       <SearchProviderLabel
@@ -247,29 +249,29 @@ const CreateSearchTool: React.FC<CreateSearchToolProps> = ({
             <Form.Item
               label={
                 <span className="text-sm font-medium text-gray-700 flex items-center">
-                  API Key
-                  <Tooltip title="The API key for authenticating with the search provider. This will be securely stored.">
+                  {t("API Key")}
+                  <Tooltip title={t("The API key for authenticating with the search provider. This will be securely stored.")}>
                     <InfoCircleOutlined className="ml-2 text-blue-400 hover:text-blue-600 cursor-help" />
                   </Tooltip>
                 </span>
               }
               name="api_key"
-              rules={[{ required: false, message: "Please enter an API key" }]}
+              rules={[{ required: false, message: t("Please enter an API key") }]}
             >
               <TextInput
                 type="password"
-                placeholder="Enter your API key"
+                placeholder={t("Enter your API key")}
                 className="rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500"
               />
             </Form.Item>
 
             <Form.Item
-              label={<span className="text-sm font-medium text-gray-700">Description (Optional)</span>}
+              label={<span className="text-sm font-medium text-gray-700">{t("Description (Optional)")}</span>}
               name="description"
             >
               <TextArea
                 rows={3}
-                placeholder="Brief description of this search tool's purpose"
+                placeholder={t("Brief description of this search tool's purpose")}
                 className="rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500"
               />
             </Form.Item>
@@ -278,15 +280,15 @@ const CreateSearchTool: React.FC<CreateSearchToolProps> = ({
           <div className="flex justify-between items-center pt-6 border-t border-gray-100">
             <Tooltip title="Get help on our github">
               <Typography.Link href="https://github.com/BerriAI/litellm/issues" target="_blank">
-                Need Help?
+                {t("Need Help?")}
               </Typography.Link>
             </Tooltip>
             <div className="space-x-2">
               <Button onClick={handleTestConnection} loading={isTestingConnection}>
-                Test Connection
+                {t("Test Connection")}
               </Button>
               <Button loading={isLoading} type="submit">
-                Add Search Tool
+                {t("Add Search Tool")}
               </Button>
             </div>
           </div>
@@ -295,7 +297,7 @@ const CreateSearchTool: React.FC<CreateSearchToolProps> = ({
 
       {/* Test Connection Results Modal */}
       <Modal
-        title="Connection Test Results"
+        title={t("Connection Test Results")}
         open={isTestModalVisible}
         onCancel={() => {
           setIsTestModalVisible(false);
@@ -309,7 +311,7 @@ const CreateSearchTool: React.FC<CreateSearchToolProps> = ({
               setIsTestingConnection(false);
             }}
           >
-            Close
+            {t("Close")}
           </Button>,
         ]}
         width={700}

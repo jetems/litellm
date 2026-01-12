@@ -15,6 +15,7 @@ import { isAdminRole } from "@/utils/roles";
 import NotificationsManager from "../molecules/notifications_manager";
 import { SearchToolView } from "./search_tool_view";
 import CreateSearchTool from "./create_search_tool";
+import { useTranslate } from "@/i18n";
 
 interface SearchToolsProps {
   accessToken: string | null;
@@ -28,13 +29,14 @@ const DeleteModal: React.FC<{
   confirmDelete: () => void;
   cancelDelete: () => void;
 }> = ({ isModalOpen, title, confirmDelete, cancelDelete }) => {
+  const t = useTranslate();
   if (!isModalOpen) return null;
   return (
     <Modal open={isModalOpen} onOk={confirmDelete} okType="danger" onCancel={cancelDelete}>
       <Grid numItems={1} className="gap-2 w-full">
         <Title>{title}</Title>
         <Col numColSpan={1}>
-          <p>Are you sure you want to delete this search tool?</p>
+          <p>{t("Are you sure you want to delete this search tool?")}</p>
         </Col>
       </Grid>
     </Modal>
@@ -42,6 +44,7 @@ const DeleteModal: React.FC<{
 };
 
 const SearchTools: React.FC<SearchToolsProps> = ({ accessToken, userRole, userID }) => {
+  const t = useTranslate();
   const {
     data: searchTools,
     isLoading: isLoadingTools,
@@ -103,8 +106,9 @@ const SearchTools: React.FC<SearchToolsProps> = ({ accessToken, userRole, userID
         },
         handleDelete,
         availableProviders,
+        t,
       ),
-    [availableProviders, searchTools, form],
+    [availableProviders, searchTools, form, t],
   );
 
   function handleDelete(toolId: string) {
@@ -118,11 +122,11 @@ const SearchTools: React.FC<SearchToolsProps> = ({ accessToken, userRole, userID
     }
     try {
       await deleteSearchTool(accessToken, toolIdToDelete);
-      NotificationsManager.success("Deleted search tool successfully");
+      NotificationsManager.success(t("Deleted search tool successfully"));
       refetch();
     } catch (error) {
       console.error("Error deleting the search tool:", error);
-      NotificationsManager.error("Failed to delete search tool");
+      NotificationsManager.error(t("Failed to delete search tool"));
     }
     setIsDeleteModalOpen(false);
     setToolToDelete(null);
@@ -158,14 +162,14 @@ const SearchTools: React.FC<SearchToolsProps> = ({ accessToken, userRole, userID
       };
 
       await updateSearchTool(accessToken, selectedToolId, searchToolData);
-      NotificationsManager.success("Search tool updated successfully");
+      NotificationsManager.success(t("Search tool updated successfully"));
       setEditModalVisible(false);
       form.resetFields();
       setSelectedToolId(null);
       refetch();
     } catch (error) {
       console.error("Failed to update search tool:", error);
-      NotificationsManager.error("Failed to update search tool");
+      NotificationsManager.error(t("Failed to update search tool"));
     }
   };
 
@@ -173,18 +177,18 @@ const SearchTools: React.FC<SearchToolsProps> = ({ accessToken, userRole, userID
     <Form form={form} layout="vertical">
       <Form.Item
         name="search_tool_name"
-        label="Search Tool Name"
-        rules={[{ required: true, message: "Please enter a search tool name" }]}
+        label={t("Search Tool Name")}
+        rules={[{ required: true, message: t("Please enter a search tool name") }]}
       >
-        <Input placeholder="e.g., my-perplexity-search" />
+        <Input placeholder={t("e.g., perplexity-search, my-tavily-tool")} />
       </Form.Item>
 
       <Form.Item
         name="search_provider"
-        label="Search Provider"
-        rules={[{ required: true, message: "Please select a search provider" }]}
+        label={t("Search Provider")}
+        rules={[{ required: true, message: t("Please select a search provider") }]}
       >
-        <Select placeholder="Select a search provider" loading={isLoadingProviders}>
+        <Select placeholder={t("Select a search provider")} loading={isLoadingProviders}>
           {availableProviders.map((provider) => (
             <Select.Option key={provider.provider_name} value={provider.provider_name}>
               {provider.ui_friendly_name}
@@ -193,19 +197,19 @@ const SearchTools: React.FC<SearchToolsProps> = ({ accessToken, userRole, userID
         </Select>
       </Form.Item>
 
-      <Form.Item name="api_key" label="API Key" extra="API key for the search provider">
-        <Input.Password placeholder="Enter API key" />
+      <Form.Item name="api_key" label={t("API Key")} extra={t("API key for the search provider")}>
+        <Input.Password placeholder={t("Enter API key")} />
       </Form.Item>
 
-      <Form.Item name="description" label="Description">
-        <Input.TextArea rows={3} placeholder="Description of this search tool" />
+      <Form.Item name="description" label={t("Description")}>
+        <Input.TextArea rows={3} placeholder={t("Description of this search tool")} />
       </Form.Item>
     </Form>
   );
 
   if (!accessToken || !userRole || !userID) {
     console.log("Missing required authentication parameters", { accessToken, userRole, userID });
-    return <div className="p-6 text-center text-gray-500">Missing required authentication parameters.</div>;
+    return <div className="p-6 text-center text-gray-500">{t("Missing required authentication parameters")}</div>;
   }
 
   const ToolsTab = () =>
@@ -238,7 +242,7 @@ const SearchTools: React.FC<SearchToolsProps> = ({ accessToken, userRole, userID
             renderSubComponent={() => <div></div>}
             getRowCanExpand={() => false}
             isLoading={isLoadingTools}
-            noDataMessage="No search tools configured"
+            noDataMessage={t("No search tools configured")}
           />
         </div>
       </div>
@@ -248,7 +252,7 @@ const SearchTools: React.FC<SearchToolsProps> = ({ accessToken, userRole, userID
     <div className="w-full h-full p-6">
       <DeleteModal
         isModalOpen={isDeleteModalOpen}
-        title="Delete Search Tool"
+        title={t("Delete Search Tool")}
         confirmDelete={confirmDelete}
         cancelDelete={cancelDelete}
       />
@@ -263,7 +267,7 @@ const SearchTools: React.FC<SearchToolsProps> = ({ accessToken, userRole, userID
 
       {/* Edit Modal */}
       <Modal
-        title="Edit Search Tool"
+        title={t("Edit Search Tool")}
         open={isEditModalVisible}
         onOk={handleEditSubmit}
         onCancel={() => {
@@ -276,11 +280,11 @@ const SearchTools: React.FC<SearchToolsProps> = ({ accessToken, userRole, userID
         {renderEditForm()}
       </Modal>
 
-      <Title>Search Tools</Title>
-      <Text className="text-tremor-content mt-2">Configure and manage your search providers</Text>
+      <Title>{t("Search Tools")}</Title>
+      <Text className="text-tremor-content mt-2">{t("Configure and manage your search providers")}</Text>
       {isAdminRole(userRole) && (
         <Button className="mt-4 mb-4" onClick={() => setCreateModalVisible(true)}>
-          + Add New Search Tool
+          {t("+ Add New Search Tool")}
         </Button>
       )}
 

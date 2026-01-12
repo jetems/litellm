@@ -6,6 +6,7 @@ import { copyToClipboard as utilCopyToClipboard } from "@/utils/dataUtils";
 import { CheckIcon, CopyIcon } from "lucide-react";
 import { Button as AntdButton } from "antd";
 import { SearchToolTester } from "./search_tool_tester";
+import { useTranslate } from "@/i18n";
 
 interface SearchToolViewProps {
   searchTool: SearchTool;
@@ -22,6 +23,7 @@ export const SearchToolView: React.FC<SearchToolViewProps> = ({
   accessToken,
   availableProviders,
 }) => {
+  const t = useTranslate();
   const [copiedStates, setCopiedStates] = useState<Record<string, boolean>>({});
 
   const copyToClipboard = async (text: string | null | undefined, key: string) => {
@@ -44,7 +46,7 @@ export const SearchToolView: React.FC<SearchToolViewProps> = ({
       <div className="flex justify-between items-center mb-6">
         <div>
           <Button icon={ArrowLeftIcon} variant="light" className="mb-4" onClick={onBack}>
-            Back to All Search Tools
+            {t("Back to All Search Tools")}
           </Button>
           <div className="flex items-center cursor-pointer">
             <Title>{searchTool.search_tool_name}</Title>
@@ -53,11 +55,10 @@ export const SearchToolView: React.FC<SearchToolViewProps> = ({
               size="small"
               icon={copiedStates["search-tool-name"] ? <CheckIcon size={12} /> : <CopyIcon size={12} />}
               onClick={() => copyToClipboard(searchTool.search_tool_name, "search-tool-name")}
-              className={`left-2 z-10 transition-all duration-200 ${
-                copiedStates["search-tool-name"]
+              className={`left-2 z-10 transition-all duration-200 ${copiedStates["search-tool-name"]
                   ? "text-green-600 bg-green-50 border-green-200"
                   : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-              }`}
+                }`}
             />
           </div>
           <div className="flex items-center cursor-pointer">
@@ -67,11 +68,10 @@ export const SearchToolView: React.FC<SearchToolViewProps> = ({
               size="small"
               icon={copiedStates["search-tool-id"] ? <CheckIcon size={12} /> : <CopyIcon size={12} />}
               onClick={() => copyToClipboard(searchTool.search_tool_id, "search-tool-id")}
-              className={`left-2 z-10 transition-all duration-200 ${
-                copiedStates["search-tool-id"]
+              className={`left-2 z-10 transition-all duration-200 ${copiedStates["search-tool-id"]
                   ? "text-green-600 bg-green-50 border-green-200"
                   : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-              }`}
+                }`}
             />
           </div>
         </div>
@@ -79,24 +79,24 @@ export const SearchToolView: React.FC<SearchToolViewProps> = ({
 
       <Grid numItems={1} numItemsSm={2} numItemsLg={3} className="gap-6">
         <Card>
-          <Text>Provider</Text>
+          <Text>{t("Provider")}</Text>
           <div className="mt-2">
             <Title>{getProviderDisplayName(searchTool.litellm_params.search_provider)}</Title>
           </div>
         </Card>
 
         <Card>
-          <Text>API Key</Text>
+          <Text>{t("API Key")}</Text>
           <div className="mt-2">
-            <Text>{searchTool.litellm_params.api_key ? "****" : "Not set"}</Text>
+            <Text>{searchTool.litellm_params.api_key ? "****" : t("Not set")}</Text>
           </div>
         </Card>
 
         <Card>
-          <Text>Created At</Text>
+          <Text>{t("Created At")}</Text>
           <div className="mt-2">
             <Text>
-              {searchTool.created_at ? new Date(searchTool.created_at).toLocaleString() : "Unknown"}
+              {searchTool.created_at ? new Date(searchTool.created_at).toLocaleString() : t("Unknown")}
             </Text>
           </div>
         </Card>
@@ -104,7 +104,7 @@ export const SearchToolView: React.FC<SearchToolViewProps> = ({
 
       {searchTool.search_tool_info?.description && (
         <Card className="mt-6">
-          <Text>Description</Text>
+          <Text>{t("Description")}</Text>
           <div className="mt-2">
             <Text>{searchTool.search_tool_info.description}</Text>
           </div>

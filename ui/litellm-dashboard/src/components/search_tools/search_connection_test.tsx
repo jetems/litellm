@@ -3,6 +3,7 @@ import { testSearchToolConnection } from "../networking";
 import { Button, Typography, Divider } from "antd";
 import { WarningOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import NotificationsManager from "../molecules/notifications_manager";
+import { useTranslate } from "@/i18n";
 
 const { Text } = Typography;
 
@@ -17,6 +18,7 @@ const SearchConnectionTest: React.FC<SearchConnectionTestProps> = ({
   accessToken,
   onTestComplete,
 }) => {
+  const t = useTranslate();
   const [isLoading, setIsLoading] = useState(true);
   const [testResult, setTestResult] = useState<{
     status: "success" | "error";
@@ -34,12 +36,12 @@ const SearchConnectionTest: React.FC<SearchConnectionTestProps> = ({
         const result = await testSearchToolConnection(accessToken, litellmParams);
         setTestResult(result);
         if (result.status === "success") {
-          NotificationsManager.success("Connection test successful!");
+          NotificationsManager.success(t("Connection test successful!"));
         }
       } catch (error) {
         setTestResult({
           status: "error",
-          message: error instanceof Error ? error.message : "Unknown error occurred",
+          message: error instanceof Error ? error.message : t("Unknown error occurred"),
           error_type: "NetworkError",
         });
       } finally {
@@ -107,7 +109,7 @@ const SearchConnectionTest: React.FC<SearchConnectionTestProps> = ({
             />
           </div>
           <Text style={{ fontSize: "16px" }}>
-            Testing connection to {litellmParams.search_provider || "search provider"}...
+            {t("Testing connection to ")} {litellmParams.search_provider || t("search provider")}...
           </Text>
           <style jsx>{`
             @keyframes spin {
@@ -147,16 +149,16 @@ const SearchConnectionTest: React.FC<SearchConnectionTestProps> = ({
           </div>
           <div style={{ marginLeft: "12px" }}>
             <Text type="success" style={{ fontSize: "18px", fontWeight: 500, display: "block" }}>
-              Connection to {litellmParams.search_provider} successful!
+              {t("Connection to ")} {litellmParams.search_provider} {t(" successful!")}
             </Text>
             {testResult.test_query && (
               <Text style={{ fontSize: "14px", color: "#666", marginTop: "8px", display: "block" }}>
-                Test query: <code style={{ backgroundColor: "#f0f0f0", padding: "2px 6px", borderRadius: "4px" }}>{testResult.test_query}</code>
+                {t("Test query: ")} <code style={{ backgroundColor: "#f0f0f0", padding: "2px 6px", borderRadius: "4px" }}>{testResult.test_query}</code>
               </Text>
             )}
             {testResult.results_count !== undefined && (
               <Text style={{ fontSize: "14px", color: "#666", display: "block" }}>
-                Results retrieved: {testResult.results_count}
+                {t("Results retrieved: ")} {testResult.results_count}
               </Text>
             )}
           </div>
@@ -167,7 +169,7 @@ const SearchConnectionTest: React.FC<SearchConnectionTestProps> = ({
             <div style={{ display: "flex", alignItems: "center", marginBottom: "20px" }}>
               <WarningOutlined style={{ color: "#ff4d4f", fontSize: "24px", marginRight: "12px" }} />
               <Text type="danger" style={{ fontSize: "18px", fontWeight: 500 }}>
-                Connection to {litellmParams.search_provider || "search provider"} failed
+                {t("Connection to ")} {litellmParams.search_provider || t("search provider")} {t(" failed")}
               </Text>
             </div>
 
@@ -182,7 +184,7 @@ const SearchConnectionTest: React.FC<SearchConnectionTestProps> = ({
               }}
             >
               <Text strong style={{ display: "block", marginBottom: "8px" }}>
-                Error:{" "}
+                {t("Error: ")}
               </Text>
               <Text type="danger" style={{ fontSize: "14px", lineHeight: "1.5" }}>
                 {errorMessage}
@@ -191,7 +193,7 @@ const SearchConnectionTest: React.FC<SearchConnectionTestProps> = ({
               {testResult.error_type && (
                 <div style={{ marginTop: "8px" }}>
                   <Text style={{ fontSize: "13px", color: "#666" }}>
-                    Error type:{" "}
+                    {t("Error type: ")}
                     <code style={{ backgroundColor: "#ffebee", padding: "2px 6px", borderRadius: "4px", color: "#d32f2f" }}>
                       {testResult.error_type}
                     </code>
@@ -206,7 +208,7 @@ const SearchConnectionTest: React.FC<SearchConnectionTestProps> = ({
                     onClick={() => setShowDetails(!showDetails)}
                     style={{ paddingLeft: 0, height: "auto" }}
                   >
-                    {showDetails ? "Hide Details" : "Show Details"}
+                    {showDetails ? t("Hide Details") : t("Show Details")}
                   </Button>
                 </div>
               )}
@@ -215,7 +217,7 @@ const SearchConnectionTest: React.FC<SearchConnectionTestProps> = ({
             {showDetails && (
               <div style={{ marginBottom: "20px" }}>
                 <Text strong style={{ display: "block", marginBottom: "8px", fontSize: "15px" }}>
-                  Full Error Details
+                  {t("Full Error Details")}
                 </Text>
                 <pre
                   style={{
@@ -246,13 +248,13 @@ const SearchConnectionTest: React.FC<SearchConnectionTestProps> = ({
               }}
             >
               <Text strong style={{ display: "block", marginBottom: "8px", color: "#d48806" }}>
-                Troubleshooting tips:
+                {t("Troubleshooting tips:")}
               </Text>
               <ul style={{ margin: "8px 0", paddingLeft: "20px", color: "#ad6800" }}>
-                <li style={{ marginBottom: "6px" }}>Verify your API key is correct and active</li>
-                <li style={{ marginBottom: "6px" }}>Check if the search provider service is operational</li>
-                <li style={{ marginBottom: "6px" }}>Ensure you have sufficient credits/quota with the provider</li>
-                <li style={{ marginBottom: "6px" }}>Review the provider&apos;s documentation for any additional requirements</li>
+                <li style={{ marginBottom: "6px" }}>{t("Verify your API key is correct and active")}</li>
+                <li style={{ marginBottom: "6px" }}>{t("Check if the search provider service is operational")}</li>
+                <li style={{ marginBottom: "6px" }}>{t("Ensure you have sufficient credits/quota with the provider")}</li>
+                <li style={{ marginBottom: "6px" }}>{t("Review the provider's documentation for any additional requirements")}</li>
               </ul>
             </div>
           </div>
@@ -261,7 +263,7 @@ const SearchConnectionTest: React.FC<SearchConnectionTestProps> = ({
       <Divider style={{ margin: "24px 0 16px" }} />
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Button type="link" href="https://docs.litellm.ai/docs/search" target="_blank" icon={<InfoCircleOutlined />}>
-          View Search Documentation
+          {t("View Search Documentation")}
         </Button>
       </div>
     </div>
