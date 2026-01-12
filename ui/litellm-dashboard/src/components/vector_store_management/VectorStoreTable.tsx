@@ -13,6 +13,7 @@ import React from "react";
 import TableIconActionButton from "../common_components/IconActionButton/TableIconActionButtons/TableIconActionButton";
 import { getProviderLogoAndName } from "../provider_info_helpers";
 import { VectorStore } from "./types";
+import { useTranslate } from "@/i18n";
 
 interface VectorStoreTableProps {
   data: VectorStore[];
@@ -22,11 +23,12 @@ interface VectorStoreTableProps {
 }
 
 const VectorStoreTable: React.FC<VectorStoreTableProps> = ({ data, onView, onEdit, onDelete }) => {
+  const t = useTranslate();
   const [sorting, setSorting] = React.useState<SortingState>([{ id: "created_at", desc: true }]);
 
   const columns: ColumnDef<VectorStore>[] = [
     {
-      header: "Vector Store ID",
+      header: t("Vector Store ID"),
       accessorKey: "vector_store_id",
       cell: ({ row }) => {
         const vectorStore = row.original;
@@ -43,7 +45,7 @@ const VectorStoreTable: React.FC<VectorStoreTableProps> = ({ data, onView, onEdi
       },
     },
     {
-      header: "Name",
+      header: t("Name"),
       accessorKey: "vector_store_name",
       cell: ({ row }) => {
         const vectorStore = row.original;
@@ -55,7 +57,7 @@ const VectorStoreTable: React.FC<VectorStoreTableProps> = ({ data, onView, onEdi
       },
     },
     {
-      header: "Description",
+      header: t("Description"),
       accessorKey: "vector_store_description",
       cell: ({ row }) => {
         const vectorStore = row.original;
@@ -67,7 +69,7 @@ const VectorStoreTable: React.FC<VectorStoreTableProps> = ({ data, onView, onEdi
       },
     },
     {
-      header: "Provider",
+      header: t("Provider"),
       accessorKey: "custom_llm_provider",
       cell: ({ row }) => {
         const vectorStore = row.original;
@@ -81,7 +83,7 @@ const VectorStoreTable: React.FC<VectorStoreTableProps> = ({ data, onView, onEdi
       },
     },
     {
-      header: "Created At",
+      header: t("Created At"),
       accessorKey: "created_at",
       sortingFn: "datetime",
       cell: ({ row }) => {
@@ -90,7 +92,7 @@ const VectorStoreTable: React.FC<VectorStoreTableProps> = ({ data, onView, onEdi
       },
     },
     {
-      header: "Updated At",
+      header: t("Updated At"),
       accessorKey: "updated_at",
       sortingFn: "datetime",
       cell: ({ row }) => {
@@ -107,12 +109,12 @@ const VectorStoreTable: React.FC<VectorStoreTableProps> = ({ data, onView, onEdi
           <div className="flex space-x-2">
             <TableIconActionButton
               variant="Edit"
-              tooltipText="Edit vector store"
+              tooltipText={t("Edit vector store")}
               onClick={() => onEdit(vectorStore.vector_store_id)}
             />
             <TableIconActionButton
               variant="Delete"
-              tooltipText="Delete vector store"
+              tooltipText={t("Delete vector store")}
               onClick={() => onDelete(vectorStore.vector_store_id)}
             />
           </div>
@@ -143,9 +145,8 @@ const VectorStoreTable: React.FC<VectorStoreTableProps> = ({ data, onView, onEdi
                 {headerGroup.headers.map((header) => (
                   <TableHeaderCell
                     key={header.id}
-                    className={`py-1 h-8 ${
-                      header.id === "actions" ? "sticky right-0 bg-white shadow-[-4px_0_8px_-6px_rgba(0,0,0,0.1)]" : ""
-                    }`}
+                    className={`py-1 h-8 ${header.id === "actions" ? "sticky right-0 bg-white shadow-[-4px_0_8px_-6px_rgba(0,0,0,0.1)]" : ""
+                      }`}
                     onClick={header.column.getToggleSortingHandler()}
                   >
                     <div className="flex items-center justify-between gap-2">
@@ -177,11 +178,10 @@ const VectorStoreTable: React.FC<VectorStoreTableProps> = ({ data, onView, onEdi
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      className={`py-0.5 max-h-8 overflow-hidden text-ellipsis whitespace-nowrap ${
-                        cell.column.id === "actions"
+                      className={`py-0.5 max-h-8 overflow-hidden text-ellipsis whitespace-nowrap ${cell.column.id === "actions"
                           ? "sticky right-0 bg-white shadow-[-4px_0_8px_-6px_rgba(0,0,0,0.1)]"
                           : ""
-                      }`}
+                        }`}
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
@@ -192,7 +192,7 @@ const VectorStoreTable: React.FC<VectorStoreTableProps> = ({ data, onView, onEdi
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-8 text-center">
                   <div className="text-center text-gray-500">
-                    <p>No vector stores found</p>
+                    <p>{t("No vector stores found")}</p>
                   </div>
                 </TableCell>
               </TableRow>
