@@ -11,17 +11,19 @@ import AddProviderForm from "./add_provider_form";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { DocsMenu } from "../HelpLink";
 import HowItWorks from "./how_it_works";
+import { useTranslate } from "@/i18n";
 
 const DOCS_LINKS = [
   { label: "Custom pricing for models", href: "https://docs.litellm.ai/docs/proxy/custom_pricing" },
   { label: "Spend tracking", href: "https://docs.litellm.ai/docs/proxy/cost_tracking" },
 ];
 
-const CostTrackingSettings: React.FC<CostTrackingSettingsProps> = ({ 
-  userID, 
-  userRole, 
-  accessToken 
+const CostTrackingSettings: React.FC<CostTrackingSettingsProps> = ({
+  userID,
+  userRole,
+  accessToken
 }) => {
+  const t = useTranslate();
   const [discountConfig, setDiscountConfig] = useState<DiscountConfig>({});
   const [selectedProvider, setSelectedProvider] = useState<string | undefined>(undefined);
   const [newDiscount, setNewDiscount] = useState<string>("");
@@ -34,10 +36,10 @@ const CostTrackingSettings: React.FC<CostTrackingSettingsProps> = ({
     setIsFetching(true);
     try {
       const proxyBaseUrl = getProxyBaseUrl();
-      const url = proxyBaseUrl 
-        ? `${proxyBaseUrl}/config/cost_discount_config` 
+      const url = proxyBaseUrl
+        ? `${proxyBaseUrl}/config/cost_discount_config`
         : "/config/cost_discount_config";
-      
+
       const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -54,7 +56,7 @@ const CostTrackingSettings: React.FC<CostTrackingSettingsProps> = ({
       }
     } catch (error) {
       console.error("Error fetching discount config:", error);
-      NotificationsManager.fromBackend("Failed to fetch discount configuration");
+      NotificationsManager.fromBackend(t("Failed to fetch discount configuration"));
     } finally {
       setIsFetching(false);
     }
@@ -69,10 +71,10 @@ const CostTrackingSettings: React.FC<CostTrackingSettingsProps> = ({
   const saveDiscountConfig = async (config: DiscountConfig) => {
     try {
       const proxyBaseUrl = getProxyBaseUrl();
-      const url = proxyBaseUrl 
-        ? `${proxyBaseUrl}/config/cost_discount_config` 
+      const url = proxyBaseUrl
+        ? `${proxyBaseUrl}/config/cost_discount_config`
         : "/config/cost_discount_config";
-      
+
       const response = await fetch(url, {
         method: "PATCH",
         headers: {
@@ -83,7 +85,7 @@ const CostTrackingSettings: React.FC<CostTrackingSettingsProps> = ({
       });
 
       if (response.ok) {
-        NotificationsManager.success("Discount configuration updated successfully");
+        NotificationsManager.success(t("Discount configuration updated successfully"));
         await fetchDiscountConfig();
       } else {
         const errorData = await response.json();
@@ -92,26 +94,26 @@ const CostTrackingSettings: React.FC<CostTrackingSettingsProps> = ({
       }
     } catch (error) {
       console.error("Error updating discount config:", error);
-      NotificationsManager.fromBackend("Failed to update discount configuration");
+      NotificationsManager.fromBackend(t("Failed to update discount configuration"));
     }
   };
 
   const handleAddProvider = async () => {
     if (!selectedProvider || !newDiscount) {
-      NotificationsManager.fromBackend("Please select a provider and enter discount percentage");
+      NotificationsManager.fromBackend(t("Please select a provider and enter discount percentage"));
       return;
     }
-    
+
     const percentageValue = parseFloat(newDiscount);
     if (isNaN(percentageValue) || percentageValue < 0 || percentageValue > 100) {
-      NotificationsManager.fromBackend("Discount must be between 0% and 100%");
+      NotificationsManager.fromBackend(t("Discount must be between 0% and 100%"));
       return;
     }
 
     const providerValue = getProviderBackendValue(selectedProvider);
-    
+
     if (!providerValue) {
-      NotificationsManager.fromBackend("Invalid provider selected");
+      NotificationsManager.fromBackend(t("Invalid provider selected"));
       return;
     }
 
@@ -128,7 +130,7 @@ const CostTrackingSettings: React.FC<CostTrackingSettingsProps> = ({
       ...discountConfig,
       [providerValue]: discountValue,
     };
-    
+
     setDiscountConfig(updatedConfig);
     await saveDiscountConfig(updatedConfig);
     setSelectedProvider(undefined);
@@ -149,12 +151,12 @@ const CostTrackingSettings: React.FC<CostTrackingSettingsProps> = ({
 
   const handleRemoveProvider = async (provider: string, providerDisplayName: string) => {
     modal.confirm({
-      title: 'Remove Provider Discount',
+      title: t('Remove Provider Discount'),
       icon: <ExclamationCircleOutlined />,
-      content: `Are you sure you want to remove the discount for ${providerDisplayName}?`,
-      okText: 'Remove',
+      content: t('Are you sure you want to remove the discount for {provider}?', { provider: providerDisplayName }),
+      okText: t('Remove'),
       okType: 'danger',
-      cancelText: 'Cancel',
+      cancelText: t('Cancel'),
       onOk: async () => {
         const updatedConfig = { ...discountConfig };
         delete updatedConfig[provider];
@@ -183,23 +185,23 @@ const CostTrackingSettings: React.FC<CostTrackingSettingsProps> = ({
   return (
     <div className="w-full p-8">
       {contextHolder}
-      
+
       {/* Header Section - Outside the card */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6">
         <div>
           <div className="flex items-center gap-2">
-            <Title>Cost Tracking Settings</Title>
+            <Title>{t("Cost Tracking Settings")}</Title>
             <DocsMenu items={DOCS_LINKS} />
           </div>
           <Text className="text-gray-500 mt-1">
-            Configure cost discounts for different LLM providers. Changes are saved automatically.
+            {t("Configure cost discounts for different LLM providers. Changes are saved automatically.")}
           </Text>
         </div>
         <Button
           onClick={() => setIsModalVisible(true)}
           className="mt-4 md:mt-0"
         >
-          + Add Provider Discount
+          {t("+ Add Provider Discount")}
         </Button>
       </div>
 
@@ -207,14 +209,14 @@ const CostTrackingSettings: React.FC<CostTrackingSettingsProps> = ({
       <div className="bg-white rounded-lg shadow w-full max-w-full">
         <TabGroup>
           <TabList className="px-6 pt-4">
-            <Tab>Provider Discounts</Tab>
-            <Tab>Test It</Tab>
+            <Tab>{t("Provider Discounts")}</Tab>
+            <Tab>{t("Test It")}</Tab>
           </TabList>
           <TabPanels>
             <TabPanel>
               {isFetching ? (
                 <div className="py-12 text-center">
-                  <Text className="text-gray-500">Loading configuration...</Text>
+                  <Text className="text-gray-500">{t("Loading configuration...")}</Text>
                 </div>
               ) : Object.keys(discountConfig).length > 0 ? (
                 <div className="p-6">
@@ -240,10 +242,10 @@ const CostTrackingSettings: React.FC<CostTrackingSettingsProps> = ({
                     />
                   </svg>
                   <Text className="text-gray-700 font-medium mb-2">
-                    No provider discounts configured
+                    {t("No provider discounts configured")}
                   </Text>
                   <Text className="text-gray-500 text-sm">
-                    Click &quot;Add Provider Discount&quot; to get started
+                    {t('Click "Add Provider Discount" to get started')}
                   </Text>
                 </div>
               )}
@@ -260,7 +262,7 @@ const CostTrackingSettings: React.FC<CostTrackingSettingsProps> = ({
       <Modal
         title={
           <div className="flex items-center space-x-3 pb-4 border-b border-gray-100">
-            <h2 className="text-xl font-semibold text-gray-900">Add Provider Discount</h2>
+            <h2 className="text-xl font-semibold text-gray-900">{t("Add Provider Discount")}</h2>
           </div>
         }
         open={isModalVisible}
@@ -275,7 +277,7 @@ const CostTrackingSettings: React.FC<CostTrackingSettingsProps> = ({
       >
         <div className="mt-6">
           <Text className="text-sm text-gray-600 mb-6">
-            Select a provider and set its discount percentage. Enter a value between 0% and 100% (e.g., 5 for a 5% discount).
+            {t("Select a provider and set its discount percentage. Enter a value between 0% and 100% (e.g., 5 for a 5% discount).")}
           </Text>
           <Form
             form={form}

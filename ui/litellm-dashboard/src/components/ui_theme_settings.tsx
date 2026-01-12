@@ -64,14 +64,14 @@ const UIThemeSettings: React.FC<UIThemeSettingsProps> = ({ userID, userRole, acc
       });
 
       if (response.ok) {
-        NotificationsManager.success("Logo settings updated successfully!");
+        NotificationsManager.success(t("Logo settings updated successfully!"));
         setLogoUrl(logoUrlInput || null);
       } else {
-        throw new Error("Failed to update settings");
+        throw new Error(t("Failed to update settings"));
       }
     } catch (error) {
       console.error("Error updating logo settings:", error);
-      NotificationsManager.fromBackend("Failed to update logo settings");
+      NotificationsManager.fromBackend(t("Failed to update logo settings"));
     } finally {
       setLoading(false);
     }
@@ -98,13 +98,13 @@ const UIThemeSettings: React.FC<UIThemeSettingsProps> = ({ userID, userRole, acc
       });
 
       if (response.ok) {
-        NotificationsManager.success("Logo reset to default!");
+        NotificationsManager.success(t("Logo reset to default!"));
       } else {
-        throw new Error("Failed to reset logo");
+        throw new Error(t("Failed to reset logo"));
       }
     } catch (error) {
       console.error("Error resetting logo:", error);
-      NotificationsManager.fromBackend("Failed to reset logo");
+      NotificationsManager.fromBackend(t("Failed to reset logo"));
     } finally {
       setLoading(false);
     }
@@ -124,7 +124,7 @@ const UIThemeSettings: React.FC<UIThemeSettingsProps> = ({ userID, userRole, acc
       <Card className="shadow-sm p-6">
         <div className="space-y-6">
           <div>
-            <Text className="text-sm font-medium text-gray-700 mb-2 block">Custom Logo URL</Text>
+            <Text className="text-sm font-medium text-gray-700 mb-2 block">{t("Custom Logo URL")}</Text>
             <TextInput
               placeholder="https://example.com/logo.png"
               value={logoUrlInput}
@@ -136,30 +136,30 @@ const UIThemeSettings: React.FC<UIThemeSettingsProps> = ({ userID, userRole, acc
               className="w-full"
             />
             <Text className="text-xs text-gray-500 mt-1">
-              Enter a URL for your custom logo or leave empty to use the default LiteLLM logo
+              {t("Enter a URL for your custom logo or leave empty to use the default LiteLLM logo")}
             </Text>
           </div>
 
           {/* Logo Preview */}
           <div>
-            <Text className="text-sm font-medium text-gray-700 mb-2 block">Current Logo</Text>
+            <Text className="text-sm font-medium text-gray-700 mb-2 block">{t("Current Logo")}</Text>
             <div className="bg-gray-50 rounded-lg p-6 flex items-center justify-center min-h-[120px]">
               {logoUrlInput ? (
                 <img
                   src={logoUrlInput}
-                  alt="Custom logo"
+                  alt={t("Custom logo")}
                   className="max-w-full max-h-24 object-contain"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.style.display = "none";
                     const fallbackText = document.createElement("div");
                     fallbackText.className = "text-gray-500 text-sm";
-                    fallbackText.textContent = "Failed to load image";
+                    fallbackText.textContent = t("Failed to load image");
                     target.parentElement?.appendChild(fallbackText);
                   }}
                 />
               ) : (
-                <Text className="text-gray-500 text-sm">Default LiteLLM logo will be used</Text>
+                <Text className="text-gray-500 text-sm">{t("Default LiteLLM logo will be used")}</Text>
               )}
             </div>
           </div>
