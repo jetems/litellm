@@ -2347,5 +2347,20 @@
     "Test it (Curl)": "Test it (Curl)",
     "Test it (OpenAI SDK)": "Test it (OpenAI SDK)",
     "TPM": "TPM",
-    "RPM": "RPM"
+    "RPM": "RPM",
+    "See how LiteLLM transforms your request for the specified provider.": "See how LiteLLM transforms your request for the specified provider.",
+    "Original Request": "Original Request",
+    "The request you would send to LiteLLM /chat/completions endpoint.": "The request you would send to LiteLLM /chat/completions endpoint.",
+    "Press Cmd/Ctrl + Enter to transform": "Press Cmd/Ctrl + Enter to transform",
+    "Transform": "Transform",
+    "Transformed Request": "Transformed Request",
+    "How LiteLLM transforms your request for the specified provider.": "How LiteLLM transforms your request for the specified provider.",
+    "Note: Sensitive headers are not shown.": "Note: Sensitive headers are not shown.",
+    "Copied to clipboard": "Copied to clipboard",
+    "Found an error? File an issue": "Found an error? File an issue",
+    "Invalid JSON in request body": "Invalid JSON in request body",
+    "No access token found": "No access token found",
+    "Request transformed successfully": "Request transformed successfully",
+    "Transformed request received in unexpected format": "Transformed request received in unexpected format",
+    "Failed to transform request": "Failed to transform request"
 }

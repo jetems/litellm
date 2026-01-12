@@ -2347,5 +2347,20 @@
     "Test it (Curl)": "测试（Curl）",
     "Test it (OpenAI SDK)": "测试（OpenAI SDK）",
     "TPM": "TPM",
-    "RPM": "RPM"
+    "RPM": "RPM",
+    "See how LiteLLM transforms your request for the specified provider.": "查看 LiteLLM 如何为指定提供商转换您的请求。",
+    "Original Request": "原始请求",
+    "The request you would send to LiteLLM /chat/completions endpoint.": "您将发送到 LiteLLM /chat/completions 端点的请求。",
+    "Press Cmd/Ctrl + Enter to transform": "按 Cmd/Ctrl + Enter 进行转换",
+    "Transform": "转换",
+    "Transformed Request": "转换后的请求",
+    "How LiteLLM transforms your request for the specified provider.": "LiteLLM 如何为指定提供商转换您的请求。",
+    "Note: Sensitive headers are not shown.": "注意：敏感请求头未显示。",
+    "Copied to clipboard": "已复制到剪贴板",
+    "Found an error? File an issue": "发现错误？提交问题",
+    "Invalid JSON in request body": "请求体中的 JSON 无效",
+    "No access token found": "未找到访问令牌",
+    "Request transformed successfully": "请求转换成功",
+    "Transformed request received in unexpected format": "收到格式意外的转换请求",
+    "Failed to transform request": "转换请求失败"
 }
