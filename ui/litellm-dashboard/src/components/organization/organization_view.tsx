@@ -205,11 +205,11 @@ const OrganizationInfoView: React.FC<OrganizationInfoProps> = ({
   };
 
   if (loading) {
-    return <div className="p-4">Loading...</div>;
+    return <div className="p-4">{t("Loading...")}</div>;
   }
 
   if (!orgData) {
-    return <div className="p-4">Organization not found</div>;
+    return <div className="p-4">{t("Organization not found")}</div>;
   }
 
   const copyToClipboard = async (text: string | null | undefined, key: string) => {
@@ -227,7 +227,7 @@ const OrganizationInfoView: React.FC<OrganizationInfoProps> = ({
       <div className="flex justify-between items-center mb-6">
         <div>
           <TremorButton icon={ArrowLeftIcon} onClick={onClose} variant="light" className="mb-4">
-            Back to Organizations
+            {t("Back to Organizations")}
           </TremorButton>
           <Title>{orgData.organization_alias}</Title>
           <div className="flex items-center cursor-pointer">
@@ -286,8 +286,8 @@ const OrganizationInfoView: React.FC<OrganizationInfoProps> = ({
               <Card>
                 <Text><T>Rate Limits</T></Text>
                 <div className="mt-2">
-                  <Text>TPM: {orgData.litellm_budget_table.tpm_limit || <T>Unlimited</T>}</Text>
-                  <Text>RPM: {orgData.litellm_budget_table.rpm_limit || <T>Unlimited</T>}</Text>
+                  <Text>{t("TPM:")} {orgData.litellm_budget_table.tpm_limit || <T>Unlimited</T>}</Text>
+                  <Text>{t("RPM:")} {orgData.litellm_budget_table.rpm_limit || <T>Unlimited</T>}</Text>
                   {orgData.litellm_budget_table.max_parallel_requests && (
                     <Text><T>Max Parallel Requests:</T> {orgData.litellm_budget_table.max_parallel_requests}</Text>
                   )}
@@ -534,8 +534,8 @@ const OrganizationInfoView: React.FC<OrganizationInfoProps> = ({
                   </div>
                   <div>
                     <Text className="font-medium"><T>Rate Limits</T></Text>
-                    <div>TPM: {orgData.litellm_budget_table.tpm_limit || <T>Unlimited</T>}</div>
-                    <div>RPM: {orgData.litellm_budget_table.rpm_limit || <T>Unlimited</T>}</div>
+                    <div>{t("TPM:")} {orgData.litellm_budget_table.tpm_limit || <T>Unlimited</T>}</div>
+                    <div>{t("RPM:")} {orgData.litellm_budget_table.rpm_limit || <T>Unlimited</T>}</div>
                   </div>
                   <div>
                     <Text className="font-medium"><T>Budget</T></Text>
