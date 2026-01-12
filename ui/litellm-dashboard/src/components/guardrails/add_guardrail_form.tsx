@@ -26,14 +26,15 @@ const { Option } = Select;
 const { Step } = Steps;
 
 // Define human-friendly descriptions for each mode
-const modeDescriptions = {
-  pre_call: "Before LLM Call - Runs before the LLM call and checks the input (Recommended)",
-  during_call: "During LLM Call - Runs in parallel with the LLM call, with response held until check completes",
-  post_call: "After LLM Call - Runs after the LLM call and checks only the output",
-  logging_only: "Logging Only - Only runs on logging callbacks without affecting the LLM call",
-  pre_mcp_call: "Before MCP Tool Call - Runs before MCP tool execution and validates tool calls",
-  during_mcp_call: "During MCP Tool Call - Runs in parallel with MCP tool execution for monitoring",
-};
+// Define human-friendly descriptions for each mode
+const getModeDescriptions = (t: any) => ({
+  pre_call: t("Before LLM Call - Runs before the LLM call and checks the input (Recommended)"),
+  during_call: t("During LLM Call - Runs in parallel with the LLM call, with response held until check completes"),
+  post_call: t("After LLM Call - Runs after the LLM call and checks only the output"),
+  logging_only: t("Logging Only - Only runs on logging callbacks without affecting the LLM call"),
+  pre_mcp_call: t("Before MCP Tool Call - Runs before MCP tool execution and validates tool calls"),
+  during_mcp_call: t("During MCP Tool Call - Runs in parallel with MCP tool execution for monitoring"),
+});
 
 interface AddGuardrailFormProps {
   visible: boolean;
@@ -102,6 +103,8 @@ const AddGuardrailForm: React.FC<AddGuardrailFormProps> = ({ visible, onClose, a
   const [selectedActions, setSelectedActions] = useState<{ [key: string]: string }>({});
   const [currentStep, setCurrentStep] = useState(0);
   const [providerParams, setProviderParams] = useState<ProviderParamsResponse | null>(null);
+
+  const modeDescriptions = useMemo(() => getModeDescriptions(t), [t]);
 
   // Azure Text Moderation state
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -444,7 +447,7 @@ const AddGuardrailForm: React.FC<AddGuardrailFormProps> = ({ visible, onClose, a
     } catch (error) {
       console.error("Failed to create guardrail:", error);
       NotificationsManager.fromBackend(
-        "Failed to create guardrail: " + (error instanceof Error ? error.message : String(error)),
+        t("Failed to create guardrail: ") + (error instanceof Error ? error.message : String(error)),
       );
     } finally {
       setLoading(false);
@@ -585,7 +588,7 @@ const AddGuardrailForm: React.FC<AddGuardrailFormProps> = ({ visible, onClose, a
                 </>
               )}
           </Select>
-        </Form.Item>
+        </Form.Item >
 
         <Form.Item
           name="default_on"
@@ -599,13 +602,15 @@ const AddGuardrailForm: React.FC<AddGuardrailFormProps> = ({ visible, onClose, a
         </Form.Item>
 
         {/* Use the GuardrailProviderFields component to render provider-specific fields */}
-        {!isToolPermissionProvider && !shouldRenderContentFilterConfigSettings(selectedProvider) && (
-          <GuardrailProviderFields
-            selectedProvider={selectedProvider}
-            accessToken={accessToken}
-            providerParams={providerParams}
-          />
-        )}
+        {
+          !isToolPermissionProvider && !shouldRenderContentFilterConfigSettings(selectedProvider) && (
+            <GuardrailProviderFields
+              selectedProvider={selectedProvider}
+              accessToken={accessToken}
+              providerParams={providerParams}
+            />
+          )
+        }
       </>
     );
   };
@@ -745,7 +750,7 @@ const AddGuardrailForm: React.FC<AddGuardrailFormProps> = ({ visible, onClose, a
   };
 
   return (
-    <Modal title="Add Guardrail" open={visible} onCancel={handleClose} footer={null} width={800}>
+    <Modal title={t("Add Guardrail")} open={visible} onCancel={handleClose} footer={null} width={800}>
       <Form
         form={form}
         layout="vertical"
@@ -755,20 +760,20 @@ const AddGuardrailForm: React.FC<AddGuardrailFormProps> = ({ visible, onClose, a
         }}
       >
         <Steps current={currentStep} className="mb-6" style={{ overflow: "visible" }}>
-          <Step title="Basic Info" />
+          <Step title={t("Basic Info")} />
           <Step
             title={
               shouldRenderPIIConfigSettings(selectedProvider)
                 ? t("PII Configuration")
                 : shouldRenderContentFilterConfigSettings(selectedProvider)
-                  ? "Default Categories"
-                  : "Provider Configuration"
+                  ? t("Default Categories")
+                  : t("Provider Configuration")
             }
           />
           {shouldRenderContentFilterConfigSettings(selectedProvider) && (
             <>
-              <Step title="Patterns" />
-              <Step title="Keywords" />
+              <Step title={t("Patterns")} />
+              <Step title={t("Keywords")} />
             </>
           )}
         </Steps>

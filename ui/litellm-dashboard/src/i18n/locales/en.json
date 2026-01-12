@@ -2134,5 +2134,14 @@
     "Select a role": "Select a role",
     "Index": "Index",
     "(Optional) If set litellm will mark the message at this index as cacheable": "(Optional) If set litellm will mark the message at this index as cacheable",
-    "Add Injection Point": "Add Injection Point"
+    "Before LLM Call - Runs before the LLM call and checks the input (Recommended)": "Before LLM Call - Runs before the LLM call and checks the input (Recommended)",
+    "During LLM Call - Runs in parallel with the LLM call, with response held until check completes": "During LLM Call - Runs in parallel with the LLM call, with response held until check completes",
+    "After LLM Call - Runs after the LLM call and checks only the output": "After LLM Call - Runs after the LLM call and checks only the output",
+    "Logging Only - Only runs on logging callbacks without affecting the LLM call": "Logging Only - Only runs on logging callbacks without affecting the LLM call",
+    "Before MCP Tool Call - Runs before MCP tool execution and validates tool calls": "Before MCP Tool Call - Runs before MCP tool execution and validates tool calls",
+    "During MCP Tool Call - Runs in parallel with MCP tool execution for monitoring": "During MCP Tool Call - Runs in parallel with MCP tool execution for monitoring",
+    "Failed to create guardrail: ": "Failed to create guardrail: ",
+    "Default Categories": "Default Categories",
+    "Patterns": "Patterns",
+    "Keywords": "Keywords"
 }

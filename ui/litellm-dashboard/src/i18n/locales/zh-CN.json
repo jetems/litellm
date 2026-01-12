@@ -1220,7 +1220,7 @@
     "Basic Info": "基本信息",
     "PII Configuration": "PII 配置",
     "Pattern Detection": "模式检测",
-    "Provider Configuration": "供应商配置",
+    "Provider Configuration": "提供商配置",
     "Blocked Keywords": "屏蔽关键词",
     "Results": "结果",
     "Output Text": "输出文本",
@@ -2134,5 +2134,14 @@
     "Select a role": "选择角色",
     "Index": "索引",
     "(Optional) If set litellm will mark the message at this index as cacheable": "(可选) 如果设置，litellm 将把此索引处的消息标记为可缓存",
-    "Add Injection Point": "添加注入点"
+    "Before LLM Call - Runs before the LLM call and checks the input (Recommended)": "LLM 调用前 - 在 LLM 调用之前运行并检查输入（推荐）",
+    "During LLM Call - Runs in parallel with the LLM call, with response held until check completes": "LLM 调用期间 - 与 LLM 调用并行运行，响应会被挂起直到检查完成",
+    "After LLM Call - Runs after the LLM call and checks only the output": "LLM 调用后 - 在 LLM 调用之后运行，仅检查输出",
+    "Logging Only - Only runs on logging callbacks without affecting the LLM call": "仅记录 - 仅在记录回调上运行，不影响 LLM 调用",
+    "Before MCP Tool Call - Runs before MCP tool execution and validates tool calls": "MCP 工具调用前 - 在 MCP 工具执行之前运行并验证工具调用",
+    "During MCP Tool Call - Runs in parallel with MCP tool execution for monitoring": "MCP 工具调用期间 - 与 MCP 工具执行并行运行以进行监控",
+    "Failed to create guardrail: ": "创建护栏失败：",
+    "Default Categories": "默认类别",
+    "Patterns": "模式",
+    "Keywords": "关键词"
 }
