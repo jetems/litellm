@@ -25,7 +25,8 @@ import {
   getBasePromptId,
   getCurrentVersion
 } from "./prompt_utils";
-import { useTranslate } from "@/i18n";
+import { useTranslate, useI18n } from "@/i18n";
+import { formatDate as formatDateUtil } from "@/utils/dateUtils";
 
 export interface PromptInfoProps {
   promptId: string;
@@ -38,6 +39,7 @@ export interface PromptInfoProps {
 
 const PromptInfoView: React.FC<PromptInfoProps> = ({ promptId, onClose, accessToken, isAdmin, onDelete, onEdit }) => {
   const t = useTranslate();
+  const { locale } = useI18n();
   const [promptData, setPromptData] = useState<PromptSpec | null>(null);
   const [promptTemplate, setPromptTemplate] = useState<PromptTemplateBase | null>(null);
   const [rawApiResponse, setRawApiResponse] = useState<any>(null);
@@ -77,8 +79,7 @@ const PromptInfoView: React.FC<PromptInfoProps> = ({ promptId, onClose, accessTo
   // Format date helper function
   const formatDate = (dateString?: string) => {
     if (!dateString) return "-";
-    const date = new Date(dateString);
-    return date.toLocaleString();
+    return formatDateUtil(dateString, locale, true);
   };
 
   const copyToClipboard = async (text: string | null | undefined, key: string) => {

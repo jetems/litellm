@@ -156,7 +156,7 @@ const ModelAliasManager: React.FC<ModelAliasManagerProps> = ({
                   aliasName: e.target.value,
                 })
               }
-              placeholder="e.g., gpt-4o"
+              placeholder={t("e.g., gpt-4o")}
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
             />
           </div>

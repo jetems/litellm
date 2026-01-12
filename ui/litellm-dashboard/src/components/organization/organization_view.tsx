@@ -41,8 +41,9 @@ import ObjectPermissionsView from "../object_permissions_view";
 import NumericalInput from "../shared/numerical_input";
 import MemberModal from "../team/EditMembership";
 import VectorStoreSelector from "../vector_store_management/VectorStoreSelector";
-import { useTranslate } from "@/i18n";
+import { useTranslate, useI18n } from "@/i18n";
 import { T } from "@/i18n";
+import { formatDate } from "@/utils/dateUtils";
 
 interface OrganizationInfoProps {
   organizationId: string;
@@ -64,6 +65,7 @@ const OrganizationInfoView: React.FC<OrganizationInfoProps> = ({
   editOrg,
 }) => {
   const t = useTranslate();
+  const { locale } = useI18n();
   const [orgData, setOrgData] = useState<Organization | null>(null);
   const [loading, setLoading] = useState(true);
   const [form] = Form.useForm();
@@ -355,7 +357,7 @@ const OrganizationInfoView: React.FC<OrganizationInfoProps> = ({
                           <Text>${formatNumberWithCommas(member.spend, 4)}</Text>
                         </TableCell>
                         <TableCell>
-                          <Text>{new Date(member.created_at).toLocaleString()}</Text>
+                          <Text>{formatDate(member.created_at, locale, true)}</Text>
                         </TableCell>
                         <TableCell>
                           {canEditOrg && (

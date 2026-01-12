@@ -14,7 +14,8 @@ import {
 } from "@tanstack/react-table";
 import { getProviderLogoAndName } from "@/components/provider_info_helpers";
 import { extractModel, getProviderFromModelHub } from "./prompt_utils";
-import { useTranslate } from "@/i18n";
+import { useTranslate, useI18n } from "@/i18n";
+import { formatDate as formatDateUtil } from "@/utils/dateUtils";
 
 interface PromptTableProps {
   promptsList: PromptSpec[];
@@ -40,6 +41,7 @@ const PromptTable: React.FC<PromptTableProps> = ({
   isAdmin,
 }) => {
   const t = useTranslate();
+  const { locale } = useI18n();
   const [sorting, setSorting] = useState<SortingState>([{ id: "created_at", desc: true }]);
   const [modelHubData, setModelHubData] = useState<Map<string, ModelGroupInfo>>(new Map());
 
@@ -67,8 +69,7 @@ const PromptTable: React.FC<PromptTableProps> = ({
   // Format date helper function
   const formatDate = (dateString?: string) => {
     if (!dateString) return "-";
-    const date = new Date(dateString);
-    return date.toLocaleString();
+    return formatDateUtil(dateString, locale, true);
   };
 
   const copyToClipboard = (text: string) => {

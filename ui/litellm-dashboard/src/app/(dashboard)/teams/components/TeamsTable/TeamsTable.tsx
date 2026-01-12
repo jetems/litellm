@@ -7,6 +7,8 @@ import { type KeyResponse, Team } from "@/components/key_team_helpers/key_list";
 import { Member, Organization } from "@/components/networking";
 import ModelsCell from "@/app/(dashboard)/teams/components/TeamsTable/ModelsCell";
 import YourRoleCell from "@/app/(dashboard)/teams/components/TeamsTable/YourRoleCell/YourRoleCell";
+import { useI18n } from "@/i18n";
+import { formatDate } from "@/utils/dateUtils";
 
 type TeamsTableProps = {
   teams: Team[] | null;
@@ -38,6 +40,7 @@ const TeamsTable = ({
   setEditTeam,
   onDeleteTeam,
 }: TeamsTableProps) => {
+  const { locale } = useI18n();
   return (
     <Table>
       <TableHead>
@@ -97,7 +100,7 @@ const TeamsTable = ({
                       overflow: "hidden",
                     }}
                   >
-                    {team.created_at ? new Date(team.created_at).toLocaleDateString() : "N/A"}
+                    {team.created_at ? formatDate(team.created_at, locale, false) : "N/A"}
                   </TableCell>
                   <TableCell
                     style={{

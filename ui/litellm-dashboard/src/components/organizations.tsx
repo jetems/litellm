@@ -34,7 +34,8 @@ import { formatNumberWithCommas } from "../utils/dataUtils";
 import NotificationsManager from "./molecules/notifications_manager";
 import DeleteResourceModal from "./common_components/DeleteResourceModal";
 import TableIconActionButton from "./common_components/IconActionButton/TableIconActionButtons/TableIconActionButton";
-import { useTranslate } from "@/i18n";
+import { useTranslate, useI18n } from "@/i18n";
+import { formatDate } from "@/utils/dateUtils";
 
 interface OrganizationsTableProps {
   organizations: Organization[];
@@ -62,14 +63,15 @@ const OrganizationsTable: React.FC<OrganizationsTableProps> = ({
   userRole,
   userModels,
   accessToken,
-  lastRefreshed,
-  handleRefreshClick,
+  lastRefreshed: externalLastRefreshed,
+  handleRefreshClick: externalHandleRefreshClick,
   currentOrg,
   guardrailsList = [],
   setOrganizations,
   premiumUser,
 }) => {
   const t = useTranslate();
+  const { locale } = useI18n();
   const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null);
   const [editOrg, setEditOrg] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -78,12 +80,28 @@ const OrganizationsTable: React.FC<OrganizationsTableProps> = ({
   const [isOrgModalVisible, setIsOrgModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [expandedAccordions, setExpandedAccordions] = useState<Record<string, boolean>>({});
+  const [internalLastRefreshed, setInternalLastRefreshed] = useState<string>("");
+
+  // Internal refresh handler
+  const internalHandleRefreshClick = React.useCallback(() => {
+    if (accessToken) {
+      fetchOrganizations(accessToken, setOrganizations);
+      const currentDate = new Date();
+      setInternalLastRefreshed(formatDate(currentDate, locale, true));
+    }
+  }, [accessToken, locale, setOrganizations]);
+
+  // Use external props if provided, otherwise use internal state
+  const lastRefreshed = externalLastRefreshed ?? internalLastRefreshed;
+  const handleRefreshClick = externalHandleRefreshClick ?? internalHandleRefreshClick;
 
   useEffect(() => {
     if (accessToken) {
       fetchOrganizations(accessToken, setOrganizations);
+      const currentDate = new Date();
+      setInternalLastRefreshed(formatDate(currentDate, locale, true));
     }
-  }, [accessToken]);
+  }, [accessToken, locale, setOrganizations]);
 
   const handleDelete = (orgId: string | null) => {
     if (!orgId) return;
@@ -258,7 +276,7 @@ const OrganizationsTable: React.FC<OrganizationsTableProps> = ({
                                     </TableCell>
                                     <TableCell>{org.organization_alias}</TableCell>
                                     <TableCell>
-                                      {org.created_at ? new Date(org.created_at).toLocaleDateString() : t("n/a")}
+                                      {org.created_at ? formatDate(org.created_at, locale, false) : t("n/a")}
                                     </TableCell>
                                     <TableCell>{formatNumberWithCommas(org.spend, 4)}</TableCell>
                                     <TableCell>
