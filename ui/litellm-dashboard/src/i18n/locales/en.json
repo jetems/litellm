@@ -2362,5 +2362,13 @@
     "No access token found": "No access token found",
     "Request transformed successfully": "Request transformed successfully",
     "Transformed request received in unexpected format": "Transformed request received in unexpected format",
-    "Failed to transform request": "Failed to transform request"
+    "Failed to transform request": "Failed to transform request",
+    "No tags found": "No tags found",
+    "You cannot view the information of a dynamically generated spend tag": "You cannot view the information of a dynamically generated spend tag",
+    "Dynamically generated spend tags cannot be edited": "Dynamically generated spend tags cannot be edited",
+    "Edit tag": "Edit tag",
+    "Edit tag (disabled)": "Edit tag (disabled)",
+    "Dynamically generated spend tags cannot be deleted": "Dynamically generated spend tags cannot be deleted",
+    "Delete tag": "Delete tag",
+    "Delete tag (disabled)": "Delete tag (disabled)"
 }

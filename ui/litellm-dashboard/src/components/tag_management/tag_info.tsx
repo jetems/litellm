@@ -22,6 +22,8 @@ import BudgetDurationDropdown from "../common_components/budget_duration_dropdow
 import { copyToClipboard as utilCopyToClipboard } from "@/utils/dataUtils";
 import { CheckIcon, CopyIcon } from "lucide-react";
 import { Button as AntdButton } from "antd";
+import { useI18n } from "@/i18n";
+import { formatDate } from "@/utils/dateUtils";
 
 interface TagInfoViewProps {
   tagId: string;
@@ -32,6 +34,7 @@ interface TagInfoViewProps {
 }
 
 const TagInfoView: React.FC<TagInfoViewProps> = ({ tagId, onClose, accessToken, is_admin, editTag }) => {
+  const { locale } = useI18n();
   const [form] = Form.useForm();
   const [tagDetails, setTagDetails] = useState<Tag | null>(null);
   const [isEditing, setIsEditing] = useState<boolean>(editTag);
@@ -253,11 +256,11 @@ const TagInfoView: React.FC<TagInfoViewProps> = ({ tagId, onClose, accessToken, 
               </div>
               <div>
                 <Text className="font-medium">Created</Text>
-                <Text>{tagDetails.created_at ? new Date(tagDetails.created_at).toLocaleString() : "-"}</Text>
+                <Text>{tagDetails.created_at ? formatDate(tagDetails.created_at, locale, true) : "-"}</Text>
               </div>
               <div>
                 <Text className="font-medium">Last Updated</Text>
-                <Text>{tagDetails.updated_at ? new Date(tagDetails.updated_at).toLocaleString() : "-"}</Text>
+                <Text>{tagDetails.updated_at ? formatDate(tagDetails.updated_at, locale, true) : "-"}</Text>
               </div>
             </div>
           </Card>

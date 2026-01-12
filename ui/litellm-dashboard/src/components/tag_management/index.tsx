@@ -8,8 +8,9 @@ import { Tag } from "./types";
 import TagTable from "./TagTable";
 import NotificationsManager from "../molecules/notifications_manager";
 import CreateTagModal from "./components/CreateTagModal";
-import { useTranslate } from "@/i18n";
+import { useTranslate, useI18n } from "@/i18n";
 import { T } from "@/i18n";
+import { formatDate } from "@/utils/dateUtils";
 
 interface ModelInfo {
   model_name: string;
@@ -29,6 +30,7 @@ interface TagProps {
 
 const TagManagement: React.FC<TagProps> = ({ accessToken, userID, userRole }) => {
   const t = useTranslate();
+  const { locale } = useI18n();
   const [tags, setTags] = useState<Tag[]>([]);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [selectedTagId, setSelectedTagId] = useState<string | null>(null);
@@ -53,7 +55,7 @@ const TagManagement: React.FC<TagProps> = ({ accessToken, userID, userRole }) =>
   const handleRefreshClick = () => {
     fetchTags();
     const currentDate = new Date();
-    setLastRefreshed(currentDate.toLocaleString());
+    setLastRefreshed(formatDate(currentDate, locale, true));
   };
 
   const handleCreate = async (formValues: any) => {

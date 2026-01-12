@@ -2362,5 +2362,13 @@
     "No access token found": "未找到访问令牌",
     "Request transformed successfully": "请求转换成功",
     "Transformed request received in unexpected format": "收到格式意外的转换请求",
-    "Failed to transform request": "转换请求失败"
+    "Failed to transform request": "转换请求失败",
+    "No tags found": "未找到标签",
+    "You cannot view the information of a dynamically generated spend tag": "您无法查看动态生成的支出标签的信息",
+    "Dynamically generated spend tags cannot be edited": "动态生成的支出标签无法编辑",
+    "Edit tag": "编辑标签",
+    "Edit tag (disabled)": "编辑标签（已禁用）",
+    "Dynamically generated spend tags cannot be deleted": "动态生成的支出标签无法删除",
+    "Delete tag": "删除标签",
+    "Delete tag (disabled)": "删除标签（已禁用）"
 }
