@@ -241,9 +241,9 @@ const SSOModals: React.FC<SSOModalsProps> = ({
     return config.fields.map((field) => (
       <Form.Item
         key={field.name}
-        label={field.label}
+        label={t(field.label)}
         name={field.name}
-        rules={[{ required: true, message: t("Please enter the") + ` ${field.label.toLowerCase()}` }]}
+        rules={[{ required: true, message: t("Please enter the") + ` ${t(field.label).toLowerCase()}` }]}
       >
         {field.name.includes("client") ? <Input.Password /> : <TextInput placeholder={field.placeholder} />}
       </Form.Item>
@@ -269,7 +269,7 @@ const SSOModals: React.FC<SSOModalsProps> = ({
         >
           <>
             <Form.Item
-              label="SSO Provider"
+              label={t("SSO Provider")}
               name="sso_provider"
               rules={[{ required: true, message: t("Please select an SSO provider") }]}
             >
@@ -307,14 +307,14 @@ const SSOModals: React.FC<SSOModalsProps> = ({
             </Form.Item>
 
             <Form.Item
-              label="Proxy Admin Email"
+              label={t("Proxy Admin Email")}
               name="user_email"
               rules={[{ required: true, message: t("Please enter the email of the proxy admin") }]}
             >
               <TextInput />
             </Form.Item>
             <Form.Item
-              label="Proxy Base URL"
+              label={t("Proxy Base URL")}
               name="proxy_base_url"
               normalize={(value) => value?.trim()}
               rules={[

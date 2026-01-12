@@ -45,7 +45,7 @@ export default function UISettings() {
       ) : (
         <Space direction="vertical" size="large" style={{ width: "100%" }}>
           {schema?.description && (
-            <Typography.Paragraph style={{ marginBottom: 0 }}>{schema.description}</Typography.Paragraph>
+            <Typography.Paragraph style={{ marginBottom: 0 }}>{t(schema.description)}</Typography.Paragraph>
           )}
 
           {updateError && (
@@ -66,7 +66,7 @@ export default function UISettings() {
             />
             <Space direction="vertical" size={4}>
               <Typography.Text strong>{t("Disable model add for internal users")}</Typography.Text>
-              {property?.description && <Typography.Text type="secondary">{property.description}</Typography.Text>}
+              {property?.description && <Typography.Text type="secondary">{t(property.description)}</Typography.Text>}
             </Space>
           </Space>
         </Space>

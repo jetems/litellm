@@ -96,7 +96,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   }
 
   const baseUrl = useBaseUrl();
-  const all_ip_address_allowed = "All IP Addresses Allowed";
+  const all_ip_address_allowed = t("All IP Addresses Allowed");
 
   let nonSssoUrl = baseUrl;
   nonSssoUrl += "/fallback/login";
