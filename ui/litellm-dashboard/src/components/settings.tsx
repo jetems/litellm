@@ -41,6 +41,7 @@ import { parseErrorMessage } from "./shared/errorUtils";
 import DeleteResourceModal from "./common_components/DeleteResourceModal";
 import { useTranslate } from "@/i18n";
 import { T } from "@/i18n";
+import CloudZeroCostTracking from "./CloudZeroCostTracking/CloudZeroCostTracking";
 interface SettingsPageProps {
   accessToken: string | null;
   userRole: string | null;
@@ -573,10 +574,11 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
       <Grid numItems={1} className="gap-2 p-8 w-full mt-2">
         <TabGroup>
           <TabList variant="line" defaultValue="1">
-            <Tab value="1"><T>Logging Callbacks</T></Tab>
-            <Tab value="2"><T>Alerting Types</T></Tab>
-            <Tab value="3"><T>Alerting Settings</T></Tab>
-            <Tab value="4"><T>Email Alerts</T></Tab>
+            <Tab value="1">Logging Callbacks</Tab>
+            <Tab value="2">CloudZero Cost Tracking</Tab>
+            <Tab value="2">Alerting Types</Tab>
+            <Tab value="3">Alerting Settings</Tab>
+            <Tab value="4">Email Alerts</Tab>
           </TabList>
           <TabPanels>
             <TabPanel>
@@ -598,6 +600,11 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
                   }
                 }}
               />
+            </TabPanel>
+            <TabPanel>
+              <div className="p-8">
+                <CloudZeroCostTracking />
+              </div>
             </TabPanel>
             <TabPanel>
               <Card>

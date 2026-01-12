@@ -374,9 +374,9 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
     return () => clearTimeout(timeoutId);
   }, [fetchUserSpendData]);
 
-  const modelMetrics = processActivityData(userSpendData, "models");
-  const keyMetrics = processActivityData(userSpendData, "api_keys");
-  const mcpServerMetrics = processActivityData(userSpendData, "mcp_servers");
+  const modelMetrics = processActivityData(userSpendData, "models", teams);
+  const keyMetrics = processActivityData(userSpendData, "api_keys", teams);
+  const mcpServerMetrics = processActivityData(userSpendData, "mcp_servers", teams);
 
   return (
     <div style={{ width: "100%" }} className="p-8 relative">
