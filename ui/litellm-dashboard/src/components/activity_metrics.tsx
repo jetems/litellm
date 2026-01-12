@@ -7,6 +7,7 @@ import { DailyData, KeyMetricWithMetadata, ModelActivityData, TopApiKeyData } fr
 import { valueFormatter } from "./UsagePage/utils/value_formatters";
 import { Team } from "./key_team_helpers/key_list";
 import { resolveTeamAliasFromTeamID } from "@/utils/teamUtils";
+import { useTranslate } from "@/i18n";
 
 interface ActivityMetricsProps {
   modelMetrics: Record<string, ModelActivityData>;
