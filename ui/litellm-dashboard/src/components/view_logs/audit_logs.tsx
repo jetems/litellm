@@ -501,7 +501,7 @@ export default function AuditLogs({
                       d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                     />
                   </svg>
-                  <span>Refresh</span>
+                  <span>{t("Refresh")}</span>
                 </button>
               </div>
             </div>
@@ -547,8 +547,8 @@ export default function AuditLogs({
                         <button
                           key={option.value}
                           className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 rounded-md ${selectedActionFilter === option.value
-                              ? "bg-blue-50 text-blue-600 font-medium"
-                              : "font-normal"
+                            ? "bg-blue-50 text-blue-600 font-medium"
+                            : "font-normal"
                             }`}
                           onClick={() => {
                             setSelectedActionFilter(option.value);
@@ -601,8 +601,8 @@ export default function AuditLogs({
                         <button
                           key={option.value}
                           className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 rounded-md ${selectedTableFilter === option.value
-                              ? "bg-blue-50 text-blue-600 font-medium"
-                              : "font-normal"
+                            ? "bg-blue-50 text-blue-600 font-medium"
+                            : "font-normal"
                             }`}
                           onClick={() => {
                             setSelectedTableFilter(option.value);
