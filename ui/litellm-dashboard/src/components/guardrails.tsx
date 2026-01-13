@@ -11,7 +11,6 @@ import { Guardrail, GuardrailDefinitionLocation } from "./guardrails/types";
 import DeleteResourceModal from "./common_components/DeleteResourceModal";
 import { getGuardrailLogoAndName } from "./guardrails/guardrail_info_helpers";
 import { useTranslate } from "@/i18n";
-import { T } from "@/i18n";
 
 interface GuardrailsPanelProps {
   accessToken: string | null;

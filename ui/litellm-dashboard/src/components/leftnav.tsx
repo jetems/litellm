@@ -23,7 +23,7 @@ import {
 } from "@ant-design/icons";
 import { Badge, ConfigProvider, Layout, Menu } from "antd";
 import type { MenuProps } from "antd";
-import { all_admin_roles, internalUserRoles, isAdminRole, rolesWithWriteAccess } from "../utils/roles";
+import { all_admin_roles, internalUserRoles, rolesWithWriteAccess } from "../utils/roles";
 import { useTranslate } from "@/i18n";
 const { Sider } = Layout;
 

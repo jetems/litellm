@@ -1,7 +1,6 @@
 import React from "react";
 import { Select } from "antd";
 import { useTranslate } from "@/i18n";
-import { T } from "@/i18n";
 
 interface RoutingStrategySelectorProps {
   selectedStrategy: string | null;

@@ -570,7 +570,7 @@ const BulkCreateUsersButton: React.FC<BulkCreateUsersProps> = ({
                 <p className="mb-4"><T>Add multiple users at once by following these steps:</T></p>
                 <ol className="list-decimal list-inside space-y-2 ml-2 mb-4">
                   <li><T>Download our CSV template</T></li>
-                  <li><T>Add your users' information to the spreadsheet</T></li>
+                  <li><T>Add your users&apos; information to the spreadsheet</T></li>
                   <li><T>Save the file and upload it here</T></li>
                   <li><T>After creation, download the results file containing the Virtual Keys for each user</T></li>
                 </ol>
@@ -582,7 +582,7 @@ const BulkCreateUsersButton: React.FC<BulkCreateUsersProps> = ({
                       <div className="w-3 h-3 rounded-full bg-red-500 mt-1.5 mr-2 flex-shrink-0"></div>
                       <div>
                         <p className="font-medium">user_email</p>
-                        <p className="text-sm text-gray-600"><T>User's email address (required)</T></p>
+                        <p className="text-sm text-gray-600"><T>User&apos;s email address (required)</T></p>
                       </div>
                     </div>
                     <div className="flex items-start">
@@ -590,7 +590,7 @@ const BulkCreateUsersButton: React.FC<BulkCreateUsersProps> = ({
                       <div>
                         <p className="font-medium">user_role</p>
                         <p className="text-sm text-gray-600">
-                          <T>User's role (one of: "proxy_admin", "proxy_admin_viewer", "internal_user", "internal_user_viewer")</T>
+                          <T>User&apos;s role (one of: &quot;proxy_admin&quot;, &quot;proxy_admin_viewer&quot;, &quot;internal_user&quot;, &quot;internal_user_viewer&quot;)</T>
                         </p>
                       </div>
                     </div>
@@ -599,7 +599,7 @@ const BulkCreateUsersButton: React.FC<BulkCreateUsersProps> = ({
                       <div>
                         <p className="font-medium">teams</p>
                         <p className="text-sm text-gray-600">
-                          <T>Comma-separated team IDs (e.g., "team-1,team-2")</T>
+                          <T>Comma-separated team IDs (e.g., &quot;team-1,team-2&quot;)</T>
                         </p>
                       </div>
                     </div>
@@ -607,7 +607,7 @@ const BulkCreateUsersButton: React.FC<BulkCreateUsersProps> = ({
                       <div className="w-3 h-3 rounded-full bg-gray-300 mt-1.5 mr-2 flex-shrink-0"></div>
                       <div>
                         <p className="font-medium">max_budget</p>
-                        <p className="text-sm text-gray-600"><T>Maximum budget as a number (e.g., "100")</T></p>
+                        <p className="text-sm text-gray-600"><T>Maximum budget as a number (e.g., &quot;100&quot;)</T></p>
                       </div>
                     </div>
                     <div className="flex items-start">
@@ -615,7 +615,7 @@ const BulkCreateUsersButton: React.FC<BulkCreateUsersProps> = ({
                       <div>
                         <p className="font-medium">budget_duration</p>
                         <p className="text-sm text-gray-600">
-                          <T>Budget reset period (e.g., "30d", "1mo")</T>
+                          <T>Budget reset period (e.g., &quot;30d&quot;, &quot;1mo&quot;)</T>
                         </p>
                       </div>
                     </div>
@@ -624,7 +624,7 @@ const BulkCreateUsersButton: React.FC<BulkCreateUsersProps> = ({
                       <div>
                         <p className="font-medium">models</p>
                         <p className="text-sm text-gray-600">
-                          <T>Comma-separated allowed models (e.g., "gpt-3.5-turbo,gpt-4")</T>
+                          <T>Comma-separated allowed models (e.g., &quot;gpt-3.5-turbo,gpt-4&quot;)</T>
                         </p>
                       </div>
                     </div>
