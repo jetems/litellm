@@ -22,6 +22,10 @@ import type { MenuProps } from "antd";
 import { Dropdown, Switch, Tooltip } from "antd";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import { useI18n, useTranslate, type Locale } from "@/i18n";
+import { T } from "@/i18n";
+import UsageIndicator from "@/components/usage_indicator";
+import { isAdminRole } from "@/utils/roles";
 
 interface NavbarProps {
   userID: string | null;
@@ -48,6 +52,7 @@ const Navbar: React.FC<NavbarProps> = ({
   sidebarCollapsed = false,
   onToggleSidebar,
 }) => {
+  const t = useTranslate();
   const baseUrl = getProxyBaseUrl();
   console.log("baseUrl", baseUrl);
   const [logoutUrl, setLogoutUrl] = useState("");
@@ -55,6 +60,15 @@ const Navbar: React.FC<NavbarProps> = ({
   const { logoUrl } = useTheme();
   const { data: healthData } = useHealthReadiness();
   const version = healthData?.litellm_version;
+  const { locale, setLocale } = useI18n();
+
+  // Language options
+  const languageOptions: { key: Locale; label: string; flag: string }[] = [
+    { key: "en", label: "English", flag: "🇺🇸" },
+    { key: "zh-CN", label: "中文", flag: "🇨🇳" },
+  ];
+
+  const currentLanguage = languageOptions.find((lang) => lang.key === locale) || languageOptions[0];
 
   // Simple logo URL: use custom logo if available, otherwise default
   const imageUrl = logoUrl || `${baseUrl}/get_image`;
@@ -100,14 +114,14 @@ const Navbar: React.FC<NavbarProps> = ({
               <span className="text-sm font-semibold text-gray-900">{userID}</span>
             </div>
             {premiumUser ? (
-              <Tooltip title="Premium User" placement="left">
+              <Tooltip title={t("Premium User")} placement="left">
                 <div className="flex items-center bg-gradient-to-r from-amber-500 to-yellow-500 text-white px-2 py-0.5 rounded-full cursor-help">
                   <CrownOutlined className="mr-1 text-xs" />
                   <span className="text-xs font-medium">Premium</span>
                 </div>
               </Tooltip>
             ) : (
-              <Tooltip title="Upgrade to Premium for advanced features" placement="left">
+              <Tooltip title={t("Upgrade to Premium for advanced features")} placement="left">
                 <div className="flex items-center bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full cursor-help">
                   <CrownOutlined className="mr-1 text-xs" />
                   <span className="text-xs font-medium">Standard</span>
@@ -118,14 +132,14 @@ const Navbar: React.FC<NavbarProps> = ({
           <div className="space-y-2">
             <div className="flex items-center text-sm">
               <SafetyOutlined className="mr-2 text-gray-400 text-xs" />
-              <span className="text-gray-500 text-xs">Role</span>
+              <span className="text-gray-500 text-xs"><T>Role</T></span>
               <span className="ml-auto text-gray-700 font-medium">{userRole}</span>
             </div>
             <div className="flex items-center text-sm">
               <MailOutlined className="mr-2 text-gray-400 text-xs" />
-              <span className="text-gray-500 text-xs">Email</span>
-              <span className="ml-auto text-gray-700 font-medium truncate max-w-[150px]" title={userEmail || "Unknown"}>
-                {userEmail || "Unknown"}
+              <span className="text-gray-500 text-xs"><T>Email</T></span>
+              <span className="ml-auto text-gray-700 font-medium truncate max-w-[150px]" title={userEmail || t("Unknown")}>
+                {userEmail || t("Unknown")}
               </span>
             </div>
             <div
@@ -159,7 +173,7 @@ const Navbar: React.FC<NavbarProps> = ({
       label: (
         <div className="flex items-center py-2 px-3 hover:bg-gray-50 rounded-md mx-1 my-1" onClick={handleLogout}>
           <LogoutOutlined className="mr-3 text-gray-600" />
-          <span className="text-gray-800">Logout</span>
+          <span className="text-gray-800"><T>Logout</T></span>
         </div>
       ),
     },
@@ -174,7 +188,7 @@ const Navbar: React.FC<NavbarProps> = ({
               <button
                 onClick={onToggleSidebar}
                 className="flex items-center justify-center w-10 h-10 mr-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
-                title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                title={sidebarCollapsed ? t("Expand sidebar") : t("Collapse sidebar")}
               >
                 <span className="text-lg">{sidebarCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}</span>
               </button>
@@ -187,7 +201,7 @@ const Navbar: React.FC<NavbarProps> = ({
                   <span
                     className="absolute -top-1 -right-2 text-lg animate-bounce"
                     style={{ animationDuration: "2s" }}
-                    title="Happy Holidays!"
+                    title={t("Happy Holidays!")}
                   >
                     🎄
                   </span>
@@ -207,14 +221,56 @@ const Navbar: React.FC<NavbarProps> = ({
           </div>
           {/* Right side nav items */}
           <div className="flex items-center space-x-5 ml-auto">
+            {/* Usage Indicator - only for admin */}
+            {!isPublicPage && isAdminRole(userRole || "") && (
+              <UsageIndicator accessToken={accessToken} />
+            )}
+
             <a
               href="https://docs.litellm.ai/docs/"
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
             >
-              Docs
+              <T>Docs</T>
             </a>
+
+            {/* Language Switcher */}
+            <Dropdown
+              menu={{
+                items: languageOptions.map((lang) => ({
+                  key: lang.key,
+                  label: (
+                    <div
+                      className={`flex items-center py-2 px-3 hover:bg-gray-50 rounded-md mx-1 my-1 cursor-pointer ${locale === lang.key ? "bg-blue-50" : ""
+                        }`}
+                      onClick={() => setLocale(lang.key)}
+                    >
+                      <span className="mr-2">{lang.flag}</span>
+                      <span className={`text-gray-800 ${locale === lang.key ? "font-medium text-blue-600" : ""}`}>
+                        {lang.label}
+                      </span>
+                      {locale === lang.key && <span className="ml-auto text-blue-600">✓</span>}
+                    </div>
+                  ),
+                })),
+                className: "min-w-[140px]",
+                style: {
+                  padding: "4px",
+                  marginTop: "8px",
+                  borderRadius: "8px",
+                  boxShadow: "0 4px 16px rgba(0, 0, 0, 0.08)",
+                },
+              }}
+            >
+              <button className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                <span className="mr-1">{currentLanguage.flag}</span>
+                {currentLanguage.label}
+                <svg className="ml-1 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            </Dropdown>
 
             {!isPublicPage && (
               <Dropdown
@@ -233,7 +289,7 @@ const Navbar: React.FC<NavbarProps> = ({
                 }}
               >
                 <button className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors">
-                  User
+                  <T>User</T>
                   <svg className="ml-1 w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
                   </svg>
