@@ -1,3 +1,5 @@
+import { useOrganizations } from "@/app/(dashboard)/hooks/organizations/useOrganizations";
+import useAuthorized from "@/app/(dashboard)/hooks/useAuthorized";
 import {
   ApiOutlined,
   AppstoreOutlined,
@@ -21,17 +23,19 @@ import {
   ToolOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Badge, ConfigProvider, Layout, Menu } from "antd";
 import type { MenuProps } from "antd";
-import { all_admin_roles, internalUserRoles, rolesWithWriteAccess } from "../utils/roles";
+import { ConfigProvider, Layout, Menu } from "antd";
+import { useMemo } from "react";
+import { all_admin_roles, internalUserRoles, isAdminRole, rolesWithWriteAccess } from "../utils/roles";
+import type { Organization } from "./networking";
+import UsageIndicator from "./usage_indicator";
+import NewBadge from "./common_components/NewBadge";
 import { useTranslate } from "@/i18n";
 const { Sider } = Layout;
 
 // Define the props type
 interface SidebarProps {
-  accessToken: string | null;
   setPage: (page: string) => void;
-  userRole: string;
   defaultSelectedKey: string;
   collapsed?: boolean;
 }
@@ -53,8 +57,18 @@ interface MenuGroup {
   roles?: string[];
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ accessToken, setPage, userRole, defaultSelectedKey, collapsed = false }) => {
+const Sidebar: React.FC<SidebarProps> = ({ setPage, defaultSelectedKey, collapsed = false }) => {
+  const { userId, accessToken, userRole } = useAuthorized();
+  const { data: organizations } = useOrganizations();
   const t = useTranslate();
+
+  // Check if user is an org_admin
+  const isOrgAdmin = useMemo(() => {
+    if (!userId || !organizations) return false;
+    return organizations.some((org: Organization) =>
+      org.members?.some((member) => member.user_id === userId && member.user_role === "org_admin"),
+    );
+  }, [userId, organizations]);
 
   // Navigate to page helper
   const navigateToPage = (page: string) => {
@@ -67,68 +81,64 @@ const Sidebar: React.FC<SidebarProps> = ({ accessToken, setPage, userRole, defau
   // Menu groups organized by category
   const menuGroups: MenuGroup[] = [
     {
-      groupLabel: t("AI GATEWAY"),
+      groupLabel: "AI GATEWAY",
       items: [
         {
           key: "api-keys",
           page: "api-keys",
-          label: t("Virtual Keys"),
+          label: "Virtual Keys",
           icon: <KeyOutlined />,
         },
         {
           key: "llm-playground",
           page: "llm-playground",
-          label: t("Playground"),
+          label: "Playground",
           icon: <PlayCircleOutlined />,
           roles: rolesWithWriteAccess,
         },
         {
           key: "models",
           page: "models",
-          label: t("Models + Endpoints"),
+          label: "Models + Endpoints",
           icon: <BlockOutlined />,
           roles: rolesWithWriteAccess,
         },
         {
           key: "agents",
           page: "agents",
-          label: (
-            <span className="flex items-center gap-4">
-              {t("Agents")} <Badge color="blue" count="New" />
-            </span>
-          ),
+          label: <span className="flex items-center gap-4">Agents</span>,
           icon: <RobotOutlined />,
           roles: rolesWithWriteAccess,
         },
         {
           key: "mcp-servers",
           page: "mcp-servers",
-          label: t("MCP Servers"),
+          label: "MCP Servers",
           icon: <ToolOutlined />,
         },
         {
           key: "guardrails",
           page: "guardrails",
-          label: t("Guardrails"),
+          label: "Guardrails",
           icon: <SafetyOutlined />,
           roles: all_admin_roles,
         },
         {
           key: "tools",
           page: "tools",
-          label: t("Tools"),
+          label: "Tools",
           icon: <ToolOutlined />,
           children: [
             {
               key: "search-tools",
               page: "search-tools",
-              label: t("Search Tools"),
+              label: "Search Tools",
               icon: <SearchOutlined />,
             },
             {
               key: "vector-stores",
               page: "vector-stores",
-              label: t("Vector Stores"),
+              label: "Vector Stores",
               icon: <DatabaseOutlined />,
               roles: all_admin_roles,
             },
@@ -137,7 +147,7 @@ const Sidebar: React.FC<SidebarProps> = ({ accessToken, setPage, userRole, defau
       ],
     },
     {
-      groupLabel: t("OBSERVABILITY"),
+      groupLabel: "OBSERVABILITY",
       items: [
         {
           key: "new_usage",
@@ -146,103 +156,103 @@ const Sidebar: React.FC<SidebarProps> = ({ accessToken, setPage, userRole, defau
           roles: [...all_admin_roles, ...internalUserRoles],
           label: (
             <span className="flex items-center gap-4">
-              {t("Usage")} <Badge color="blue" count="New" />
+              Usage <NewBadge />
             </span>
           ),
         },
         {
           key: "logs",
           page: "logs",
-          label: t("Logs"),
+          label: "Logs",
           icon: <LineChartOutlined />,
         },
       ],
     },
     {
-      groupLabel: t("ACCESS CONTROL"),
+      groupLabel: "ACCESS CONTROL",
       items: [
         {
           key: "users",
           page: "users",
-          label: t("Internal Users"),
+          label: "Internal Users",
           icon: <UserOutlined />,
           roles: all_admin_roles,
         },
         {
           key: "teams",
           page: "teams",
-          label: t("Teams"),
+          label: "Teams",
           icon: <TeamOutlined />,
         },
         {
           key: "organizations",
           page: "organizations",
-          label: t("Organizations"),
+          label: "Organizations",
           icon: <BankOutlined />,
           roles: all_admin_roles,
         },
         {
           key: "budgets",
           page: "budgets",
-          label: t("Budgets"),
+          label: "Budgets",
           icon: <CreditCardOutlined />,
           roles: all_admin_roles,
         },
       ],
     },
     {
-      groupLabel: t("DEVELOPER TOOLS"),
+      groupLabel: "DEVELOPER TOOLS",
       items: [
         {
           key: "api_ref",
           page: "api_ref",
-          label: t("API Reference"),
+          label: "API Reference",
           icon: <ApiOutlined />,
         },
         {
           key: "model-hub-table",
           page: "model-hub-table",
-          label: t("AI Hub"),
+          label: "AI Hub",
           icon: <AppstoreOutlined />,
         },
         {
           key: "experimental",
           page: "experimental",
-          label: t("Experimental"),
+          label: "Experimental",
           icon: <ExperimentOutlined />,
           children: [
             {
               key: "caching",
               page: "caching",
-              label: t("Caching"),
+              label: "Caching",
               icon: <DatabaseOutlined />,
               roles: all_admin_roles,
             },
             {
               key: "prompts",
               page: "prompts",
-              label: t("Prompts"),
+              label: "Prompts",
               icon: <FileTextOutlined />,
               roles: all_admin_roles,
             },
             {
               key: "transform-request",
               page: "transform-request",
-              label: t("API Playground"),
+              label: "API Playground",
               icon: <ApiOutlined />,
               roles: [...all_admin_roles, ...internalUserRoles],
             },
             {
               key: "tag-management",
               page: "tag-management",
-              label: t("Tag Management"),
+              label: "Tag Management",
               icon: <TagsOutlined />,
               roles: all_admin_roles,
             },
             {
               key: "4",
               page: "usage",
-              label: t("Old Usage"),
+              label: "Old Usage",
               icon: <BarChartOutlined />,
             },
           ],
@@ -250,48 +260,48 @@ const Sidebar: React.FC<SidebarProps> = ({ accessToken, setPage, userRole, defau
       ],
     },
     {
-      groupLabel: t("SETTINGS"),
+      groupLabel: "SETTINGS",
       roles: all_admin_roles,
       items: [
         {
           key: "settings",
           page: "settings",
-          label: t("Settings"),
+          label: <span className="flex items-center gap-4">Settings</span>,
           icon: <SettingOutlined />,
           roles: all_admin_roles,
           children: [
             {
               key: "router-settings",
               page: "router-settings",
-              label: t("Router Settings"),
+              label: "Router Settings",
               icon: <SettingOutlined />,
               roles: all_admin_roles,
             },
             {
               key: "logging-and-alerts",
               page: "logging-and-alerts",
-              label: t("Logging & Alerts"),
+              label: "Logging & Alerts",
               icon: <SettingOutlined />,
               roles: all_admin_roles,
             },
             {
               key: "admin-panel",
               page: "admin-panel",
-              label: t("Admin Settings"),
+              label: "Admin Settings",
               icon: <SettingOutlined />,
               roles: all_admin_roles,
             },
             {
               key: "cost-tracking",
               page: "cost-tracking",
-              label: t("Cost Tracking"),
+              label: "Cost Tracking",
               icon: <BarChartOutlined />,
               roles: all_admin_roles,
             },
             {
               key: "ui-theme",
               page: "ui-theme",
-              label: t("UI Theme"),
+              label: "UI Theme",
               icon: <BgColorsOutlined />,
               roles: all_admin_roles,
             },
@@ -304,7 +314,13 @@ const Sidebar: React.FC<SidebarProps> = ({ accessToken, setPage, userRole, defau
   // Filter items based on user role
   const filterItemsByRole = (items: MenuItem[]): MenuItem[] => {
     return items
-      .filter((item) => !item.roles || item.roles.includes(userRole))
+      .filter((item) => {
+        // Special handling for organizations menu item - allow org_admins
+        if (item.key === "organizations") {
+          return !item.roles || item.roles.includes(userRole) || isOrgAdmin;
+        }
+        return !item.roles || item.roles.includes(userRole);
+      })
       .map((item) => ({
         ...item,
         children: item.children ? filterItemsByRole(item.children) : undefined,
@@ -422,6 +438,7 @@ const Sidebar: React.FC<SidebarProps> = ({ accessToken, setPage, userRole, defau
             items={buildMenuItems()}
           />
         </ConfigProvider>
+        {isAdminRole(userRole) && !collapsed && <UsageIndicator accessToken={accessToken} width={220} />}
       </Sider>
     </Layout>
   );

@@ -599,7 +599,6 @@ const HealthCheckComponent: React.FC<HealthCheckComponentProps> = ({
             };
           })}
           isLoading={false}
-          table={healthTableRef}
         />
       </div>
 

@@ -1,66 +1,74 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
   Card,
-  Title,
+  Col,
+  Grid,
   Subtitle,
   Table,
-  TableHead,
-  TableRow,
-  TableHeaderCell,
-  TableCell,
   TableBody,
+  TableCell,
+  TableHead,
+  TableHeaderCell,
+  TableRow,
   Text,
-  Grid,
-  Col,
+  Title,
 } from "@tremor/react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { CredentialItem, credentialListCall, CredentialsResponse } from "../networking";
 
 import { handleAddModelSubmit } from "../add_model/handle_add_model_submit";
 
 import CredentialsPanel from "@/components/model_add/credentials";
-import { getDisplayModelName } from "../view_model/model_name_display";
-import { TabPanel, TabPanels, TabGroup, TabList, Tab, Icon } from "@tremor/react";
-import { Select, SelectItem, DateRangePickerValue } from "@tremor/react";
-import UsageDatePicker from "../shared/usage_date_picker";
+import { InfoCircleOutlined } from "@ant-design/icons";
+import { FilterIcon, RefreshIcon } from "@heroicons/react/outline";
 import {
-  modelInfoCall,
-  modelCostMap,
-  healthCheckCall,
-  modelMetricsCall,
-  streamingModelMetricsCall,
-  modelExceptionsCall,
-  modelMetricsSlowResponsesCall,
-  getCallbacksCall,
-  setCallbacksCall,
-  modelSettingsCall,
+  AreaChart,
+  BarChart,
+  Button,
+  DateRangePickerValue,
+  Icon,
+  Select,
+  SelectItem,
+  Tab,
+  TabGroup,
+  TabList,
+  TabPanel,
+  TabPanels,
+} from "@tremor/react";
+import type { UploadProps } from "antd";
+import { Form, InputNumber, Popover, Typography } from "antd";
+import AddModelTab from "../add_model/add_model_tab";
+import { Team } from "../key_team_helpers/key_list";
+import ModelInfoView from "../model_info_view";
+import TimeToFirstToken from "../model_metrics/time_to_first_token";
+import {
   adminGlobalActivityExceptions,
   adminGlobalActivityExceptionsPerDeployment,
   allEndUsersCall,
+  getCallbacksCall,
+  healthCheckCall,
+  modelCostMap,
+  modelExceptionsCall,
+  modelInfoCall,
+  modelMetricsCall,
+  modelMetricsSlowResponsesCall,
+  modelSettingsCall,
+  setCallbacksCall,
+  streamingModelMetricsCall,
 } from "../networking";
-import { BarChart, AreaChart } from "@tremor/react";
-import { Popover, Form, InputNumber } from "antd";
-import { Button } from "@tremor/react";
-import { Typography } from "antd";
-import { RefreshIcon, FilterIcon } from "@heroicons/react/outline";
-import { InfoCircleOutlined } from "@ant-design/icons";
-import type { UploadProps } from "antd";
-import TimeToFirstToken from "../model_metrics/time_to_first_token";
-import { Team } from "../key_team_helpers/key_list";
+import { getPlaceholder, getProviderModels, provider_map, Providers } from "../provider_info_helpers";
+import UsageDatePicker from "../shared/usage_date_picker";
 import TeamInfoView from "../team/team_info";
-import { Providers, provider_map, getPlaceholder, getProviderModels } from "../provider_info_helpers";
-import ModelInfoView from "../model_info_view";
-import AddModelTab from "../add_model/add_model_tab";
+import { getDisplayModelName } from "../view_model/model_name_display";
 
-import { ModelDataTable } from "../model_dashboard/table";
-import { columns } from "../molecules/models/columns";
-import PriceDataReload from "../price_data_reload";
-import HealthCheckComponent from "../model_dashboard/HealthCheckComponent";
-import PassThroughSettings from "../pass_through_settings";
-import ModelGroupAliasSettings from "../model_group_alias_settings";
 import { all_admin_roles } from "@/utils/roles";
-import { Table as TableInstance, PaginationState } from "@tanstack/react-table";
+import { PaginationState } from "@tanstack/react-table";
+import HealthCheckComponent from "../model_dashboard/HealthCheckComponent";
+import { ModelDataTable } from "../model_dashboard/table";
+import ModelGroupAliasSettings from "../model_group_alias_settings";
+import { columns } from "../molecules/models/columns";
 import NotificationsManager from "../molecules/notifications_manager";
-import { useTranslate } from "@/i18n";
+import PassThroughSettings from "../pass_through_settings";
+import PriceDataReload from "../price_data_reload";
 
 interface ModelDashboardProps {
   accessToken: string | null;
@@ -121,7 +129,6 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
   premiumUser,
   teams,
 }) => {
-  const t = useTranslate();
   const [addModelForm] = Form.useForm();
   const [autoRouterForm] = Form.useForm();
   const [modelMap, setModelMap] = useState<any>(null);
@@ -198,7 +205,6 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const tableRef = useRef<TableInstance<any>>(null);
 
   // Pagination state
   const [pagination, setPagination] = useState<PaginationState>({
@@ -944,7 +950,7 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
     );
   };
 
-  const handleOk = () => {
+  const handleOk = async () => {
     console.log("🚀 handleOk called from model dashboard!");
     console.log("Current form values:", addModelForm.getFieldsValue());
 
@@ -1015,7 +1021,6 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
           {selectedModelId ? (
             <ModelInfoView
               modelId={selectedModelId}
-              editModel={true}
               onClose={() => {
                 setSelectedModelId(null);
                 setEditModel(false);
@@ -1024,8 +1029,6 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
               accessToken={accessToken}
               userID={userID}
               userRole={userRole}
-              setEditModalVisible={setEditModalVisible}
-              setSelectedModel={setSelectedModel}
               onModelUpdate={(updatedModel) => {
                 // Update the model in the modelData.data array
                 const updatedModelData = {
@@ -1044,19 +1047,19 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
             <TabGroup index={selectedTabIndex} onIndexChange={setSelectedTabIndex} className="gap-2 h-[75vh] w-full ">
               <TabList className="flex justify-between mt-2 w-full items-center">
                 <div className="flex">
-                  {all_admin_roles.includes(userRole) ? <Tab>{t("All Models")}</Tab> : <Tab>{t("Your Models")}</Tab>}
-                  <Tab>{t("Add Model")}</Tab>
-                  {all_admin_roles.includes(userRole) && <Tab>{t("LLM Credentials")}</Tab>}
-                  {all_admin_roles.includes(userRole) && <Tab>{t("Pass-Through Endpoints")}</Tab>}
-                  {all_admin_roles.includes(userRole) && <Tab>{t("Health Status")}</Tab>}
-                  {all_admin_roles.includes(userRole) && <Tab>{t("Model Analytics")}</Tab>}
-                  {all_admin_roles.includes(userRole) && <Tab>{t("Model Retry Settings")}</Tab>}
-                  {all_admin_roles.includes(userRole) && <Tab>{t("Model Group Alias")}</Tab>}
-                  {all_admin_roles.includes(userRole) && <Tab>{t("Price Data Reload")}</Tab>}
+                  {all_admin_roles.includes(userRole) ? <Tab>All Models</Tab> : <Tab>Your Models</Tab>}
+                  <Tab>Add Model</Tab>
+                  {all_admin_roles.includes(userRole) && <Tab>LLM Credentials</Tab>}
+                  {all_admin_roles.includes(userRole) && <Tab>Pass-Through Endpoints</Tab>}
+                  {all_admin_roles.includes(userRole) && <Tab>Health Status</Tab>}
+                  {all_admin_roles.includes(userRole) && <Tab>Model Analytics</Tab>}
+                  {all_admin_roles.includes(userRole) && <Tab>Model Retry Settings</Tab>}
+                  {all_admin_roles.includes(userRole) && <Tab>Model Group Alias</Tab>}
+                  {all_admin_roles.includes(userRole) && <Tab>Price Data Reload</Tab>}
                 </div>
 
                 <div className="flex items-center space-x-2">
-                  {lastRefreshed && <Text>{t("Last Refreshed")}: {lastRefreshed}</Text>}
+                  {lastRefreshed && <Text>Last Refreshed: {lastRefreshed}</Text>}
                   <Icon
                     icon={RefreshIcon} // Modify as necessary for correct icon name
                     variant="shadow"
@@ -1267,9 +1270,9 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
                               <span className="text-sm text-gray-700">
                                 {filteredData.length > 0
                                   ? `Showing ${pagination.pageIndex * pagination.pageSize + 1} - ${Math.min(
-                                    (pagination.pageIndex + 1) * pagination.pageSize,
-                                    filteredData.length,
-                                  )} of ${filteredData.length} results`
+                                      (pagination.pageIndex + 1) * pagination.pageSize,
+                                      filteredData.length,
+                                    )} of ${filteredData.length} results`
                                   : "Showing 0 results"}
                               </span>
 
@@ -1281,10 +1284,11 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
                                       setPagination((prev) => ({ ...prev, pageIndex: prev.pageIndex - 1 }))
                                     }
                                     disabled={pagination.pageIndex === 0}
-                                    className={`px-3 py-1 text-sm border rounded-md ${pagination.pageIndex === 0
-                                      ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                      : "hover:bg-gray-50"
-                                      }`}
+                                    className={`px-3 py-1 text-sm border rounded-md ${
+                                      pagination.pageIndex === 0
+                                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                        : "hover:bg-gray-50"
+                                    }`}
                                   >
                                     Previous
                                   </button>
@@ -1296,10 +1300,11 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
                                     disabled={
                                       pagination.pageIndex >= Math.ceil(filteredData.length / pagination.pageSize) - 1
                                     }
-                                    className={`px-3 py-1 text-sm border rounded-md ${pagination.pageIndex >= Math.ceil(filteredData.length / pagination.pageSize) - 1
-                                      ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                      : "hover:bg-gray-50"
-                                      }`}
+                                    className={`px-3 py-1 text-sm border rounded-md ${
+                                      pagination.pageIndex >= Math.ceil(filteredData.length / pagination.pageSize) - 1
+                                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                        : "hover:bg-gray-50"
+                                    }`}
                                   >
                                     Next
                                   </button>
@@ -1319,14 +1324,11 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
                             getDisplayModelName,
                             handleEditClick,
                             handleRefreshClick,
-                            setEditModel,
                             expandedRows,
                             setExpandedRows,
-                            t,
                           )}
                           data={paginatedData}
                           isLoading={false}
-                          table={tableRef}
                         />
                       </div>
                     </div>
@@ -1348,7 +1350,6 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
                     credentials={credentialsList}
                     accessToken={accessToken}
                     userRole={userRole}
-                    premiumUser={premiumUser}
                   />
                 </TabPanel>
                 <TabPanel>
@@ -1385,7 +1386,7 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
                       />
                     </Col>
                     <Col className="ml-2">
-                      <Text>{t("Select Model Group")}</Text>
+                      <Text>Select Model Group</Text>
                       <Select
                         defaultValue={selectedModelGroup ? selectedModelGroup : availableModelGroups[0]}
                         value={selectedModelGroup ? selectedModelGroup : availableModelGroups[0]}
@@ -1428,18 +1429,18 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
                       <Card className="mr-2 max-h-[400px] min-h-[400px]">
                         <TabGroup>
                           <TabList variant="line" defaultValue="1">
-                            <Tab value="1">{t("Avg. Latency per Token")}</Tab>
-                            <Tab value="2">{t("Time to first token")}</Tab>
+                            <Tab value="1">Avg. Latency per Token</Tab>
+                            <Tab value="2">Time to first token</Tab>
                           </TabList>
                           <TabPanels>
                             <TabPanel>
-                              <p className="text-gray-500 italic"> {t("(seconds/token)")}</p>
+                              <p className="text-gray-500 italic"> (seconds/token)</p>
                               <Text className="text-gray-500 italic mt-1 mb-1">
-                                {t("average Latency for successfull requests divided by the total tokens")}
+                                average Latency for successfull requests divided by the total tokens
                               </Text>
                               {modelMetrics && modelMetricsCategories && (
                                 <AreaChart
-                                  title={t("Model Latency")}
+                                  title="Model Latency"
                                   className="h-72"
                                   data={modelMetrics}
                                   showLegend={false}
@@ -1467,10 +1468,10 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
                         <Table>
                           <TableHead>
                             <TableRow>
-                              <TableHeaderCell>{t("Deployment")}</TableHeaderCell>
-                              <TableHeaderCell>{t("Success Responses")}</TableHeaderCell>
+                              <TableHeaderCell>Deployment</TableHeaderCell>
+                              <TableHeaderCell>Success Responses</TableHeaderCell>
                               <TableHeaderCell>
-                                {t("Slow Responses")} <p>{t("Success Responses taking 600+s")}</p>
+                                Slow Responses <p>Success Responses taking 600+s</p>
                               </TableHeaderCell>
                             </TableRow>
                           </TableHead>
@@ -1489,7 +1490,7 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
                   </Grid>
                   <Grid numItems={1} className="gap-2 w-full mt-2">
                     <Card>
-                      <Title>{t("All Exceptions for")} {selectedModelGroup}</Title>
+                      <Title>All Exceptions for {selectedModelGroup}</Title>
 
                       <BarChart
                         className="h-60"
@@ -1504,7 +1505,7 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
 
                   <Grid numItems={1} className="gap-2 w-full mt-2">
                     <Card>
-                      <Title>{t("All Up Rate Limit Errors (429) for")} {selectedModelGroup}</Title>
+                      <Title>All Up Rate Limit Errors (429) for {selectedModelGroup}</Title>
                       <Grid numItems={1}>
                         <Col>
                           <Subtitle
@@ -1514,7 +1515,7 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
                               color: "#535452",
                             }}
                           >
-                            {t("Num Rate Limit Errors")} {globalExceptionData.sum_num_rate_limit_exceptions}
+                            Num Rate Limit Errors {globalExceptionData.sum_num_rate_limit_exceptions}
                           </Subtitle>
                           <BarChart
                             className="h-40"
@@ -1533,7 +1534,7 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
                       <>
                         {globalExceptionPerDeployment.map((globalActivity, index) => (
                           <Card key={index}>
-                            <Title>{globalActivity.api_base ? globalActivity.api_base : t("Unknown API Base")}</Title>
+                            <Title>{globalActivity.api_base ? globalActivity.api_base : "Unknown API Base"}</Title>
                             <Grid numItems={1}>
                               <Col>
                                 <Subtitle
@@ -1543,7 +1544,7 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
                                     color: "#535452",
                                   }}
                                 >
-                                  {t("Num Rate Limit Errors")} (429) {globalActivity.sum_num_rate_limit_exceptions}
+                                  Num Rate Limit Errors (429) {globalActivity.sum_num_rate_limit_exceptions}
                                 </Subtitle>
                                 <BarChart
                                   className="h-40"
@@ -1564,13 +1565,13 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
                           globalExceptionPerDeployment.length > 0 &&
                           globalExceptionPerDeployment.slice(0, 1).map((globalActivity, index) => (
                             <Card key={index}>
-                              <Title>✨ {t("Rate Limit Errors by Deployment")}</Title>
+                              <Title>✨ Rate Limit Errors by Deployment</Title>
                               <p className="mb-2 text-gray-500 italic text-[12px]">
-                                {t("Upgrade to see exceptions for all deployments")}
+                                Upgrade to see exceptions for all deployments
                               </p>
                               <Button variant="primary" className="mb-2">
                                 <a href="https://forms.gle/W3U4PZpJGFHWtHyA9" target="_blank">
-                                  {t("Get Free Trial")}
+                                  Get Free Trial
                                 </a>
                               </Button>
                               <Card>
@@ -1584,7 +1585,7 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
                                         color: "#535452",
                                       }}
                                     >
-                                      {t("Num Rate Limit Errors")} {globalActivity.sum_num_rate_limit_exceptions}
+                                      Num Rate Limit Errors {globalActivity.sum_num_rate_limit_exceptions}
                                     </Subtitle>
                                     <BarChart
                                       className="h-40"
@@ -1606,7 +1607,7 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
                 <TabPanel>
                   <div className="flex items-center gap-4 mb-6">
                     <div className="flex items-center">
-                      <Text>{t("Retry Policy Scope:")}</Text>
+                      <Text>Retry Policy Scope:</Text>
                       <Select
                         className="ml-2 w-48"
                         defaultValue="global"
@@ -1615,7 +1616,7 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
                         }
                         onValueChange={(value) => setSelectedModelGroup(value)}
                       >
-                        <SelectItem value="global">{t("Global Default")}</SelectItem>
+                        <SelectItem value="global">Global Default</SelectItem>
                         {availableModelGroups.map((group, idx) => (
                           <SelectItem key={idx} value={group} onClick={() => setSelectedModelGroup(group)}>
                             {group}
@@ -1627,14 +1628,14 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
 
                   {selectedModelGroup === "global" ? (
                     <>
-                      <Title>{t("Global Retry Policy")}</Title>
-                      <Text className="mb-6">{t("Default retry settings applied to all model groups unless overridden")}</Text>
+                      <Title>Global Retry Policy</Title>
+                      <Text className="mb-6">Default retry settings applied to all model groups unless overridden</Text>
                     </>
                   ) : (
                     <>
-                      <Title>{t("Retry Policy for")} {selectedModelGroup}</Title>
+                      <Title>Retry Policy for {selectedModelGroup}</Title>
                       <Text className="mb-6">
-                        {t("Model-specific retry settings. Falls back to global defaults if not set.")}
+                        Model-specific retry settings. Falls back to global defaults if not set.
                       </Text>
                     </>
                   )}
@@ -1664,7 +1665,7 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
                                 <Text>{exceptionType}</Text>
                                 {selectedModelGroup !== "global" && (
                                   <Text className="text-xs text-gray-500 ml-2">
-                                    ({t("Global:")} {globalRetryPolicy?.[retryPolicyKey] ?? defaultRetry})
+                                    (Global: {globalRetryPolicy?.[retryPolicyKey] ?? defaultRetry})
                                   </Text>
                                 )}
                               </td>
@@ -1707,7 +1708,7 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
                     </table>
                   )}
                   <Button className="mt-6 mr-8" onClick={handleSaveRetrySettings}>
-                    {t("Save")}
+                    Save
                   </Button>
                 </TabPanel>
                 <TabPanel>
@@ -1720,9 +1721,9 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
                 <TabPanel>
                   <div className="p-6">
                     <div className="mb-6">
-                      <Title>{t("Price Data Management")}</Title>
+                      <Title>Price Data Management</Title>
                       <Text className="text-tremor-content">
-                        {t("Manage model pricing data and configure automatic reload schedules")}
+                        Manage model pricing data and configure automatic reload schedules
                       </Text>
                     </div>
                     <PriceDataReload
@@ -1747,7 +1748,7 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
           )}
         </Col>
       </Grid>
-    </div >
+    </div>
   );
 };
 

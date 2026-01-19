@@ -10,7 +10,7 @@ import { useTranslate } from "@/i18n";
 export default function UISettings() {
   const t = useTranslate();
   const { accessToken } = useAuthorized();
-  const { data, isLoading, isError, error } = useUISettings(accessToken);
+  const { data, isLoading, isError, error } = useUISettings();
   const { mutate: updateSettings, isPending: isUpdating, error: updateError } = useUpdateUISettings(accessToken);
 
   const schema = data?.field_schema;

@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from "react";
 import {
-  Card,
   BarChart,
-  Subtitle,
-  Grid,
+  Card,
   Col,
   DateRangePickerValue,
+  Grid,
+  Icon,
   MultiSelect,
   MultiSelectItem,
-  TabPanel,
-  TabPanels,
+  Subtitle,
+  Tab,
   TabGroup,
   TabList,
-  Tab,
-  Icon,
+  TabPanel,
+  TabPanels,
   Text,
 } from "@tremor/react";
-import UsageDatePicker from "./shared/usage_date_picker";
+import React, { useEffect, useState } from "react";
 import NotificationsManager from "./molecules/notifications_manager";
+import UsageDatePicker from "./shared/usage_date_picker";
 
 import { RefreshIcon } from "@heroicons/react/outline";
 import { adminGlobalCacheActivity, cachingHealthCheckCall } from "./networking";
@@ -25,8 +25,6 @@ import { adminGlobalCacheActivity, cachingHealthCheckCall } from "./networking";
 // Import the new component
 import { CacheHealthTab } from "./cache_health";
 import CacheSettings from "./cache_settings";
-import { useTranslate, useI18n } from "@/i18n";
-import { T } from "@/i18n";
 
 const formatDateWithoutTZ = (date: Date | undefined) => {
   if (!date) return undefined;
@@ -99,8 +97,6 @@ const deepParse = (input: any) => {
 };
 
 const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole, userID, premiumUser }) => {
-  const t = useTranslate();
-  const { locale } = useI18n();
   const [filteredData, setFilteredData] = useState<uiData[]>([]);
   const [selectedApiKeys, setSelectedApiKeys] = useState<string[]>([]);
   const [selectedModels, setSelectedModels] = useState<string[]>([]);
@@ -132,9 +128,8 @@ const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole
     fetchData();
 
     const currentDate = new Date();
-    const jsLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
-    setLastRefreshed(currentDate.toLocaleString(jsLocale));
-  }, [accessToken, locale]);
+    setLastRefreshed(currentDate.toLocaleString());
+  }, [accessToken]);
 
   const uniqueApiKeys = Array.from(new Set(data.map((item) => item?.api_key ?? "")));
   const uniqueModels = Array.from(new Set(data.map((item) => item?.model ?? "")));
@@ -167,13 +162,13 @@ const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole
 
     /* 
     Data looks like this 
-    [{"api_key":"147dba2181f28914eea90eb484926c293cdcf7f5b5c9c3dd6a004d9e0f9fdb21","call_type":"acompletion","model":"llama3-8b-8192","total_rows":13,"cache_hit_true_rows":0},
-    {"api_key":"8c23f021d0535c2e59abb7d83d0e03ccfb8db1b90e231ff082949d95df419e86","call_type":"None","model":"chatgpt-v-2","total_rows":1,"cache_hit_true_rows":0},
-    {"api_key":"88dc28d0f030c55ed4ab77ed8faf098196cb1c05df778539800c9f1243fe6b4b","call_type":"acompletion","model":"gpt-3.5-turbo","total_rows":19,"cache_hit_true_rows":0},
-    {"api_key":"88dc28d0f030c55ed4ab77ed8faf098196cb1c05df778539800c9f1243fe6b4b","call_type":"aimage_generation","model":"","total_rows":3,"cache_hit_true_rows":0},
-    {"api_key":"0ad4b3c03dcb6de0b5b8f761db798c6a8ae80be3fd1e2ea30c07ce6d5e3bf870","call_type":"None","model":"chatgpt-v-2","total_rows":1,"cache_hit_true_rows":0},
-    {"api_key":"034224b36e9769bc50e2190634abc3f97cad789b17ca80ac43b82f46cd5579b3","call_type":"","model":"chatgpt-v-2","total_rows":1,"cache_hit_true_rows":0},
-    {"api_key":"4f9c71cce0a2bb9a0b62ce6f0ebb3245b682702a8851d26932fa7e3b8ebfc755","call_type":"","model":"chatgpt-v-2","total_rows":1,"cache_hit_true_rows":0},
+    [{"api_key":"sk-test-mock-key-001","call_type":"acompletion","model":"llama3-8b-8192","total_rows":13,"cache_hit_true_rows":0},
+    {"api_key":"sk-test-mock-key-002","call_type":"None","model":"chatgpt-v-2","total_rows":1,"cache_hit_true_rows":0},
+    {"api_key":"sk-test-mock-key-123","call_type":"acompletion","model":"gpt-3.5-turbo","total_rows":19,"cache_hit_true_rows":0},
+    {"api_key":"sk-test-mock-key-123","call_type":"aimage_generation","model":"","total_rows":3,"cache_hit_true_rows":0},
+    {"api_key":"sk-test-mock-key-003","call_type":"None","model":"chatgpt-v-2","total_rows":1,"cache_hit_true_rows":0},
+    {"api_key":"sk-test-mock-key-004","call_type":"","model":"chatgpt-v-2","total_rows":1,"cache_hit_true_rows":0},
+    {"api_key":"sk-test-mock-key-005","call_type":"","model":"chatgpt-v-2","total_rows":1,"cache_hit_true_rows":0},
     */
 
     // What data we need for bar chat
@@ -195,7 +190,7 @@ const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole
 
       if (!item.call_type) {
         console.log("Item has no call_type:", item);
-        item.call_type = t("Unknown");
+        item.call_type = "Unknown";
       }
 
       llm_api_requests += (item.total_rows || 0) - (item.cache_hit_true_rows || 0);
@@ -239,13 +234,12 @@ const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole
   const handleRefreshClick = () => {
     // Update the 'lastRefreshed' state to the current date and time
     const currentDate = new Date();
-    const jsLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
-    setLastRefreshed(currentDate.toLocaleString(jsLocale));
+    setLastRefreshed(currentDate.toLocaleString());
   };
 
   const runCachingHealthCheck = async () => {
     try {
-      NotificationsManager.info(t("Running cache health check..."));
+      NotificationsManager.info("Running cache health check...");
       setHealthCheckResponse("");
       const response = await cachingHealthCheckCall(accessToken !== null ? accessToken : "");
       console.log("CACHING HEALTH CHECK RESPONSE", response);
@@ -266,7 +260,7 @@ const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole
           errorData = { message: error.message };
         }
       } else {
-        errorData = { message: t("Unknown error occurred") };
+        errorData = { message: "Unknown error occurred" };
       }
       setHealthCheckResponse({ error: errorData });
     }
@@ -276,15 +270,13 @@ const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole
     <TabGroup className="gap-2 p-8 h-full w-full mt-2 mb-8">
       <TabList className="flex justify-between mt-2 w-full items-center">
         <div className="flex">
-          <Tab>{t("Cache Analytics")}</Tab>
-          <Tab>
-            <pre>{t("Cache Health")}</pre>
-          </Tab>
-          <Tab>{t("Cache Settings")}</Tab>
+          <Tab>Cache Analytics</Tab>
+          <Tab>Cache Health</Tab>
+          <Tab>Cache Settings</Tab>
         </div>
 
         <div className="flex items-center space-x-2">
-          {lastRefreshed && <Text><T>Last Refreshed:</T> {lastRefreshed}</Text>}
+          {lastRefreshed && <Text>Last Refreshed: {lastRefreshed}</Text>}
           <Icon
             icon={RefreshIcon} // Modify as necessary for correct icon name
             variant="shadow"
@@ -300,7 +292,7 @@ const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole
             <Grid numItems={3} className="gap-4 mt-4">
               <Col>
                 <MultiSelect
-                  placeholder={t("Select Virtual Keys")}
+                  placeholder="Select Virtual Keys"
                   value={selectedApiKeys}
                   onValueChange={setSelectedApiKeys}
                 >
@@ -312,7 +304,7 @@ const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole
                 </MultiSelect>
               </Col>
               <Col>
-                <MultiSelect placeholder={t("Select Models")} value={selectedModels} onValueChange={setSelectedModels}>
+                <MultiSelect placeholder="Select Models" value={selectedModels} onValueChange={setSelectedModels}>
                   {uniqueModels.map((model) => (
                     <MultiSelectItem key={model} value={model}>
                       {model}
@@ -334,7 +326,7 @@ const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-4">
               <Card>
                 <p className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">
-                  <T>Cache Hit Ratio</T>
+                  Cache Hit Ratio
                 </p>
                 <div className="mt-2 flex items-baseline space-x-2.5">
                   <p className="text-tremor-metric font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
@@ -344,7 +336,7 @@ const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole
               </Card>
               <Card>
                 <p className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">
-                  <T>Cache Hits</T>
+                  Cache Hits
                 </p>
                 <div className="mt-2 flex items-baseline space-x-2.5">
                   <p className="text-tremor-metric font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
@@ -355,7 +347,7 @@ const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole
 
               <Card>
                 <p className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">
-                  <T>Cached Tokens</T>
+                  Cached Tokens
                 </p>
                 <div className="mt-2 flex items-baseline space-x-2.5">
                   <p className="text-tremor-metric font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
@@ -365,9 +357,9 @@ const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole
               </Card>
             </div>
 
-            <Subtitle className="mt-4"><T>Cache Hits vs API Requests</T></Subtitle>
+            <Subtitle className="mt-4">Cache Hits vs API Requests</Subtitle>
             <BarChart
-              title={t("Cache Hits vs API Requests")}
+              title="Cache Hits vs API Requests"
               data={filteredData}
               stack={true}
               index="name"
@@ -377,7 +369,7 @@ const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole
               yAxisWidth={48}
             />
 
-            <Subtitle className="mt-4"><T>Cached Completion Tokens vs Generated Completion Tokens</T></Subtitle>
+            <Subtitle className="mt-4">Cached Completion Tokens vs Generated Completion Tokens</Subtitle>
             <BarChart
               className="mt-6"
               data={filteredData}

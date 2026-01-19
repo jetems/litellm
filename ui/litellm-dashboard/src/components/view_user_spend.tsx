@@ -19,7 +19,6 @@ interface ViewUserSpendProps {
 const ViewUserSpend: React.FC<ViewUserSpendProps> = ({ userSpend, userMaxBudget, selectedTeam }) => {
   const t = useTranslate();
   const { accessToken, userRole, userId: userID } = useAuthorized();
-  console.log(`userSpend: ${userSpend}`);
   let [spend, setSpend] = useState(userSpend !== null ? userSpend : 0.0);
   const [maxBudget, setMaxBudget] = useState(
     selectedTeam ? Number(formatNumberWithCommas(selectedTeam.max_budget, 4)) : null,
@@ -63,6 +62,8 @@ const ViewUserSpend: React.FC<ViewUserSpendProps> = ({ userSpend, userMaxBudget,
           setMaxBudget(selectedTeam.max_budget);
         }
       }
+    } else {
+      setMaxBudget(userMaxBudget);
     }
   }, [selectedTeam, userMaxBudget]);
   const [userModels, setUserModels] = useState([]);

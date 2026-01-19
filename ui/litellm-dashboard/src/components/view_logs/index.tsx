@@ -18,13 +18,13 @@ import KeyInfoView from "../templates/key_info_view";
 import { SessionView } from "./SessionView";
 import { VectorStoreViewer } from "./VectorStoreViewer";
 import GuardrailViewer from "@/components/view_logs/GuardrailViewer/GuardrailViewer";
+import { CostBreakdownViewer } from "./CostBreakdownViewer";
 import FilterComponent from "../molecules/filter";
 import { FilterOption } from "../molecules/filter";
 import { useLogFilterLogic } from "./log_filter_logic";
 import { fetchAllKeyAliases } from "../key_team_helpers/filter_helpers";
 import { Tab, TabGroup, TabList, TabPanels, TabPanel, Switch } from "@tremor/react";
 import AuditLogs from "./audit_logs";
-import { useTranslate } from "@/i18n";
 import { getTimeRangeDisplay } from "./logs_utils";
 import { formatNumberWithCommas } from "@/utils/dataUtils";
 import { truncateString } from "@/utils/textUtils";
@@ -59,7 +59,6 @@ export default function SpendLogsTable({
   allTeams,
   premiumUser,
 }: SpendLogsTableProps) {
-  const t = useTranslate();
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [showColumnDropdown, setShowColumnDropdown] = useState(false);
@@ -150,7 +149,7 @@ export default function SpendLogsTable({
   const LiveTailControls = () => {
     return (
       <div className="flex items-center gap-2">
-        <span className="text-sm font-medium text-gray-900">{t("Live Tail")}</span>
+        <span className="text-sm font-medium text-gray-900">Live Tail</span>
         <Switch color="green" checked={isLiveTail} defaultChecked={true} onChange={setIsLiveTail} />
       </div>
     );
@@ -356,7 +355,7 @@ export default function SpendLogsTable({
     sessionLogs.data?.data?.map((log) => ({
       ...log,
       onKeyHashClick: (keyHash: string) => setSelectedKeyIdInfoView(keyHash),
-      onSessionClick: (sessionId: string) => { },
+      onSessionClick: (sessionId: string) => {},
     })) || [];
 
   // Add this function to handle manual refresh
@@ -366,6 +365,24 @@ export default function SpendLogsTable({
 
   const handleRowExpand = (requestId: string | null) => {
     setExpandedRequestId(requestId);
+  };
+
+  // Function to extract unique error codes from logs
+  const extractErrorCodes = (logs: LogEntry[], searchText: string = "") => {
+    const errorCodes = new Set<string>();
+    logs.forEach((log) => {
+      const metadata = log.metadata || {};
+      if (metadata.status === "failure" && metadata.error_information) {
+        const errorCode = metadata.error_information.error_code;
+        if (errorCode && (!searchText || errorCode.toLowerCase().includes(searchText.toLowerCase()))) {
+          errorCodes.add(errorCode);
+        }
+      }
+    });
+    return Array.from(errorCodes).map((code) => ({
+      label: code,
+      value: code,
+    }));
   };
 
   const logFilterOptions: FilterOption[] = [
@@ -392,8 +409,8 @@ export default function SpendLogsTable({
       label: "Status",
       isSearchable: false,
       options: [
-        { label: t("Success"), value: "success" },
-        { label: t("Failure"), value: "failure" },
+        { label: "Success", value: "success" },
+        { label: "Failure", value: "failure" },
       ],
     },
     {
@@ -429,6 +446,14 @@ export default function SpendLogsTable({
       },
     },
     {
+      name: "Error Code",
+      label: "Error Code",
+      isSearchable: true,
+      searchFn: async (searchText: string) => {
+        return extractErrorCodes(logsData.data, searchText);
+      },
+    },
+    {
       name: "Key Hash",
       label: "Key Hash",
       isSearchable: false,
@@ -458,11 +483,11 @@ export default function SpendLogsTable({
   };
 
   const quickSelectOptions = [
-    { label: t("Last 15 Minutes"), value: 15, unit: "minutes" },
-    { label: t("Last Hour"), value: 1, unit: "hours" },
-    { label: t("Last 4 Hours"), value: 4, unit: "hours" },
-    { label: t("Last 24 Hours"), value: 24, unit: "hours" },
-    { label: t("Last 7 Days"), value: 7, unit: "days" },
+    { label: "Last 15 Minutes", value: 15, unit: "minutes" },
+    { label: "Last Hour", value: 1, unit: "hours" },
+    { label: "Last 4 Hours", value: 4, unit: "hours" },
+    { label: "Last 24 Hours", value: 24, unit: "hours" },
+    { label: "Last 7 Days", value: 7, unit: "days" },
   ];
 
   const selectedOption = quickSelectOptions.find(
@@ -475,8 +500,8 @@ export default function SpendLogsTable({
     <div className="w-full max-w-screen p-6 overflow-x-hidden box-border">
       <TabGroup defaultIndex={0} onIndexChange={(index) => setActiveTab(index === 0 ? "request logs" : "audit logs")}>
         <TabList>
-          <Tab>{t("Request Logs")}</Tab>
-          <Tab>{t("Audit Logs")}</Tab>
+          <Tab>Request Logs</Tab>
+          <Tab>Audit Logs</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
@@ -484,16 +509,16 @@ export default function SpendLogsTable({
               <h1 className="text-xl font-semibold">
                 {selectedSessionId ? (
                   <>
-                    {t("Session")}: <span className="font-mono">{selectedSessionId}</span>
+                    Session: <span className="font-mono">{selectedSessionId}</span>
                     <button
                       className="ml-4 px-3 py-1 text-sm border rounded hover:bg-gray-50"
                       onClick={() => setSelectedSessionId(null)}
                     >
-                      {t("← Back to All Logs")}
+                      ← Back to All Logs
                     </button>
                   </>
                 ) : (
-                  t("Request Logs")
+                  "Request Logs"
                 )}
               </h1>
             </div>
@@ -501,13 +526,9 @@ export default function SpendLogsTable({
               <KeyInfoView
                 keyId={selectedKeyIdInfoView}
                 keyData={selectedKeyInfo}
-                accessToken={accessToken}
-                userID={userID}
-                userRole={userRole}
                 teams={allTeams}
                 onClose={() => setSelectedKeyIdInfoView(null)}
-                premiumUser={premiumUser}
-                backButtonText={t("Back to Logs")}
+                backButtonText="Back to Logs"
               />
             ) : selectedSessionId ? (
               <div className="bg-white rounded-lg shadow">
@@ -516,7 +537,7 @@ export default function SpendLogsTable({
                   data={sessionData}
                   renderSubComponent={RequestViewer}
                   getRowCanExpand={() => true}
-                // Optionally: add session-specific row expansion state
+                  // Optionally: add session-specific row expansion state
                 />
               </div>
             ) : (
@@ -533,7 +554,7 @@ export default function SpendLogsTable({
                         <div className="relative w-64 min-w-0 flex-shrink-0">
                           <input
                             type="text"
-                            placeholder={t("Search by Request ID")}
+                            placeholder="Search by Request ID"
                             className="w-full px-3 py-2 pl-8 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -576,8 +597,9 @@ export default function SpendLogsTable({
                                   {quickSelectOptions.map((option) => (
                                     <button
                                       key={option.label}
-                                      className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 rounded-md ${displayLabel === option.label ? "bg-blue-50 text-blue-600" : ""
-                                        }`}
+                                      className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 rounded-md ${
+                                        displayLabel === option.label ? "bg-blue-50 text-blue-600" : ""
+                                      }`}
                                       onClick={() => {
                                         setEndTime(moment().format("YYYY-MM-DDTHH:mm"));
                                         setStartTime(
@@ -595,11 +617,12 @@ export default function SpendLogsTable({
                                   ))}
                                   <div className="border-t my-2" />
                                   <button
-                                    className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 rounded-md ${isCustomDate ? "bg-blue-50 text-blue-600" : ""
-                                      }`}
+                                    className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 rounded-md ${
+                                      isCustomDate ? "bg-blue-50 text-blue-600" : ""
+                                    }`}
                                     onClick={() => setIsCustomDate(!isCustomDate)}
                                   >
-                                    {t("Custom Range")}
+                                    Custom Range
                                   </button>
                                 </div>
                               </div>
@@ -611,7 +634,7 @@ export default function SpendLogsTable({
                           <button
                             onClick={handleRefresh}
                             className="px-3 py-2 text-sm border rounded-md hover:bg-gray-50 flex items-center gap-2"
-                            title={t("Refresh data")}
+                            title="Refresh data"
                           >
                             <svg
                               className={`w-4 h-4 ${logs.isFetching ? "animate-spin" : ""}`}
@@ -626,7 +649,7 @@ export default function SpendLogsTable({
                                 d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                               />
                             </svg>
-                            <span>{t("Refresh")}</span>
+                            <span>Refresh</span>
                           </button>
                         </div>
 
@@ -643,7 +666,7 @@ export default function SpendLogsTable({
                                 className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                               />
                             </div>
-                            <span className="text-gray-500">{t("to")}</span>
+                            <span className="text-gray-500">to</span>
                             <div>
                               <input
                                 type="datetime-local"
@@ -661,32 +684,32 @@ export default function SpendLogsTable({
 
                       <div className="flex items-center space-x-4">
                         <span className="text-sm text-gray-700 whitespace-nowrap">
-                          {t("Showing")} {logs.isLoading ? "..." : filteredLogs ? (currentPage - 1) * pageSize + 1 : 0} -{" "}
+                          Showing {logs.isLoading ? "..." : filteredLogs ? (currentPage - 1) * pageSize + 1 : 0} -{" "}
                           {logs.isLoading
                             ? "..."
                             : filteredLogs
                               ? Math.min(currentPage * pageSize, filteredLogs.total)
                               : 0}{" "}
-                          {t("of")} {logs.isLoading ? "..." : filteredLogs ? filteredLogs.total : 0} {t("results")}
+                          of {logs.isLoading ? "..." : filteredLogs ? filteredLogs.total : 0} results
                         </span>
                         <div className="flex items-center space-x-2">
                           <span className="text-sm text-gray-700 min-w-[90px]">
-                            {t("Page")} {logs.isLoading ? "..." : currentPage} {t("of")}{" "}
+                            Page {logs.isLoading ? "..." : currentPage} of{" "}
                             {logs.isLoading ? "..." : filteredLogs ? filteredLogs.total_pages : 1}
                           </span>
                           <button
                             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                             disabled={logs.isLoading || currentPage === 1}
-                            className="px-3 py-1 text-sm border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                            className="px-3 py-1 text-sm border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            {t("Previous")}
+                            Previous
                           </button>
                           <button
                             onClick={() => setCurrentPage((p) => Math.min(filteredLogs.total_pages || 1, p + 1))}
                             disabled={logs.isLoading || currentPage === (filteredLogs.total_pages || 1)}
-                            className="px-3 py-1 text-sm border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                            className="px-3 py-1 text-sm border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            {t("Next")}
+                            Next
                           </button>
                         </div>
                       </div>
@@ -695,13 +718,13 @@ export default function SpendLogsTable({
                   {isLiveTail && currentPage === 1 && (
                     <div className="mb-4 px-4 py-2 bg-green-50 border border-greem-200 rounded-md flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-green-700">{t("Auto-refreshing every 15 seconds")}</span>
+                        <span className="text-sm text-green-700">Auto-refreshing every 15 seconds</span>
                       </div>
                       <button
                         onClick={() => setIsLiveTail(false)}
                         className="text-sm text-green-600 hover:text-green-800"
                       >
-                        {t("Stop")}
+                        Stop
                       </button>
                     </div>
                   )}
@@ -909,10 +932,11 @@ export function RequestViewer({ row }: { row: Row<LogEntry> }) {
             <div className="flex">
               <span className="font-medium w-1/3">Status:</span>
               <span
-                className={`px-2 py-1 rounded-md text-xs font-medium inline-block text-center w-16 ${(row.original.metadata?.status || "Success").toLowerCase() !== "failure"
-                  ? "bg-green-100 text-green-800"
-                  : "bg-red-100 text-red-800"
-                  }`}
+                className={`px-2 py-1 rounded-md text-xs font-medium inline-block text-center w-16 ${
+                  (row.original.metadata?.status || "Success").toLowerCase() !== "failure"
+                    ? "bg-green-100 text-green-800"
+                    : "bg-red-100 text-red-800"
+                }`}
               >
                 {(row.original.metadata?.status || "Success").toLowerCase() !== "failure" ? "Success" : "Failure"}
               </span>
@@ -938,6 +962,9 @@ export function RequestViewer({ row }: { row: Row<LogEntry> }) {
           </div>
         </div>
       </div>
+
+      {/* Cost Breakdown - Show if cost breakdown data is available */}
+      <CostBreakdownViewer costBreakdown={row.original.metadata?.cost_breakdown} totalSpend={row.original.spend || 0} />
 
       {/* Configuration Info Message - Show when data is missing */}
       <ConfigInfoMessage show={missingData} />

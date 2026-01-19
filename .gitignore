@@ -100,9 +100,8 @@ update_model_cost_map.py
 tests/test_litellm/proxy/_experimental/mcp_server/test_mcp_server_manager.py
 litellm/proxy/_experimental/out/guardrails/index.html
 scripts/test_vertex_ai_search.py
-scripts/private_key.pem
-scripts/generate_license.py
-scripts/LICENSE_GENERATOR.md
-scripts/public_key.pem
-ui/litellm-dashboard/out/*
-litellm/proxy/_experimental/out/*
+LAZY_LOADING_IMPROVEMENTS.md
+**/test-results
+**/playwright-report
+**/*.storageState.json
+**/coverage

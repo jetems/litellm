@@ -23,7 +23,6 @@ import {
 import { Card, Text, TextInput, Title, Button as TremorButton } from "@tremor/react";
 import { Button, Input, Modal, Popover, Select, Spin, Tooltip, Typography, Upload } from "antd";
 import React, { useEffect, useRef, useState } from "react";
-import { useTranslate } from "@/i18n";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { coy } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -46,8 +45,8 @@ import { makeOpenAIAudioSpeechRequest } from "../llm_calls/audio_speech";
 import { makeOpenAIAudioTranscriptionRequest } from "../llm_calls/audio_transcriptions";
 import { makeOpenAIChatCompletionRequest } from "../llm_calls/chat_completion";
 import { makeOpenAIEmbeddingsRequest } from "../llm_calls/embeddings_api";
-import type { MCPTool } from "../llm_calls/fetch_mcp_tools";
-import { fetchAvailableMCPTools } from "../llm_calls/fetch_mcp_tools";
+import { listMCPTools, fetchMCPServers } from "../../networking";
+import { MCPServer } from "../../mcp_tools/types";
 import { fetchAvailableModels, ModelGroup } from "../llm_calls/fetch_models";
 import { makeOpenAIImageEditsRequest } from "../llm_calls/image_edits";
 import { makeOpenAIImageGenerationRequest } from "../llm_calls/image_generation";
@@ -85,6 +84,8 @@ interface ChatUIProps {
   };
 }
 
+const MCP_SUPPORTED_ENDPOINTS = new Set<EndpointType>([EndpointType.CHAT, EndpointType.RESPONSES]);
+
 const ChatUI: React.FC<ChatUIProps> = ({
   accessToken,
   token,
@@ -93,21 +94,27 @@ const ChatUI: React.FC<ChatUIProps> = ({
   disabledPersonalKeyCreation,
   proxySettings,
 }) => {
-  const t = useTranslate();
-  const [isMCPToolsModalVisible, setIsMCPToolsModalVisible] = useState(false);
-  const [mcpTools, setMCPTools] = useState<MCPTool[]>([]);
-  const [selectedMCPTools, setSelectedMCPTools] = useState<string[]>(() => {
-    const saved = sessionStorage.getItem("selectedMCPTools");
+  const [mcpServers, setMCPServers] = useState<MCPServer[]>([]);
+  const [selectedMCPServers, setSelectedMCPServers] = useState<string[]>(() => {
+    const saved = sessionStorage.getItem("selectedMCPServers");
     try {
-      const parsed = saved ? JSON.parse(saved) : [];
-      // Convert from single string to array if needed for backward compatibility
-      return Array.isArray(parsed) ? parsed : parsed ? [parsed] : [];
+      return saved ? JSON.parse(saved) : [];
     } catch (error) {
-      console.error("Error parsing selectedMCPTools from sessionStorage", error);
+      console.error("Error parsing selectedMCPServers from sessionStorage", error);
       return [];
     }
   });
-  const [isLoadingMCPTools, setIsLoadingMCPTools] = useState(false);
+  const [isLoadingMCPServers, setIsLoadingMCPServers] = useState(false);
+  const [serverToolsMap, setServerToolsMap] = useState<Record<string, any[]>>({});
+  const [mcpServerToolRestrictions, setMCPServerToolRestrictions] = useState<Record<string, string[]>>(() => {
+    const saved = sessionStorage.getItem("mcpServerToolRestrictions");
+    try {
+      return saved ? JSON.parse(saved) : {};
+    } catch (error) {
+      console.error("Error parsing mcpServerToolRestrictions from sessionStorage", error);
+      return {};
+    }
+  });
   const [apiKeySource, setApiKeySource] = useState<"session" | "custom">(() => {
     const saved = sessionStorage.getItem("apiKeySource");
     if (saved) {
@@ -120,6 +127,9 @@ const ChatUI: React.FC<ChatUIProps> = ({
     return disabledPersonalKeyCreation ? "custom" : "session";
   });
   const [apiKey, setApiKey] = useState<string>(() => sessionStorage.getItem("apiKey") || "");
+  const [customProxyBaseUrl, setCustomProxyBaseUrl] = useState<string>(
+    () => sessionStorage.getItem("customProxyBaseUrl") || "",
+  );
   const [inputMessage, setInputMessage] = useState("");
   const [chatHistory, setChatHistory] = useState<MessageType[]>(() => {
     try {
@@ -208,27 +218,37 @@ const ChatUI: React.FC<ChatUIProps> = ({
 
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  // Fetch MCP tools
-  const loadMCPTools = async () => {
+  // Fetch MCP servers
+  const loadMCPServers = async () => {
     const userApiKey = apiKeySource === "session" ? accessToken : apiKey;
     if (!userApiKey) return;
 
-    setIsLoadingMCPTools(true);
+    setIsLoadingMCPServers(true);
     try {
-      const tools = await fetchAvailableMCPTools(userApiKey);
-      setMCPTools(tools);
+      const servers = await fetchMCPServers(userApiKey);
+      setMCPServers(Array.isArray(servers) ? servers : servers.data || []);
     } catch (error) {
-      console.error("Error fetching MCP tools:", error);
+      console.error("Error fetching MCP servers:", error);
     } finally {
-      setIsLoadingMCPTools(false);
+      setIsLoadingMCPServers(false);
     }
   };
 
-  useEffect(() => {
-    if (isMCPToolsModalVisible) {
-      loadMCPTools();
+  // Fetch tools for a specific server
+  const loadServerTools = async (serverId: string) => {
+    const userApiKey = apiKeySource === "session" ? accessToken : apiKey;
+    if (!userApiKey || serverToolsMap[serverId]) return;
+
+    try {
+      const response = await listMCPTools(userApiKey, serverId);
+      setServerToolsMap((prev) => ({
+        ...prev,
+        [serverId]: response.tools || [],
+      }));
+    } catch (error) {
+      console.error(`Error fetching tools for server ${serverId}:`, error);
     }
-  }, [isMCPToolsModalVisible, accessToken, apiKey, apiKeySource]);
+  };
 
   useEffect(() => {
     if (isGetCodeModalVisible) {
@@ -241,7 +261,9 @@ const ChatUI: React.FC<ChatUIProps> = ({
         selectedTags,
         selectedVectorStores,
         selectedGuardrails,
-        selectedMCPTools,
+        selectedMCPServers,
+        mcpServers,
+        mcpServerToolRestrictions,
         endpointType,
         selectedModel,
         selectedSdk,
@@ -261,7 +283,9 @@ const ChatUI: React.FC<ChatUIProps> = ({
     selectedTags,
     selectedVectorStores,
     selectedGuardrails,
-    selectedMCPTools,
+    selectedMCPServers,
+    mcpServers,
+    mcpServerToolRestrictions,
     endpointType,
     selectedModel,
     proxySettings,
@@ -284,8 +308,10 @@ const ChatUI: React.FC<ChatUIProps> = ({
     sessionStorage.setItem("selectedTags", JSON.stringify(selectedTags));
     sessionStorage.setItem("selectedVectorStores", JSON.stringify(selectedVectorStores));
     sessionStorage.setItem("selectedGuardrails", JSON.stringify(selectedGuardrails));
-    sessionStorage.setItem("selectedMCPTools", JSON.stringify(selectedMCPTools));
+    sessionStorage.setItem("selectedMCPServers", JSON.stringify(selectedMCPServers));
+    sessionStorage.setItem("mcpServerToolRestrictions", JSON.stringify(mcpServerToolRestrictions));
     sessionStorage.setItem("selectedVoice", selectedVoice);
+    sessionStorage.removeItem("selectedMCPTools"); // Clean up old key
 
     if (selectedModel) {
       sessionStorage.setItem("selectedModel", selectedModel);
@@ -315,7 +341,8 @@ const ChatUI: React.FC<ChatUIProps> = ({
     messageTraceId,
     responsesSessionId,
     useApiSessionManagement,
-    selectedMCPTools,
+    selectedMCPServers,
+    mcpServerToolRestrictions,
     selectedVoice,
   ]);
 
@@ -352,7 +379,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
     };
 
     loadModels();
-    loadMCPTools();
+    loadMCPServers();
   }, [accessToken, userID, userRole, apiKeySource, apiKey, token]);
 
   // Fetch agents when A2A endpoint is selected
@@ -364,7 +391,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
 
     const loadAgents = async () => {
       try {
-        const agents = await fetchAvailableAgents(userApiKey);
+        const agents = await fetchAvailableAgents(userApiKey, customProxyBaseUrl || undefined);
         setAgentInfo(agents);
         // Clear selection if current agent not in list
         if (selectedAgent && !agents.some((a) => a.agent_name === selectedAgent)) {
@@ -376,7 +403,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
     };
 
     loadAgents();
-  }, [accessToken, apiKeySource, apiKey, endpointType]);
+  }, [accessToken, apiKeySource, apiKey, endpointType, customProxyBaseUrl, selectedAgent]);
 
   useEffect(() => {
     // Scroll to the bottom of the chat whenever chatHistory updates
@@ -658,7 +685,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
       abortControllerRef.current.abort();
       abortControllerRef.current = null;
       setIsLoading(false);
-      NotificationsManager.info(t("Request cancelled"));
+      NotificationsManager.info("Request cancelled");
     }
   };
 
@@ -729,25 +756,36 @@ const ChatUI: React.FC<ChatUIProps> = ({
 
     // For image edits, require both image and prompt
     if (endpointType === EndpointType.IMAGE_EDITS && uploadedImages.length === 0) {
-      NotificationsManager.fromBackend(t("Please upload at least one image for editing"));
+      NotificationsManager.fromBackend("Please upload at least one image for editing");
       return;
     }
 
     // For audio transcriptions, require audio file
     if (endpointType === EndpointType.TRANSCRIPTION && !uploadedAudio) {
-      NotificationsManager.fromBackend(t("Please upload an audio file for transcription"));
+      NotificationsManager.fromBackend("Please upload an audio file for transcription");
       return;
     }
 
     // For A2A agents, require agent selection
     if (endpointType === EndpointType.A2A_AGENTS && !selectedAgent) {
-      NotificationsManager.fromBackend(t("Please select an agent to send a message"));
+      NotificationsManager.fromBackend("Please select an agent to send a message");
       return;
     }
 
-    // Require model selection for Responses API
-    if (endpointType === EndpointType.RESPONSES && !selectedModel) {
-      NotificationsManager.fromBackend(t("Please select a model before sending a request"));
+    // Require model selection for all model-based endpoints
+    const modelRequiredEndpoints = [
+      EndpointType.CHAT,
+      EndpointType.IMAGE,
+      EndpointType.SPEECH,
+      EndpointType.IMAGE_EDITS,
+      EndpointType.RESPONSES,
+      EndpointType.ANTHROPIC_MESSAGES,
+      EndpointType.EMBEDDINGS,
+      EndpointType.TRANSCRIPTION,
+    ];
+
+    if (modelRequiredEndpoints.includes(endpointType as EndpointType) && !selectedModel) {
+      NotificationsManager.fromBackend("Please select a model before sending a request");
       return;
     }
 
@@ -758,7 +796,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
     const effectiveApiKey = apiKeySource === "session" ? accessToken : apiKey;
 
     if (!effectiveApiKey) {
-      NotificationsManager.fromBackend(t("Please provide a Virtual Key or select Current UI Session"));
+      NotificationsManager.fromBackend("Please provide a Virtual Key or select Current UI Session");
       return;
     }
 
@@ -783,6 +821,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
       try {
         newUserMessage = await createChatMultimodalMessage(inputMessage, chatUploadedImage);
       } catch (error) {
+        NotificationsManager.fromBackend("Failed to process image. Please try again.");
         return;
       }
     } else {
@@ -854,12 +893,15 @@ const ChatUI: React.FC<ChatUIProps> = ({
             traceId,
             selectedVectorStores.length > 0 ? selectedVectorStores : undefined,
             selectedGuardrails.length > 0 ? selectedGuardrails : undefined,
-            selectedMCPTools,
+            selectedMCPServers,
             updateChatImageUI,
             updateSearchResults,
             useAdvancedParams ? temperature : undefined,
             useAdvancedParams ? maxTokens : undefined,
             updateTotalLatency,
+            customProxyBaseUrl || undefined,
+            mcpServers,
+            mcpServerToolRestrictions,
           );
         } else if (endpointType === EndpointType.IMAGE) {
           // For image generation
@@ -870,6 +912,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
             effectiveApiKey,
             selectedTags,
             signal,
+            customProxyBaseUrl || undefined,
           );
         } else if (endpointType === EndpointType.SPEECH) {
           // For audio speech
@@ -881,6 +924,9 @@ const ChatUI: React.FC<ChatUIProps> = ({
             effectiveApiKey,
             selectedTags,
             signal,
+            undefined, // responseFormat
+            undefined, // speed
+            customProxyBaseUrl || undefined,
           );
         } else if (endpointType === EndpointType.IMAGE_EDITS) {
           // For image edits
@@ -893,6 +939,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
               effectiveApiKey,
               selectedTags,
               signal,
+              customProxyBaseUrl || undefined,
             );
           }
         } else if (endpointType === EndpointType.RESPONSES) {
@@ -925,12 +972,15 @@ const ChatUI: React.FC<ChatUIProps> = ({
             traceId,
             selectedVectorStores.length > 0 ? selectedVectorStores : undefined,
             selectedGuardrails.length > 0 ? selectedGuardrails : undefined,
-            selectedMCPTools, // Pass the selected tools array
+            selectedMCPServers, // Pass the selected servers array
             useApiSessionManagement ? responsesSessionId : null, // Only pass session ID if API mode is enabled
             handleResponseId, // Pass callback to capture new response ID
             handleMCPEvent, // Pass MCP event handler
             codeInterpreter.enabled, // Enable Code Interpreter tool
             codeInterpreter.setResult, // Handle code interpreter output
+            customProxyBaseUrl || undefined,
+            mcpServers,
+            mcpServerToolRestrictions,
           );
         } else if (endpointType === EndpointType.ANTHROPIC_MESSAGES) {
           const apiChatHistory = [
@@ -953,7 +1003,8 @@ const ChatUI: React.FC<ChatUIProps> = ({
             traceId,
             selectedVectorStores.length > 0 ? selectedVectorStores : undefined,
             selectedGuardrails.length > 0 ? selectedGuardrails : undefined,
-            selectedMCPTools, // Pass the selected tools array
+            selectedMCPServers, // Pass the selected tools array
+            customProxyBaseUrl || undefined,
           );
         } else if (endpointType === EndpointType.EMBEDDINGS) {
           await makeOpenAIEmbeddingsRequest(
@@ -962,6 +1013,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
             selectedModel,
             effectiveApiKey,
             selectedTags,
+            customProxyBaseUrl || undefined,
           );
         } else if (endpointType === EndpointType.TRANSCRIPTION) {
           // For audio transcriptions
@@ -973,6 +1025,11 @@ const ChatUI: React.FC<ChatUIProps> = ({
               effectiveApiKey,
               selectedTags,
               signal,
+              undefined, // language
+              undefined, // prompt
+              undefined, // responseFormat
+              undefined, // temperature
+              customProxyBaseUrl || undefined,
             );
           }
         }
@@ -989,6 +1046,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
           updateTimingData,
           updateTotalLatency,
           updateA2AMetadata,
+          customProxyBaseUrl || undefined,
         );
       }
     } catch (error) {
@@ -1041,15 +1099,15 @@ const ChatUI: React.FC<ChatUIProps> = ({
     sessionStorage.removeItem("chatHistory");
     sessionStorage.removeItem("messageTraceId");
     sessionStorage.removeItem("responsesSessionId");
-    NotificationsManager.success(t("Chat history cleared."));
+    NotificationsManager.success("Chat history cleared.");
   };
 
   if (userRole && userRole === "Admin Viewer") {
     const { Title, Paragraph } = Typography;
     return (
       <div>
-        <Title level={1}>{t("Access Denied")}</Title>
-        <Paragraph>{t("Ask your proxy admin for access to test models")}</Paragraph>
+        <Title level={1}>Access Denied</Title>
+        <Paragraph>Ask your proxy admin for access to test models</Paragraph>
       </div>
     );
   }
@@ -1082,11 +1140,11 @@ const ChatUI: React.FC<ChatUIProps> = ({
         <div className="flex h-[80vh] w-full gap-4">
           {/* Left Sidebar with Controls */}
           <div className="w-1/4 p-4 bg-gray-50 overflow-y-auto">
-            <Title className="text-xl font-semibold mb-6 mt-2">{t("Configurations")}</Title>
+            <Title className="text-xl font-semibold mb-6 mt-2">Configurations</Title>
             <div className="space-y-4">
               <div>
                 <Text className="font-medium block mb-2 text-gray-700 flex items-center">
-                  <KeyOutlined className="mr-2" /> {t("Virtual Key Source")}
+                  <KeyOutlined className="mr-2" /> Virtual Key Source
                 </Text>
                 <Select
                   disabled={disabledPersonalKeyCreation}
@@ -1096,15 +1154,15 @@ const ChatUI: React.FC<ChatUIProps> = ({
                     setApiKeySource(value as "session" | "custom");
                   }}
                   options={[
-                    { value: "session", label: t("Current UI Session") },
-                    { value: "custom", label: t("Virtual Key") },
+                    { value: "session", label: "Current UI Session" },
+                    { value: "custom", label: "Virtual Key" },
                   ]}
                   className="rounded-md"
                 />
                 {apiKeySource === "custom" && (
                   <TextInput
                     className="mt-2"
-                    placeholder={t("Enter custom Virtual Key")}
+                    placeholder="Enter custom Virtual Key"
                     type="password"
                     onValueChange={setApiKey}
                     value={apiKey}
@@ -1114,8 +1172,42 @@ const ChatUI: React.FC<ChatUIProps> = ({
               </div>
 
               <div>
+                <div className="flex items-center justify-between mb-2">
+                  <Text className="font-medium text-gray-700 flex items-center">
+                    <SettingOutlined className="mr-2" /> Custom Proxy Base URL
+                  </Text>
+                  {customProxyBaseUrl && (
+                    <Button
+                      type="link"
+                      size="small"
+                      icon={<ClearOutlined />}
+                      onClick={() => {
+                        setCustomProxyBaseUrl("");
+                        sessionStorage.removeItem("customProxyBaseUrl");
+                      }}
+                      className="text-gray-500 hover:text-gray-700"
+                    >
+                      Clear
+                    </Button>
+                  )}
+                </div>
+                <TextInput
+                  placeholder="Optional: Enter custom proxy URL (e.g., http://localhost:5000)"
+                  onValueChange={(value) => {
+                    setCustomProxyBaseUrl(value);
+                    sessionStorage.setItem("customProxyBaseUrl", value);
+                  }}
+                  value={customProxyBaseUrl}
+                  icon={ApiOutlined}
+                />
+                {customProxyBaseUrl && (
+                  <Text className="text-xs text-gray-500 mt-1">API calls will be sent to: {customProxyBaseUrl}</Text>
+                )}
+              </div>
+
+              <div>
                 <Text className="font-medium block mb-2 text-gray-700 flex items-center">
-                  <ApiOutlined className="mr-2" /> {t("Endpoint Type")}
+                  <ApiOutlined className="mr-2" /> Endpoint Type
                 </Text>
                 <EndpointSelector
                   endpointType={endpointType}
@@ -1128,7 +1220,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
                     try {
                       sessionStorage.removeItem("selectedModel");
                       sessionStorage.removeItem("selectedAgent");
-                    } catch { }
+                    } catch {}
                   }}
                   className="mb-4"
                 />
@@ -1138,7 +1230,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
                   <div className="mb-4">
                     <Text className="font-medium block mb-2 text-gray-700 flex items-center">
                       <SoundOutlined className="mr-2" />
-                      {t("Voice")}
+                      Voice
                     </Text>
                     <Select
                       value={selectedVoice}
@@ -1148,10 +1240,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
                       }}
                       style={{ width: "100%" }}
                       className="rounded-md"
-                      options={OPEN_AI_VOICE_SELECT_OPTIONS.map((opt) => ({
-                        ...opt,
-                        label: t(opt.label),
-                      }))}
+                      options={OPEN_AI_VOICE_SELECT_OPTIONS}
                     />
                   </div>
                 )}
@@ -1170,7 +1259,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
                 <div>
                   <Text className="font-medium block mb-2 text-gray-700 flex items-center justify-between">
                     <span className="flex items-center">
-                      <RobotOutlined className="mr-2" /> {t("Select Model")}
+                      <RobotOutlined className="mr-2" /> Select Model
                     </span>
                     {isChatModel() ? (
                       <Popover
@@ -1184,7 +1273,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
                             onUseAdvancedParamsChange={setUseAdvancedParams}
                           />
                         }
-                        title={t("Model Settings")}
+                        title="Model Settings"
                         trigger="click"
                         placement="right"
                       >
@@ -1196,7 +1285,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
                         />
                       </Popover>
                     ) : (
-                      <Tooltip title={t("Advanced parameters are only supported for chat models currently")}>
+                      <Tooltip title="Advanced parameters are only supported for chat models currently">
                         <Button
                           type="text"
                           size="small"
@@ -1209,10 +1298,10 @@ const ChatUI: React.FC<ChatUIProps> = ({
                   </Text>
                   <Select
                     value={selectedModel}
-                    placeholder={t("Select a Model")}
+                    placeholder="Select a Model"
                     onChange={onModelChange}
                     options={[
-                      { value: "custom", label: t("Enter custom model"), key: "custom" },
+                      { value: "custom", label: "Enter custom model", key: "custom" },
                       ...Array.from(
                         new Set(
                           modelInfo
@@ -1250,7 +1339,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
                   {showCustomModelInput && (
                     <TextInput
                       className="mt-2"
-                      placeholder={t("Enter custom model name")}
+                      placeholder="Enter custom model name"
                       onValueChange={(value) => {
                         // Using setTimeout to create a simple debounce effect
                         if (customModelTimeout.current) {
@@ -1270,11 +1359,11 @@ const ChatUI: React.FC<ChatUIProps> = ({
               {endpointType === EndpointType.A2A_AGENTS && (
                 <div>
                   <Text className="font-medium block mb-2 text-gray-700 flex items-center">
-                    <RobotOutlined className="mr-2" /> {t("Select Agent")}
+                    <RobotOutlined className="mr-2" /> Select Agent
                   </Text>
                   <Select
                     value={selectedAgent}
-                    placeholder={t("Select an Agent")}
+                    placeholder="Select an Agent"
                     onChange={(value) => setSelectedAgent(value)}
                     options={agentInfo.map((agent) => ({
                       value: agent.agent_name,
@@ -1287,7 +1376,11 @@ const ChatUI: React.FC<ChatUIProps> = ({
                     optionLabelProp="label"
                   >
                     {agentInfo.map((agent) => (
-                      <Select.Option key={agent.agent_id} value={agent.agent_name} label={agent.agent_name || agent.agent_id}>
+                      <Select.Option
+                        key={agent.agent_id}
+                        value={agent.agent_name}
+                        label={agent.agent_name || agent.agent_id}
+                      >
                         <div className="flex flex-col py-1">
                           <span className="font-medium">{agent.agent_name || agent.agent_id}</span>
                           {agent.agent_card_params?.description && (
@@ -1299,7 +1392,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
                   </Select>
                   {agentInfo.length === 0 && (
                     <Text className="text-xs text-gray-500 mt-2 block">
-                      {t("No agents found. Create agents via /v1/agents endpoint.")}
+                      No agents found. Create agents via /v1/agents endpoint.
                     </Text>
                   )}
                 </div>
@@ -1307,7 +1400,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
 
               <div>
                 <Text className="font-medium block mb-2 text-gray-700 flex items-center">
-                  <TagsOutlined className="mr-2" /> {t("Tags")}
+                  <TagsOutlined className="mr-2" /> Tags
                 </Text>
                 <TagSelector
                   value={selectedTags}
@@ -1317,56 +1410,122 @@ const ChatUI: React.FC<ChatUIProps> = ({
                 />
               </div>
 
-              {/* MCP Tool Selection */}
+              {/* MCP Server Selection */}
               <div>
                 <Text className="font-medium block mb-2 text-gray-700 flex items-center">
-                  <ToolOutlined className="mr-2" /> {t("MCP Tool")}
-                  <Tooltip
-                    className="ml-1"
-                    title={t("Select MCP tools to use in your conversation, only available for /v1/responses endpoint")}
-                  >
+                  <ToolOutlined className="mr-2" /> MCP Servers
+                  <Tooltip className="ml-1" title="Select MCP servers to use in your conversation.">
                     <InfoCircleOutlined />
                   </Tooltip>
                 </Text>
                 <Select
                   mode="multiple"
                   style={{ width: "100%" }}
-                  placeholder={t("Select MCP tools")}
-                  value={selectedMCPTools}
-                  onChange={(value) => setSelectedMCPTools(value)}
-                  loading={isLoadingMCPTools}
-                  className="mb-4"
+                  placeholder="Select MCP servers"
+                  value={selectedMCPServers}
+                  onChange={(value) => {
+                    if (value.includes("__all__")) {
+                      setSelectedMCPServers(["__all__"]);
+                      setMCPServerToolRestrictions({});
+                    } else {
+                      setSelectedMCPServers(value);
+                      // Clean up tool restrictions for removed servers
+                      setMCPServerToolRestrictions((prev) => {
+                        const updated = { ...prev };
+                        Object.keys(updated).forEach((serverId) => {
+                          if (!value.includes(serverId)) delete updated[serverId];
+                        });
+                        return updated;
+                      });
+                      // Load tools for newly selected servers
+                      value.forEach((serverId) => {
+                        if (!serverToolsMap[serverId]) {
+                          loadServerTools(serverId);
+                        }
+                      });
+                    }
+                  }}
+                  loading={isLoadingMCPServers}
+                  className="mb-2"
                   allowClear
                   optionLabelProp="label"
-                  disabled={!(endpointType === EndpointType.RESPONSES)}
+                  disabled={!MCP_SUPPORTED_ENDPOINTS.has(endpointType as EndpointType)}
                   maxTagCount="responsive"
                 >
-                  {Array.isArray(mcpTools) &&
-                    mcpTools.map((tool) => (
-                      <Select.Option
-                        key={tool.name}
-                        value={tool.name}
-                        label={<div className="font-medium">{tool.name}</div>}
-                      >
-                        <div className="flex flex-col py-1">
-                          <span className="font-medium">{tool.name}</span>
-                          <span className="text-xs text-gray-500 mt-1">{tool.description}</span>
-                        </div>
-                      </Select.Option>
-                    ))}
+                  {/* All MCP Servers option */}
+                  <Select.Option key="__all__" value="__all__" label="All MCP Servers">
+                    <div className="flex flex-col py-1">
+                      <span className="font-medium">All MCP Servers</span>
+                      <span className="text-xs text-gray-500 mt-1">Use all available MCP servers</span>
+                    </div>
+                  </Select.Option>
+
+                  {/* Individual servers */}
+                  {mcpServers.map((server) => (
+                    <Select.Option
+                      key={server.server_id}
+                      value={server.server_id}
+                      label={server.alias || server.server_name || server.server_id}
+                      disabled={selectedMCPServers.includes("__all__")}
+                    >
+                      <div className="flex flex-col py-1">
+                        <span className="font-medium">{server.alias || server.server_name || server.server_id}</span>
+                        {server.description && <span className="text-xs text-gray-500 mt-1">{server.description}</span>}
+                      </div>
+                    </Select.Option>
+                  ))}
                 </Select>
+
+                {/* Tool restrictions UI (optional) */}
+                {selectedMCPServers.length > 0 &&
+                  !selectedMCPServers.includes("__all__") &&
+                  MCP_SUPPORTED_ENDPOINTS.has(endpointType as EndpointType) && (
+                    <div className="mt-3 space-y-2">
+                      {selectedMCPServers.map((serverId) => {
+                        const server = mcpServers.find((s) => s.server_id === serverId);
+                        const tools = serverToolsMap[serverId] || [];
+                        if (tools.length === 0) return null;
+
+                        return (
+                          <div key={serverId} className="border rounded p-2">
+                            <Text className="text-xs text-gray-600 mb-1">
+                              Limit tools for {server?.alias || server?.server_name || serverId}:
+                            </Text>
+                            <Select
+                              mode="multiple"
+                              size="small"
+                              style={{ width: "100%" }}
+                              placeholder="All tools (default)"
+                              value={mcpServerToolRestrictions[serverId] || []}
+                              onChange={(selectedTools) => {
+                                setMCPServerToolRestrictions((prev) => ({
+                                  ...prev,
+                                  [serverId]: selectedTools,
+                                }));
+                              }}
+                              options={tools.map((tool) => ({
+                                value: tool.name,
+                                label: tool.name,
+                              }))}
+                              maxTagCount={2}
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
               </div>
 
               <div>
                 <Text className="font-medium block mb-2 text-gray-700 flex items-center">
-                  <DatabaseOutlined className="mr-2" /> {t("Vector Store")}
+                  <DatabaseOutlined className="mr-2" /> Vector Store
                   <Tooltip
                     className="ml-1"
                     title={
                       <span>
-                        {t("Select vector store(s) to use for this LLM API call. You can set up your vector store")}{" "}
+                        Select vector store(s) to use for this LLM API call. You can set up your vector store{" "}
                         <a href="?page=vector-stores" style={{ color: "#1890ff" }}>
-                          {t("here")}
+                          here
                         </a>
                         .
                       </span>
@@ -1385,14 +1544,14 @@ const ChatUI: React.FC<ChatUIProps> = ({
 
               <div>
                 <Text className="font-medium block mb-2 text-gray-700 flex items-center">
-                  <SafetyOutlined className="mr-2" /> {t("Guardrails")}
+                  <SafetyOutlined className="mr-2" /> Guardrails
                   <Tooltip
                     className="ml-1"
                     title={
                       <span>
-                        {t("Select guardrail(s) to use for this LLM API call. You can set up your guardrails")}{" "}
+                        Select guardrail(s) to use for this LLM API call. You can set up your guardrails{" "}
                         <a href="?page=guardrails" style={{ color: "#1890ff" }}>
-                          {t("here")}
+                          here
                         </a>
                         .
                       </span>
@@ -1417,7 +1576,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
                     enabled={codeInterpreter.enabled}
                     onEnabledChange={codeInterpreter.setEnabled}
                     selectedContainerId={null}
-                    onContainerChange={() => { }}
+                    onContainerChange={() => {}}
                     selectedModel={selectedModel || ""}
                   />
                 </div>
@@ -1428,21 +1587,21 @@ const ChatUI: React.FC<ChatUIProps> = ({
           {/* Main Chat Area */}
           <div className="w-3/4 flex flex-col bg-white">
             <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-              <Title className="text-xl font-semibold mb-0">{t("Test Key")}</Title>
+              <Title className="text-xl font-semibold mb-0">Test Key</Title>
               <div className="flex gap-2">
                 <TremorButton
                   onClick={clearChatHistory}
                   className="bg-gray-100 hover:bg-gray-200 text-gray-700 border-gray-300"
                   icon={ClearOutlined}
                 >
-                  {t("Clear Chat")}
+                  Clear Chat
                 </TremorButton>
                 <TremorButton
                   onClick={() => setIsGetCodeModalVisible(true)}
                   className="bg-gray-100 hover:bg-gray-200 text-gray-700 border-gray-300"
                   icon={CodeOutlined}
                 >
-                  {t("Get Code")}
+                  Get Code
                 </TremorButton>
               </div>
             </div>
@@ -1450,7 +1609,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
               {chatHistory.length === 0 && (
                 <div className="h-full flex flex-col items-center justify-center text-gray-400">
                   <RobotOutlined style={{ fontSize: "48px", marginBottom: "16px" }} />
-                  <Text>{t("Start a conversation, generate an image, or handle audio")}</Text>
+                  <Text>Start a conversation, generate an image, or handle audio</Text>
                 </div>
               )}
 
@@ -1645,7 +1804,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
                         >
                           <RobotOutlined style={{ fontSize: "12px", color: "#4b5563" }} />
                         </div>
-                        <strong className="text-sm capitalize">{t("Assistant")}</strong>
+                        <strong className="text-sm capitalize">Assistant</strong>
                       </div>
                       <MCPEventsDisplay events={mcpEvents} />
                     </div>
@@ -1669,9 +1828,9 @@ const ChatUI: React.FC<ChatUIProps> = ({
                       <p className="ant-upload-drag-icon">
                         <PictureOutlined style={{ fontSize: "24px", color: "#666" }} />
                       </p>
-                      <p className="ant-upload-text text-sm">{t("Click or drag images to upload")}</p>
+                      <p className="ant-upload-text text-sm">Click or drag images to upload</p>
                       <p className="ant-upload-hint text-xs text-gray-500">
-                        {t("Support for PNG, JPG, JPEG formats. Multiple images supported.")}
+                        Support for PNG, JPG, JPEG formats. Multiple images supported.
                       </p>
                     </Dragger>
                   ) : (
@@ -1698,7 +1857,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
                       >
                         <div className="text-center">
                           <PictureOutlined style={{ fontSize: "24px", color: "#666" }} />
-                          <p className="text-xs text-gray-500 mt-1">{t("Add more")}</p>
+                          <p className="text-xs text-gray-500 mt-1">Add more</p>
                         </div>
                         <input
                           id="additional-image-upload"
@@ -1729,9 +1888,9 @@ const ChatUI: React.FC<ChatUIProps> = ({
                       <p className="ant-upload-drag-icon">
                         <SoundOutlined style={{ fontSize: "24px", color: "#666" }} />
                       </p>
-                      <p className="ant-upload-text text-sm">{t("Click or drag audio file to upload")}</p>
+                      <p className="ant-upload-text text-sm">Click or drag audio file to upload</p>
                       <p className="ant-upload-hint text-xs text-gray-500">
-                        {t("Support for MP3, MP4, MPEG, MPGA, M4A, WAV, WEBM formats. Max file size: 25 MB.")}
+                        Support for MP3, MP4, MPEG, MPGA, M4A, WAV, WEBM formats. Max file size: 25 MB.
                       </p>
                     </Dragger>
                   ) : (
@@ -1747,7 +1906,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
                         className="bg-white shadow-sm border border-gray-200 rounded px-2 py-1 text-red-500 hover:bg-red-50 text-xs"
                         onClick={handleRemoveAudio}
                       >
-                        <DeleteOutlined /> {t("Remove")}
+                        <DeleteOutlined /> Remove
                       </button>
                     </div>
                   )}
@@ -1774,7 +1933,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-medium text-gray-900 truncate">{responsesUploadedImage.name}</div>
                       <div className="text-xs text-gray-500">
-                        {responsesUploadedImage.name.toLowerCase().endsWith(".pdf") ? "PDF" : t("Image")}
+                        {responsesUploadedImage.name.toLowerCase().endsWith(".pdf") ? "PDF" : "Image"}
                       </div>
                     </div>
                     <button
@@ -1806,7 +1965,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-medium text-gray-900 truncate">{chatUploadedImage.name}</div>
                       <div className="text-xs text-gray-500">
-                        {chatUploadedImage.name.toLowerCase().endsWith(".pdf") ? t("PDF") : t("Image")}
+                        {chatUploadedImage.name.toLowerCase().endsWith(".pdf") ? "PDF" : "Image"}
                       </div>
                     </div>
                     <button
@@ -1827,12 +1986,12 @@ const ChatUI: React.FC<ChatUIProps> = ({
                       {isLoading ? (
                         <>
                           <LoadingOutlined className="text-blue-500" spin />
-                          <span className="text-sm text-blue-700 font-medium">{t("Running Python code...")}</span>
+                          <span className="text-sm text-blue-700 font-medium">Running Python code...</span>
                         </>
                       ) : (
                         <>
                           <CodeOutlined className="text-blue-500" />
-                          <span className="text-sm text-blue-700 font-medium">{t("Code Interpreter Active")}</span>
+                          <span className="text-sm text-blue-700 font-medium">Code Interpreter Active</span>
                         </>
                       )}
                     </div>
@@ -1840,16 +1999,16 @@ const ChatUI: React.FC<ChatUIProps> = ({
                       className="text-xs text-blue-500 hover:text-blue-700"
                       onClick={() => codeInterpreter.setEnabled(false)}
                     >
-                      {t("Disable")}
+                      Disable
                     </button>
                   </div>
                   {/* Sample prompts - only show when not loading */}
                   {!isLoading && (
                     <div className="flex flex-wrap gap-2">
                       {[
-                        t("Generate sample sales data CSV and create a chart"),
-                        t("Create a PNG bar chart comparing AI gateway providers including LiteLLM"),
-                        t("Generate a CSV of LLM pricing data and visualize it as a line chart"),
+                        "Generate sample sales data CSV and create a chart",
+                        "Create a PNG bar chart comparing AI gateway providers including LiteLLM",
+                        "Generate a CSV of LLM pricing data and visualize it as a line chart",
                       ].map((prompt, idx) => (
                         <button
                           key={idx}
@@ -1868,8 +2027,8 @@ const ChatUI: React.FC<ChatUIProps> = ({
               {chatHistory.length === 0 && !isLoading && (
                 <div className="flex items-center gap-2 mb-3 overflow-x-auto">
                   {(endpointType === EndpointType.A2A_AGENTS
-                    ? [t("What can you help me with?"), t("Tell me about yourself"), t("What tasks can you perform?")]
-                    : [t("Write me a poem"), t("Explain quantum computing"), t("Draft a polite email requesting a meeting")]
+                    ? ["What can you help me with?", "Tell me about yourself", "What tasks can you perform?"]
+                    : ["Write me a poem", "Explain quantum computing", "Draft a polite email requesting a meeting"]
                   ).map((prompt) => (
                     <button
                       key={prompt}
@@ -1905,16 +2064,23 @@ const ChatUI: React.FC<ChatUIProps> = ({
                     )}
                     {/* Quick Code Interpreter toggle for Responses */}
                     {endpointType === EndpointType.RESPONSES && (
-                      <Tooltip title={codeInterpreter.enabled ? t("Code Interpreter enabled (click to disable)") : t("Enable Code Interpreter")}>
+                      <Tooltip
+                        title={
+                          codeInterpreter.enabled
+                            ? "Code Interpreter enabled (click to disable)"
+                            : "Enable Code Interpreter"
+                        }
+                      >
                         <button
-                          className={`p-1.5 rounded-md transition-colors ${codeInterpreter.enabled
-                            ? "bg-blue-100 text-blue-600"
-                            : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"
-                            }`}
+                          className={`p-1.5 rounded-md transition-colors ${
+                            codeInterpreter.enabled
+                              ? "bg-blue-100 text-blue-600"
+                              : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                          }`}
                           onClick={() => {
                             codeInterpreter.toggle();
                             if (!codeInterpreter.enabled) {
-                              NotificationsManager.success(t("Code Interpreter enabled!"));
+                              NotificationsManager.success("Code Interpreter enabled!");
                             }
                           }}
                         >
@@ -1931,19 +2097,19 @@ const ChatUI: React.FC<ChatUIProps> = ({
                     onKeyDown={handleKeyDown}
                     placeholder={
                       endpointType === EndpointType.CHAT ||
-                        endpointType === EndpointType.EMBEDDINGS ||
-                        endpointType === EndpointType.RESPONSES ||
-                        endpointType === EndpointType.ANTHROPIC_MESSAGES
-                        ? t("Type your message... (Shift+Enter for new line)")
+                      endpointType === EndpointType.EMBEDDINGS ||
+                      endpointType === EndpointType.RESPONSES ||
+                      endpointType === EndpointType.ANTHROPIC_MESSAGES
+                        ? "Type your message... (Shift+Enter for new line)"
                         : endpointType === EndpointType.A2A_AGENTS
-                          ? t("Send a message to the A2A agent...")
+                          ? "Send a message to the A2A agent..."
                           : endpointType === EndpointType.IMAGE_EDITS
-                            ? t("Describe how you want to edit the image...")
+                            ? "Describe how you want to edit the image..."
                             : endpointType === EndpointType.SPEECH
-                              ? t("Enter text to convert to speech...")
+                              ? "Enter text to convert to speech..."
                               : endpointType === EndpointType.TRANSCRIPTION
-                                ? t("Optional: Add context or prompt for transcription...")
-                                : t("Describe the image you want to generate...")
+                                ? "Optional: Add context or prompt for transcription..."
+                                : "Describe the image you want to generate..."
                     }
                     disabled={isLoading}
                     className="flex-1"
@@ -1977,7 +2143,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
                     className="bg-red-50 hover:bg-red-100 text-red-600 border-red-200"
                     icon={DeleteOutlined}
                   >
-                    {t("Cancel")}
+                    Cancel
                   </TremorButton>
                 )}
               </div>
@@ -1986,7 +2152,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
         </div>
       </Card>
       <Modal
-        title={t("Generated Code")}
+        title="Generated Code"
         visible={isGetCodeModalVisible}
         onCancel={() => setIsGetCodeModalVisible(false)}
         footer={null}
@@ -1994,24 +2160,24 @@ const ChatUI: React.FC<ChatUIProps> = ({
       >
         <div className="flex justify-between items-end my-4">
           <div>
-            <Text className="font-medium block mb-1 text-gray-700">{t("SDK Type")}</Text>
+            <Text className="font-medium block mb-1 text-gray-700">SDK Type</Text>
             <Select
               value={selectedSdk}
               onChange={(value) => setSelectedSdk(value as "openai" | "azure")}
               style={{ width: 150 }}
               options={[
-                { value: "openai", label: t("OpenAI SDK") },
-                { value: "azure", label: t("Azure SDK") },
+                { value: "openai", label: "OpenAI SDK" },
+                { value: "azure", label: "Azure SDK" },
               ]}
             />
           </div>
           <Button
             onClick={() => {
               navigator.clipboard.writeText(generatedCode);
-              NotificationsManager.success(t("Copied to clipboard!"));
+              NotificationsManager.success("Copied to clipboard!");
             }}
           >
-            {t("Copy to Clipboard")}
+            Copy to Clipboard
           </Button>
         </div>
         <SyntaxHighlighter
@@ -2028,53 +2194,6 @@ const ChatUI: React.FC<ChatUIProps> = ({
           {generatedCode}
         </SyntaxHighlighter>
       </Modal>
-      {apiKeySource === "custom" && (
-        <Modal
-          title={t("Select MCP Tool")}
-          visible={isMCPToolsModalVisible}
-          onCancel={() => setIsMCPToolsModalVisible(false)}
-          onOk={() => {
-            setIsMCPToolsModalVisible(false);
-            NotificationsManager.success(t("MCP tool selection updated"));
-          }}
-          width={800}
-        >
-          {isLoadingMCPTools ? (
-            <div className="flex justify-center items-center py-8">
-              <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <Text className="text-gray-600 block mb-4">
-                {t("Select the MCP tools you want to use in your conversation.")}
-              </Text>
-              <Select
-                mode="multiple"
-                style={{ width: "100%" }}
-                placeholder={t("Select MCP tools")}
-                value={selectedMCPTools}
-                onChange={(value) => setSelectedMCPTools(value)}
-                optionLabelProp="label"
-                allowClear
-                maxTagCount="responsive"
-              >
-                {mcpTools.map((tool) => (
-                  <Select.Option
-                    key={tool.name}
-                    value={tool.name}
-                    label={<div className="font-medium">{tool.name}</div>}
-                  >
-                    <div className="flex flex-col py-1">
-                      <span className="font-medium">{tool.name}</span>
-                      <span className="text-xs text-gray-500 mt-1">{tool.description}</span>
-                    </div>
-                  </Select.Option>
-                ))}
-              </Select>
-            </div>
-          )}
-        </Modal>
-      )}
     </div>
   );
 };

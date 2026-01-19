@@ -1,15 +1,17 @@
+import { useModelCostMap } from "@/app/(dashboard)/hooks/models/useModelCostMap";
+import { useTeams } from "@/app/(dashboard)/hooks/teams/useTeams";
 import useAuthorized from "@/app/(dashboard)/hooks/useAuthorized";
-import useTeams from "@/app/(dashboard)/hooks/useTeams";
 import { Team } from "@/components/key_team_helpers/key_list";
 import { ModelDataTable } from "@/components/model_dashboard/table";
 import { columns } from "@/components/molecules/models/columns";
 import { getDisplayModelName } from "@/components/view_model/model_name_display";
 import { InfoCircleOutlined } from "@ant-design/icons";
-import { PaginationState, Table as TableInstance } from "@tanstack/react-table";
+import { PaginationState } from "@tanstack/react-table";
 import { Grid, Select, SelectItem, TabPanel, Text } from "@tremor/react";
-import { useTranslate } from "@/i18n";
-import { useEffect, useMemo, useRef, useState } from "react";
-
+import { useEffect, useMemo, useState } from "react";
+import { useModelsInfo } from "../../hooks/models/useModels";
+import { transformModelData } from "../utils/modelDataTransformer";
+import { Skeleton } from "antd";
 type ModelViewMode = "all" | "current_team";
 
 interface AllModelsTabProps {
@@ -19,8 +21,6 @@ interface AllModelsTabProps {
   availableModelAccessGroups: string[];
   setSelectedModelId: (id: string) => void;
   setSelectedTeamId: (id: string) => void;
-  setEditModel: (edit: boolean) => void;
-  modelData: any;
 }
 
 const AllModelsTab = ({
@@ -30,13 +30,25 @@ const AllModelsTab = ({
   availableModelAccessGroups,
   setSelectedModelId,
   setSelectedTeamId,
-  setEditModel,
-  modelData,
 }: AllModelsTabProps) => {
+  const { data: rawModelData, isLoading: isLoadingModelsInfo } = useModelsInfo();
+  const { data: modelCostMapData, isLoading: isLoadingModelCostMap } = useModelCostMap();
   const { userId, userRole, premiumUser } = useAuthorized();
+  const { data: teams } = useTeams();
 
-  const { teams } = useTeams();
-  const t = useTranslate();
+  const getProviderFromModel = (model: string) => {
+    if (modelCostMapData !== null && modelCostMapData !== undefined) {
+      if (typeof modelCostMapData == "object" && model in modelCostMapData) {
+        return modelCostMapData[model]["litellm_provider"];
+      }
+    }
+    return "openai";
+  };
+
+  const modelData = useMemo(() => {
+    if (!rawModelData) return { data: [] };
+    return transformModelData(rawModelData, getProviderFromModel);
+  }, [rawModelData, modelCostMapData]);
 
   const [modelNameSearch, setModelNameSearch] = useState<string>("");
   const [modelViewMode, setModelViewMode] = useState<ModelViewMode>("current_team");
@@ -48,7 +60,8 @@ const AllModelsTab = ({
     pageIndex: 0,
     pageSize: 50,
   });
-  const tableRef = useRef<TableInstance<any>>(null);
+
+  const isLoading = isLoadingModelsInfo || isLoadingModelCostMap;
 
   const filteredData = useMemo(() => {
     if (!modelData || !modelData.data || modelData.data.length === 0) {
@@ -91,12 +104,6 @@ const AllModelsTab = ({
     });
   }, [modelData, modelNameSearch, selectedModelGroup, selectedModelAccessGroupFilter, currentTeam, modelViewMode]);
 
-  const paginatedData = useMemo(() => {
-    const startIndex = pagination.pageIndex * pagination.pageSize;
-    const endIndex = startIndex + pagination.pageSize;
-    return filteredData.slice(startIndex, endIndex);
-  }, [filteredData, pagination.pageIndex, pagination.pageSize]);
-
   useEffect(() => {
     setPagination((prev: PaginationState) => ({ ...prev, pageIndex: 0 }));
   }, [modelNameSearch, selectedModelGroup, selectedModelAccessGroupFilter, currentTeam, modelViewMode]);
@@ -119,64 +126,72 @@ const AllModelsTab = ({
             <div className="border-b px-6 py-4 bg-gray-50">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <Text className="text-lg font-semibold text-gray-900">{t("Current Team:")}</Text>
-                  <Select
-                    className="w-80"
-                    defaultValue="personal"
-                    value={currentTeam === "personal" ? "personal" : currentTeam.team_id}
-                    onValueChange={(value) => {
-                      if (value === "personal") {
-                        setCurrentTeam("personal");
-                      } else {
-                        const team = teams?.find((t) => t.team_id === value);
-                        if (team) setCurrentTeam(team);
-                      }
-                    }}
-                  >
-                    <SelectItem value="personal">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        <span className="font-medium">{t("Personal")}</span>
-                      </div>
-                    </SelectItem>
-                    {teams
-                      ?.filter((team) => team.team_id)
-                      .map((team) => (
-                        <SelectItem key={team.team_id} value={team.team_id}>
-                          <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                            <span className="font-medium">
-                              {team.team_alias
-                                ? `${team.team_alias.slice(0, 30)}...`
-                                : `Team ${team.team_id.slice(0, 30)}...`}
-                            </span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                  </Select>
+                  <Text className="text-lg font-semibold text-gray-900">Current Team:</Text>
+                  {isLoading ? (
+                    <Skeleton.Input active style={{ width: 320, height: 36 }} />
+                  ) : (
+                    <Select
+                      className="w-80"
+                      defaultValue="personal"
+                      value={currentTeam === "personal" ? "personal" : currentTeam.team_id}
+                      onValueChange={(value) => {
+                        if (value === "personal") {
+                          setCurrentTeam("personal");
+                        } else {
+                          const team = teams?.find((t) => t.team_id === value);
+                          if (team) setCurrentTeam(team);
+                        }
+                      }}
+                    >
+                      <SelectItem value="personal">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          <span className="font-medium">Personal</span>
+                        </div>
+                      </SelectItem>
+                      {teams
+                        ?.filter((team) => team.team_id)
+                        .map((team) => (
+                          <SelectItem key={team.team_id} value={team.team_id}>
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                              <span className="font-medium">
+                                {team.team_alias
+                                  ? `${team.team_alias.slice(0, 30)}...`
+                                  : `Team ${team.team_id.slice(0, 30)}...`}
+                              </span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                    </Select>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <Text className="text-lg font-semibold text-gray-900">{t("View:")}</Text>
-                  <Select
-                    className="w-64"
-                    defaultValue="current_team"
-                    value={modelViewMode}
-                    onValueChange={(value) => setModelViewMode(value as "current_team" | "all")}
-                  >
-                    <SelectItem value="current_team">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                        <span className="font-medium">{t("Current Team Models")}</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="all">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
-                        <span className="font-medium">{t("All Available Models")}</span>
-                      </div>
-                    </SelectItem>
-                  </Select>
+                  <Text className="text-lg font-semibold text-gray-900">View:</Text>
+                  {isLoading ? (
+                    <Skeleton.Input active style={{ width: 256, height: 36 }} />
+                  ) : (
+                    <Select
+                      className="w-64"
+                      defaultValue="current_team"
+                      value={modelViewMode}
+                      onValueChange={(value) => setModelViewMode(value as "current_team" | "all")}
+                    >
+                      <SelectItem value="current_team">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                          <span className="font-medium">Current Team Models</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="all">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
+                          <span className="font-medium">All Available Models</span>
+                        </div>
+                      </SelectItem>
+                    </Select>
+                  )}
                 </div>
               </div>
 
@@ -186,23 +201,24 @@ const AllModelsTab = ({
                   <div className="text-xs text-gray-500">
                     {currentTeam === "personal" ? (
                       <span>
-                        {t("To access these models: Create a Virtual Key without selecting a team on the")}{" "}
+                        To access these models: Create a Virtual Key without selecting a team on the{" "}
                         <a
                           href="/public?login=success&page=api-keys"
                           className="text-gray-600 hover:text-gray-800 underline"
                         >
-                          {t("Virtual Keys page")}
+                          Virtual Keys page
                         </a>
                       </span>
                     ) : (
                       <span>
-                        {t("To access these models: Create a Virtual Key and select Team as")} &quot;
-                        {typeof currentTeam !== "string" ? currentTeam.team_alias || currentTeam.team_id : ""}&quot; {t("on the")}{" "}
+                        To access these models: Create a Virtual Key and select Team as &quot;
+                        {typeof currentTeam !== "string" ? currentTeam.team_alias || currentTeam.team_id : ""}&quot; on
+                        the{" "}
                         <a
                           href="/public?login=success&page=api-keys"
                           className="text-gray-600 hover:text-gray-800 underline"
                         >
-                          {t("Virtual Keys page")}
+                          Virtual Keys page
                         </a>
                       </span>
                     )}
@@ -220,7 +236,7 @@ const AllModelsTab = ({
                   <div className="relative w-64">
                     <input
                       type="text"
-                      placeholder={t("Search model names...")}
+                      placeholder="Search model names..."
                       className="w-full px-3 py-2 pl-8 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       value={modelNameSearch}
                       onChange={(e) => setModelNameSearch(e.target.value)}
@@ -253,7 +269,7 @@ const AllModelsTab = ({
                         d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
                       />
                     </svg>
-                    {t("Filters")}
+                    Filters
                   </button>
 
                   {/* Reset Filters Button */}
@@ -269,7 +285,7 @@ const AllModelsTab = ({
                         d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                       />
                     </svg>
-                    {t("Reset Filters")}
+                    Reset Filters
                   </button>
                 </div>
 
@@ -281,10 +297,10 @@ const AllModelsTab = ({
                       <Select
                         value={selectedModelGroup ?? "all"}
                         onValueChange={(value) => setSelectedModelGroup(value === "all" ? "all" : value)}
-                        placeholder={t("Filter by Public Model Name")}
+                        placeholder="Filter by Public Model Name"
                       >
-                        <SelectItem value="all">{t("All Models")}</SelectItem>
-                        <SelectItem value="wildcard">{t("Wildcard Models (*)")}</SelectItem>
+                        <SelectItem value="all">All Models</SelectItem>
+                        <SelectItem value="wildcard">Wildcard Models (*)</SelectItem>
                         {availableModelGroups.map((group, idx) => (
                           <SelectItem key={idx} value={group}>
                             {group}
@@ -298,9 +314,9 @@ const AllModelsTab = ({
                       <Select
                         value={selectedModelAccessGroupFilter ?? "all"}
                         onValueChange={(value) => setSelectedModelAccessGroupFilter(value === "all" ? null : value)}
-                        placeholder={t("Filter by Model Access Group")}
+                        placeholder="Filter by Model Access Group"
                       >
-                        <SelectItem value="all">{t("All Model Access Groups")}</SelectItem>
+                        <SelectItem value="all">All Model Access Groups</SelectItem>
                         {availableModelAccessGroups.map((accessGroup, idx) => (
                           <SelectItem key={idx} value={accessGroup}>
                             {accessGroup}
@@ -313,45 +329,56 @@ const AllModelsTab = ({
 
                 {/* Results Count and Pagination Controls */}
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-700">
-                    {filteredData.length > 0
-                      ? `${t("Showing")} ${pagination.pageIndex * pagination.pageSize + 1} - ${Math.min(
-                        (pagination.pageIndex + 1) * pagination.pageSize,
-                        filteredData.length,
-                      )} ${t("of")} ${filteredData.length} ${t("results")}`
-                      : t("Showing 0 results")}
-                  </span>
+                  {isLoading ? (
+                    <Skeleton.Input active style={{ width: 184, height: 20 }} />
+                  ) : (
+                    <span className="text-sm text-gray-700">
+                      {filteredData.length > 0
+                        ? `Showing ${pagination.pageIndex * pagination.pageSize + 1} - ${Math.min(
+                            (pagination.pageIndex + 1) * pagination.pageSize,
+                            filteredData.length,
+                          )} of ${filteredData.length} results`
+                        : "Showing 0 results"}
+                    </span>
+                  )}
 
-                  {/* Pagination Controls */}
-                  {filteredData.length > pagination.pageSize && (
-                    <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2">
+                    {isLoading ? (
+                      <Skeleton.Button active style={{ width: 84, height: 30 }} />
+                    ) : (
                       <button
                         onClick={() =>
                           setPagination((prev: PaginationState) => ({ ...prev, pageIndex: prev.pageIndex - 1 }))
                         }
                         disabled={pagination.pageIndex === 0}
-                        className={`px-3 py-1 text-sm border rounded-md ${pagination.pageIndex === 0
-                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                          : "hover:bg-gray-50"
-                          }`}
+                        className={`px-3 py-1 text-sm border rounded-md ${
+                          pagination.pageIndex === 0
+                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                            : "hover:bg-gray-50"
+                        }`}
                       >
-                        {t("Previous")}
+                        Previous
                       </button>
+                    )}
 
+                    {isLoading ? (
+                      <Skeleton.Button active style={{ width: 56, height: 30 }} />
+                    ) : (
                       <button
                         onClick={() =>
                           setPagination((prev: PaginationState) => ({ ...prev, pageIndex: prev.pageIndex + 1 }))
                         }
                         disabled={pagination.pageIndex >= Math.ceil(filteredData.length / pagination.pageSize) - 1}
-                        className={`px-3 py-1 text-sm border rounded-md ${pagination.pageIndex >= Math.ceil(filteredData.length / pagination.pageSize) - 1
-                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                          : "hover:bg-gray-50"
-                          }`}
+                        className={`px-3 py-1 text-sm border rounded-md ${
+                          pagination.pageIndex >= Math.ceil(filteredData.length / pagination.pageSize) - 1
+                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                            : "hover:bg-gray-50"
+                        }`}
                       >
-                        {t("Next")}
+                        Next
                       </button>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -364,16 +391,16 @@ const AllModelsTab = ({
                 setSelectedModelId,
                 setSelectedTeamId,
                 getDisplayModelName,
-                () => { },
-                () => { },
-                setEditModel,
+                () => {},
+                () => {},
                 expandedRows,
                 setExpandedRows,
-                t
               )}
-              data={paginatedData}
+              data={filteredData}
               isLoading={false}
-              table={tableRef}
+              pagination={pagination}
+              onPaginationChange={setPagination}
+              enablePagination={true}
             />
           </div>
         </div>

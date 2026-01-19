@@ -27,7 +27,7 @@ import {
   Text,
   Title,
 } from "@tremor/react";
-import { Alert, Badge } from "antd";
+import { Alert } from "antd";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useAgents } from "@/app/(dashboard)/hooks/agents/useAgents";
@@ -52,7 +52,9 @@ import { valueFormatterSpend } from "../utils/value_formatters";
 import EntityUsage, { EntityList } from "./EntityUsage/EntityUsage";
 import TopKeyView from "./EntityUsage/TopKeyView";
 import { UsageOption, UsageViewSelect } from "./UsageViewSelect/UsageViewSelect";
-import { useTranslate, useI18n } from "@/i18n";
+import { useCurrentUser } from "@/app/(dashboard)/hooks/users/useCurrentUser";
+import EndpointUsage from "./EndpointUsage/EndpointUsage";
+import NewBadge from "../../common_components/NewBadge";
 
 interface UsagePageProps {
   teams: Team[];
@@ -60,8 +62,6 @@ interface UsagePageProps {
 }
 
 const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
-  const t = useTranslate();
-  const { locale } = useI18n();
   const { accessToken, userRole, userId: userID, premiumUser } = useAuthorized();
   const [userSpendData, setUserSpendData] = useState<{
     results: DailyData[];
@@ -83,8 +83,11 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
   });
 
   const [allTags, setAllTags] = useState<EntityList[]>([]);
-  const { data: customers = [] } = useCustomers(accessToken, userRole);
-  const { data: agentsResponse } = useAgents(accessToken, userRole);
+  const { data: customers = [] } = useCustomers();
+  const { data: agentsResponse } = useAgents();
+  const { data: currentUser } = useCurrentUser();
+  console.log(`currentUser: ${JSON.stringify(currentUser)}`);
+  console.log(`currentUser max budget: ${currentUser?.max_budget}`);
   const [modelViewType, setModelViewType] = useState<"groups" | "individual">("groups");
   const [isCloudZeroModalOpen, setIsCloudZeroModalOpen] = useState(false);
   const [isGlobalExportModalOpen, setIsGlobalExportModalOpen] = useState(false);
@@ -422,25 +425,26 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
       <div className="flex items-end justify-between gap-6 mb-6">
         <div className="flex-1">
           <div className="flex items-end justify-between gap-6 mb-4 w-full">
-            <Badge color="blue" count="New">
-              <UsageViewSelect
-                value={usageView}
-                onChange={(value) => setUsageView(value)}
-                isAdmin={all_admin_roles.includes(userRole || "")}
-              />
-            </Badge>
+            <UsageViewSelect
+              value={usageView}
+              onChange={(value) => setUsageView(value)}
+              isAdmin={all_admin_roles.includes(userRole || "")}
+            />
             <AdvancedDatePicker value={dateValue} onValueChange={handleDateChange} />
           </div>
           {/* Your Usage Panel */}
           {usageView === "global" && (
             <TabGroup>
               <div className="flex justify-between items-center">
-                <TabList variant="solid" className="mt-1">
-                  <Tab>{t("Cost")}</Tab>
-                  <Tab>{t("Model Activity")}</Tab>
-                  <Tab>{t("Key Activity")}</Tab>
-                  <Tab>{t("MCP Server Activity")}</Tab>
-                </TabList>
+                <NewBadge>
+                  <TabList variant="solid" className="mt-1">
+                    <Tab>Cost</Tab>
+                    <Tab>Model Activity</Tab>
+                    <Tab>Key Activity</Tab>
+                    <Tab>MCP Server Activity</Tab>
+                    <Tab>Endpoint Activity</Tab>
+                  </TabList>
+                </NewBadge>
                 <Button
                   onClick={() => setIsGlobalExportModalOpen(true)}
                   icon={() => (
@@ -454,7 +458,7 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
                     </svg>
                   )}
                 >
-                  {t("Export Data")}
+                  Export Data
                 </Button>
               </div>
               <TabPanels>
@@ -464,68 +468,61 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
                     {/* Total Spend Card */}
                     <Col numColSpan={2}>
                       <Text className="text-tremor-default text-tremor-content dark:text-dark-tremor-content mb-2 mt-2 text-lg">
-                        {t("Project Spend")}{" "}
+                        Project Spend{" "}
                         {dateValue.from && dateValue.to && (
                           <>
-                            {locale === "zh-CN" ? (
-                              <>
-                                {dateValue.from.getFullYear()}年{dateValue.from.getMonth() + 1}月{dateValue.from.getDate()}日
-                                {" - "}
-                                {dateValue.to.getFullYear() !== dateValue.from.getFullYear() ? `${dateValue.to.getFullYear()}年` : ""}
-                                {dateValue.to.getMonth() + 1}月{dateValue.to.getDate()}日
-                              </>
-                            ) : (
-                              <>
-                                {dateValue.from.toLocaleDateString("en-US", {
-                                  month: "short",
-                                  day: "numeric",
-                                  year: dateValue.from.getFullYear() !== dateValue.to.getFullYear() ? "numeric" : undefined,
-                                })}
-                                {" - "}
-                                {dateValue.to.toLocaleDateString("en-US", {
-                                  month: "short",
-                                  day: "numeric",
-                                  year: "numeric",
-                                })}
-                              </>
-                            )}
+                            {dateValue.from.toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: dateValue.from.getFullYear() !== dateValue.to.getFullYear() ? "numeric" : undefined,
+                            })}
+                            {" - "}
+                            {dateValue.to.toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })}
                           </>
                         )}
                       </Text>
 
-                      <ViewUserSpend userSpend={totalSpend} selectedTeam={null} userMaxBudget={null} />
+                      <ViewUserSpend
+                        userSpend={totalSpend}
+                        selectedTeam={null}
+                        userMaxBudget={currentUser?.max_budget || null}
+                      />
                     </Col>
 
                     <Col numColSpan={2}>
                       <Card>
-                        <Title>{t("Usage Metrics")}</Title>
+                        <Title>Usage Metrics</Title>
                         <Grid numItems={5} className="gap-4 mt-4">
                           <Card>
-                            <Title>{t("Total Requests")}</Title>
+                            <Title>Total Requests</Title>
                             <Text className="text-2xl font-bold mt-2">
                               {userSpendData.metadata?.total_api_requests?.toLocaleString() || 0}
                             </Text>
                           </Card>
                           <Card>
-                            <Title>{t("Successful Requests")}</Title>
+                            <Title>Successful Requests</Title>
                             <Text className="text-2xl font-bold mt-2 text-green-600">
                               {userSpendData.metadata?.total_successful_requests?.toLocaleString() || 0}
                             </Text>
                           </Card>
                           <Card>
-                            <Title>{t("Failed Requests")}</Title>
+                            <Title>Failed Requests</Title>
                             <Text className="text-2xl font-bold mt-2 text-red-600">
                               {userSpendData.metadata?.total_failed_requests?.toLocaleString() || 0}
                             </Text>
                           </Card>
                           <Card>
-                            <Title>{t("Total Tokens")}</Title>
+                            <Title>Total Tokens</Title>
                             <Text className="text-2xl font-bold mt-2">
                               {userSpendData.metadata?.total_tokens?.toLocaleString() || 0}
                             </Text>
                           </Card>
                           <Card>
-                            <Title>{t("Average Cost per Request")}</Title>
+                            <Title>Average Cost per Request</Title>
                             <Text className="text-2xl font-bold mt-2">
                               $
                               {formatNumberWithCommas(
@@ -541,7 +538,7 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
                     {/* Daily Spend Chart */}
                     <Col numColSpan={2}>
                       <Card>
-                        <Title>{t("Daily Spend")}</Title>
+                        <Title>Daily Spend</Title>
                         {loading ? (
                           <ChartLoader isDateChanging={isDateChanging} />
                         ) : (
@@ -562,12 +559,12 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
                                 <div className="bg-white p-4 shadow-lg rounded-lg border">
                                   <p className="font-bold">{data.date}</p>
                                   <p className="text-cyan-500">
-                                    {t("Spend")}: ${formatNumberWithCommas(data.metrics.spend, 2)}
+                                    Spend: ${formatNumberWithCommas(data.metrics.spend, 2)}
                                   </p>
-                                  <p className="text-gray-600">{t("Requests")}: {data.metrics.api_requests}</p>
-                                  <p className="text-gray-600">{t("Successful")}: {data.metrics.successful_requests}</p>
-                                  <p className="text-gray-600">{t("Failed")}: {data.metrics.failed_requests}</p>
-                                  <p className="text-gray-600">{t("Tokens")}: {data.metrics.total_tokens}</p>
+                                  <p className="text-gray-600">Requests: {data.metrics.api_requests}</p>
+                                  <p className="text-gray-600">Successful: {data.metrics.successful_requests}</p>
+                                  <p className="text-gray-600">Failed: {data.metrics.failed_requests}</p>
+                                  <p className="text-gray-600">Tokens: {data.metrics.total_tokens}</p>
                                 </div>
                               );
                             }}
@@ -578,7 +575,7 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
                     {/* Top API Keys */}
                     <Col numColSpan={1}>
                       <Card className="h-full">
-                        <Title>{t("Top Virtual Keys")}</Title>
+                        <Title>Top Virtual Keys</Title>
                         <TopKeyView topKeys={getTopKeys()} teams={null} />
                       </Card>
                     </Col>
@@ -587,25 +584,27 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
                     <Col numColSpan={1}>
                       <Card className="h-full">
                         <div className="flex justify-between items-center mb-4">
-                          <Title>{modelViewType === "groups" ? t("Top Public Model Names") : t("Top Litellm Models")}</Title>
+                          <Title>{modelViewType === "groups" ? "Top Public Model Names" : "Top Litellm Models"}</Title>
                           <div className="flex bg-gray-100 rounded-lg p-1">
                             <button
-                              className={`px-3 py-1 text-sm rounded-md transition-colors ${modelViewType === "groups"
-                                ? "bg-white shadow-sm text-gray-900"
-                                : "text-gray-600 hover:text-gray-900"
-                                }`}
+                              className={`px-3 py-1 text-sm rounded-md transition-colors ${
+                                modelViewType === "groups"
+                                  ? "bg-white shadow-sm text-gray-900"
+                                  : "text-gray-600 hover:text-gray-900"
+                              }`}
                               onClick={() => setModelViewType("groups")}
                             >
-                              {t("Public Model Name")}
+                              Public Model Name
                             </button>
                             <button
-                              className={`px-3 py-1 text-sm rounded-md transition-colors ${modelViewType === "individual"
-                                ? "bg-white shadow-sm text-gray-900"
-                                : "text-gray-600 hover:text-gray-900"
-                                }`}
+                              className={`px-3 py-1 text-sm rounded-md transition-colors ${
+                                modelViewType === "individual"
+                                  ? "bg-white shadow-sm text-gray-900"
+                                  : "text-gray-600 hover:text-gray-900"
+                              }`}
                               onClick={() => setModelViewType("individual")}
                             >
-                              {t("Litellm Model Name")}
+                              Litellm Model Name
                             </button>
                           </div>
                         </div>
@@ -628,13 +627,13 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
                               return (
                                 <div className="bg-white p-4 shadow-lg rounded-lg border">
                                   <p className="font-bold">{data.key}</p>
-                                  <p className="text-cyan-500">{t("Spend")}: ${formatNumberWithCommas(data.spend, 2)}</p>
-                                  <p className="text-gray-600">{t("Total Requests")}: {data.requests.toLocaleString()}</p>
+                                  <p className="text-cyan-500">Spend: ${formatNumberWithCommas(data.spend, 2)}</p>
+                                  <p className="text-gray-600">Total Requests: {data.requests.toLocaleString()}</p>
                                   <p className="text-green-600">
-                                    {t("Successful")}: {data.successful_requests.toLocaleString()}
+                                    Successful: {data.successful_requests.toLocaleString()}
                                   </p>
-                                  <p className="text-red-600">{t("Failed")}: {data.failed_requests.toLocaleString()}</p>
-                                  <p className="text-gray-600">{t("Tokens")}: {data.tokens.toLocaleString()}</p>
+                                  <p className="text-red-600">Failed: {data.failed_requests.toLocaleString()}</p>
+                                  <p className="text-gray-600">Tokens: {data.tokens.toLocaleString()}</p>
                                 </div>
                               );
                             }}
@@ -647,7 +646,7 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
                     <Col numColSpan={2}>
                       <Card className="h-full">
                         <div className="flex justify-between items-center mb-4">
-                          <Title>{t("Spend by Provider")}</Title>
+                          <Title>Spend by Provider</Title>
                         </div>
                         {loading ? (
                           <ChartLoader isDateChanging={isDateChanging} />
@@ -667,11 +666,11 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
                               <Table>
                                 <TableHead>
                                   <TableRow>
-                                    <TableHeaderCell>{t("Provider")}</TableHeaderCell>
-                                    <TableHeaderCell>{t("Spend")}</TableHeaderCell>
-                                    <TableHeaderCell className="text-green-600">{t("Successful")}</TableHeaderCell>
-                                    <TableHeaderCell className="text-red-600">{t("Failed")}</TableHeaderCell>
-                                    <TableHeaderCell>{t("Tokens")}</TableHeaderCell>
+                                    <TableHeaderCell>Provider</TableHeaderCell>
+                                    <TableHeaderCell>Spend</TableHeaderCell>
+                                    <TableHeaderCell className="text-green-600">Successful</TableHeaderCell>
+                                    <TableHeaderCell className="text-red-600">Failed</TableHeaderCell>
+                                    <TableHeaderCell>Tokens</TableHeaderCell>
                                   </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -734,6 +733,9 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
                 <TabPanel>
                   <ActivityMetrics modelMetrics={mcpServerMetrics} />
                 </TabPanel>
+                <TabPanel>
+                  <EndpointUsage userSpendData={userSpendData} />
+                </TabPanel>
               </TabPanels>
             </TabGroup>
           )}
@@ -745,8 +747,8 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
                 <Alert
                   banner
                   type="info"
-                  message={t("Organization usage is a new feature.")}
-                  description={t("Spend is tracked from feature launch and previous data isn't backfilled, so only future usage appears here.")}
+                  message="Organization usage is a new feature."
+                  description="Spend is tracked from feature launch and previous data isn't backfilled, so only future usage appears here."
                   closable
                   onClose={() => setShowOrganizationBanner(false)}
                   className="mb-5"
@@ -794,8 +796,8 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
                 <Alert
                   banner
                   type="info"
-                  message={t("Customer usage is a new feature.")}
-                  description={t("Spend is tracked from feature launch and previous data isn't backfilled, so only future usage appears here.")}
+                  message="Customer usage is a new feature."
+                  description="Spend is tracked from feature launch and previous data isn't backfilled, so only future usage appears here."
                   closable
                   onClose={() => setShowCustomerBanner(false)}
                   className="mb-5"
@@ -835,8 +837,8 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
                 <Alert
                   banner
                   type="info"
-                  message={t("Agent usage (A2A) is a new feature.")}
-                  description={t("Spend is tracked from feature launch and previous data isn't backfilled, so only future usage appears here.")}
+                  message="Agent usage (A2A) is a new feature."
+                  description="Spend is tracked from feature launch and previous data isn't backfilled, so only future usage appears here."
                   closable
                   onClose={() => setShowAgentBanner(false)}
                   className="mb-5"

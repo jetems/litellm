@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Select, Tooltip, Divider, Switch } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { TextInput } from "@tremor/react";
-import { useTranslate } from "@/i18n";
 
 const { Option } = Select;
 
@@ -21,8 +20,6 @@ const KeyLifecycleSettings: React.FC<KeyLifecycleSettingsProps> = ({
   rotationInterval,
   onRotationIntervalChange,
 }) => {
-  const t = useTranslate();
-
   // Predefined intervals
   const predefinedIntervals = ["7d", "30d", "90d", "180d", "365d"];
 
@@ -62,18 +59,18 @@ const KeyLifecycleSettings: React.FC<KeyLifecycleSettingsProps> = ({
     <div className="space-y-6">
       {/* Key Expiry Section */}
       <div className="space-y-4">
-        <span className="text-sm font-medium text-gray-700">{t("Key Expiry Settings")}</span>
+        <span className="text-sm font-medium text-gray-700">Key Expiry Settings</span>
 
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700 flex items-center space-x-1">
-            <span>{t("Expire Key")}</span>
-            <Tooltip title={t("Set when this key should expire. Format: 30s (seconds), 30m (minutes), 30h (hours), 30d (days)")}>
+            <span>Expire Key</span>
+            <Tooltip title="Set when this key should expire. Format: 30s (seconds), 30m (minutes), 30h (hours), 30d (days). Use -1 to never expire.">
               <InfoCircleOutlined className="text-gray-400 cursor-help text-xs" />
             </Tooltip>
           </label>
           <TextInput
             name="duration"
-            placeholder="e.g., 30d"
+            placeholder="e.g., 30d or -1 to never expire"
             className="w-full"
             value={durationValue}
             onValueChange={handleDurationChange}
@@ -85,13 +82,13 @@ const KeyLifecycleSettings: React.FC<KeyLifecycleSettingsProps> = ({
 
       {/* Auto-Rotation Section */}
       <div className="space-y-4">
-        <span className="text-sm font-medium text-gray-700">{t("Auto-Rotation Settings")}</span>
+        <span className="text-sm font-medium text-gray-700">Auto-Rotation Settings</span>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700 flex items-center space-x-1">
-              <span>{t("Enable Auto-Rotation")}</span>
-              <Tooltip title={t("Key will automatically regenerate at the specified interval for enhanced security.")}>
+              <span>Enable Auto-Rotation</span>
+              <Tooltip title="Key will automatically regenerate at the specified interval for enhanced security.">
                 <InfoCircleOutlined className="text-gray-400 cursor-help text-xs" />
               </Tooltip>
             </label>
@@ -106,8 +103,8 @@ const KeyLifecycleSettings: React.FC<KeyLifecycleSettingsProps> = ({
           {autoRotationEnabled && (
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 flex items-center space-x-1">
-                <span>{t("Rotation Interval")}</span>
-                <Tooltip title={t("How often the key should be automatically rotated. Choose the interval that best fits your security requirements.")}>
+                <span>Rotation Interval</span>
+                <Tooltip title="How often the key should be automatically rotated. Choose the interval that best fits your security requirements.">
                   <InfoCircleOutlined className="text-gray-400 cursor-help text-xs" />
                 </Tooltip>
               </label>
@@ -116,14 +113,14 @@ const KeyLifecycleSettings: React.FC<KeyLifecycleSettingsProps> = ({
                   value={showCustomInput ? "custom" : rotationInterval}
                   onChange={handleIntervalChange}
                   className="w-full"
-                  placeholder={t("Select interval")}
+                  placeholder="Select interval"
                 >
-                  <Option value="7d">{t("7 days")}</Option>
-                  <Option value="30d">{t("30 days")}</Option>
-                  <Option value="90d">{t("90 days")}</Option>
-                  <Option value="180d">{t("180 days")}</Option>
-                  <Option value="365d">{t("365 days")}</Option>
-                  <Option value="custom">{t("Custom interval")}</Option>
+                  <Option value="7d">7 days</Option>
+                  <Option value="30d">30 days</Option>
+                  <Option value="90d">90 days</Option>
+                  <Option value="180d">180 days</Option>
+                  <Option value="365d">365 days</Option>
+                  <Option value="custom">Custom interval</Option>
                 </Select>
 
                 {showCustomInput && (
@@ -134,7 +131,7 @@ const KeyLifecycleSettings: React.FC<KeyLifecycleSettingsProps> = ({
                       placeholder="e.g., 1s, 5m, 2h, 14d"
                     />
                     <div className="text-xs text-gray-500">
-                      {t("Supported formats: seconds (s), minutes (m), hours (h), days (d)")}
+                      Supported formats: seconds (s), minutes (m), hours (h), days (d)
                     </div>
                   </div>
                 )}
@@ -145,7 +142,8 @@ const KeyLifecycleSettings: React.FC<KeyLifecycleSettingsProps> = ({
 
         {autoRotationEnabled && (
           <div className="bg-blue-50 p-3 rounded-md text-sm text-blue-700">
-            {t("When rotation occurs, you'll receive a notification with the new key. The old key will be deactivated after a brief grace period.")}
+            When rotation occurs, you&apos;ll receive a notification with the new key. The old key will be deactivated
+            after a brief grace period.
           </div>
         )}
       </div>
@@ -154,4 +152,3 @@ const KeyLifecycleSettings: React.FC<KeyLifecycleSettingsProps> = ({
 };
 
 export default KeyLifecycleSettings;
-

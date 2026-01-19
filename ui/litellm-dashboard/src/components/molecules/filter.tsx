@@ -133,6 +133,7 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
     "Key Alias",
     "User ID",
     "End User",
+    "Error Code",
     "Key Hash",
     "Model",
   ];
