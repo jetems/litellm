@@ -72,12 +72,12 @@ const AddAutoRouterTab: React.FC<AddAutoRouterTabProps> = ({ form, handleOk, acc
 
     // Check basic required fields first
     if (!currentFormValues.auto_router_name) {
-      NotificationManager.fromBackend("Please enter an Auto Router Name");
+      NotificationManager.fromBackend(t("Please enter an Auto Router Name"));
       return;
     }
 
     if (!currentFormValues.auto_router_default_model) {
-      NotificationManager.fromBackend("Please select a Default Model");
+      NotificationManager.fromBackend(t("Please select a Default Model"));
       return;
     }
 
@@ -91,7 +91,7 @@ const AddAutoRouterTab: React.FC<AddAutoRouterTabProps> = ({ form, handleOk, acc
 
     // Custom validation for router config
     if (!routerConfig || !routerConfig.routes || routerConfig.routes.length === 0) {
-      NotificationManager.fromBackend("Please configure at least one route for the auto router");
+      NotificationManager.fromBackend(t("Please configure at least one route for the auto router"));
       return;
     }
 
@@ -102,7 +102,7 @@ const AddAutoRouterTab: React.FC<AddAutoRouterTabProps> = ({ form, handleOk, acc
 
     if (invalidRoutes.length > 0) {
       NotificationManager.fromBackend(
-        "Please ensure all routes have a target model, description, and at least one utterance",
+        t("Please ensure all routes have a target model, description, and at least one utterance"),
       );
       return;
     }
@@ -134,9 +134,9 @@ const AddAutoRouterTab: React.FC<AddAutoRouterTabProps> = ({ form, handleOk, acc
             };
             return friendlyNames[fieldName] || fieldName;
           });
-          NotificationManager.fromBackend(`Please fill in the following required fields: ${missingFields.join(", ")}`);
+          NotificationManager.fromBackend(`${t("Please fill in the following required fields:")} ${missingFields.join(", ")}`);
         } else {
-          NotificationManager.fromBackend("Please fill in all required fields");
+          NotificationManager.fromBackend(t("Please fill in all required fields"));
         }
       });
   };
@@ -165,7 +165,7 @@ const AddAutoRouterTab: React.FC<AddAutoRouterTabProps> = ({ form, handleOk, acc
             labelCol={{ span: 10 }}
             labelAlign="left"
           >
-            <TextInput placeholder="e.g., auto_router_1, smart_routing" />
+            <TextInput placeholder={t("e.g., auto_router_1, smart_routing")} />
           </Form.Item>
 
           {/* Router Configuration Builder */}

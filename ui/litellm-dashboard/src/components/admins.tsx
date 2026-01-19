@@ -56,6 +56,7 @@ import {
 } from "./networking";
 import UISettings from "./Settings/AdminSettings/UISettings/UISettings";
 import SSOSettings from "./Settings/AdminSettings/SSOSettings/SSOSettings";
+import { useTranslate } from "@/i18n";
 
 const AdminPanel: React.FC<AdminPanelProps> = ({
   searchParams,
@@ -66,6 +67,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   proxySettings,
   userRole,
 }) => {
+  const t = useTranslate();
   const [form] = Form.useForm();
   const [memberForm] = Form.useForm();
   const { Title, Paragraph } = Typography;
@@ -91,7 +93,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
 
   const isLocal = process.env.NODE_ENV === "development";
   if (isLocal != true) {
-    console.log = function () {};
+    console.log = function () { };
   }
 
   const baseUrl = useBaseUrl();
@@ -128,7 +130,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     try {
       if (premiumUser !== true) {
         NotificationsManager.fromBackend(
-          "This feature is only available for premium users. Please upgrade your account.",
+          t("This feature is only available for premium users. Please upgrade your account."),
         );
         return;
       }
@@ -140,7 +142,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
       }
     } catch (error) {
       console.error("Error fetching allowed IPs:", error);
-      NotificationsManager.fromBackend(`Failed to fetch allowed IPs ${error}`);
+      NotificationsManager.fromBackend(`${t("Failed to fetch allowed IPs")} ${error}`);
       setAllowedIPs([all_ip_address_allowed]);
     } finally {
       if (premiumUser === true) {
@@ -156,11 +158,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
         // Fetch the updated list of IPs
         const updatedIPs = await getAllowedIPs(accessToken);
         setAllowedIPs(updatedIPs);
-        NotificationsManager.success("IP address added successfully");
+        NotificationsManager.success(t("IP address added successfully"));
       }
     } catch (error) {
       console.error("Error adding IP:", error);
-      NotificationsManager.fromBackend(`Failed to add IP address ${error}`);
+      NotificationsManager.fromBackend(`${t("Failed to add IP address")} ${error}`);
     } finally {
       setIsAddIPModalVisible(false);
     }
@@ -178,10 +180,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
         // Fetch the updated list of IPs
         const updatedIPs = await getAllowedIPs(accessToken);
         setAllowedIPs(updatedIPs.length > 0 ? updatedIPs : [all_ip_address_allowed]);
-        NotificationsManager.success("IP address deleted successfully");
+        NotificationsManager.success(t("IP address deleted successfully"));
       } catch (error) {
         console.error("Error deleting IP:", error);
-        NotificationsManager.fromBackend(`Failed to delete IP address ${error}`);
+        NotificationsManager.fromBackend(`${t("Failed to delete IP address")} ${error}`);
       } finally {
         setIsDeleteIPModalVisible(false);
         setIPToDelete(null);
@@ -331,12 +333,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
         labelAlign="left"
       >
         <>
-          <Form.Item label="Email" name="user_email" className="mb-8 mt-4">
+          <Form.Item label={t("Email")} name="user_email" className="mb-8 mt-4">
             <Input name="user_email" className="px-3 py-2 border rounded-md w-full" />
           </Form.Item>
         </>
         <div style={{ textAlign: "right", marginTop: "10px" }} className="mt-4">
-          <Button2 htmlType="submit">Add member</Button2>
+          <Button2 htmlType="submit">{t("Add member")}</Button2>
         </div>
       </Form>
     );
@@ -353,8 +355,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
       >
         <>
           <Form.Item
-            rules={[{ required: true, message: "Required" }]}
-            label="User Role"
+            rules={[{ required: true, message: t("Required") }]}
+            label={t("User Role")}
             name="user_role"
             labelCol={{ span: 10 }}
             labelAlign="left"
@@ -368,7 +370,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
             </Select>
           </Form.Item>
           <Form.Item
-            label="Team ID"
+            label={t("Team ID")}
             name="user_id"
             hidden={true}
             initialValue={userID}
@@ -379,7 +381,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
           </Form.Item>
         </>
         <div style={{ textAlign: "right", marginTop: "10px" }}>
-          <Button2 htmlType="submit">Update role</Button2>
+          <Button2 htmlType="submit">{t("Update role")}</Button2>
         </div>
       </Form>
     );
@@ -403,7 +405,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
           // If new user is found, update it
           setAdmins(admins); // Set the new state
         }
-        NotificationsManager.success("Refresh tab to see updated user role");
+        NotificationsManager.success(t("Refresh tab to see updated user role"));
         setIsUpdateModalModalVisible(false);
       }
     } catch (error) {
@@ -493,14 +495,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   console.log(`admins: ${admins?.length}`);
   return (
     <div className="w-full m-2 mt-2 p-8">
-      <Title level={4}>Admin Access </Title>
-      <Paragraph>Go to &apos;Internal Users&apos; page to add other admins.</Paragraph>
+      <Title level={4}>{t("Admin Access")}</Title>
+      <Paragraph>{t("Go to 'Internal Users' page to add other admins.")}</Paragraph>
       <TabGroup>
         <TabList>
-          <Tab>SSO Settings</Tab>
-          <Tab>Security Settings</Tab>
+          <Tab>{t("SSO Settings")}</Tab>
+          <Tab>{t("Security Settings")}</Tab>
           <Tab>SCIM</Tab>
-          <Tab>UI Settings</Tab>
+          <Tab>{t("UI Settings")}</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
@@ -508,10 +510,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
           </TabPanel>
           <TabPanel>
             <Card>
-              <Title level={4}> ✨ Security Settings</Title>
+              <Title level={4}> ✨ {t("Security Settings")}</Title>
               <Alert
-                message="SSO Configuration Deprecated"
-                description="Editing SSO Settings on this page is deprecated and will be removed in a future version. Please use the SSO Settings tab for SSO configuration."
+                message={t("SSO Configuration Deprecated")}
+                description={t("Editing SSO Settings on this page is deprecated and will be removed in a future version. Please use the SSO Settings tab for SSO configuration.")}
                 type="warning"
                 showIcon
               />
@@ -526,12 +528,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
               >
                 <div>
                   <Button style={{ width: "150px" }} onClick={() => setIsAddSSOModalVisible(true)}>
-                    {ssoConfigured ? "Edit SSO Settings" : "Add SSO"}
+                    {ssoConfigured ? t("Edit SSO Settings") : t("Add SSO")}
                   </Button>
                 </div>
                 <div>
                   <Button style={{ width: "150px" }} onClick={handleShowAllowedIPs}>
-                    Allowed IPs
+                    {t("Allowed IPs")}
                   </Button>
                 </div>
                 <div>
@@ -540,10 +542,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                     onClick={() =>
                       premiumUser === true
                         ? setIsUIAccessControlModalVisible(true)
-                        : NotificationsManager.fromBackend("Only premium users can configure UI access control")
+                        : NotificationsManager.fromBackend(t("Only premium users can configure UI access control"))
                     }
                   >
-                    UI Access Control
+                    {t("UI Access Control")}
                   </Button>
                 </div>
               </div>
@@ -563,24 +565,24 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                 ssoConfigured={ssoConfigured}
               />
               <Modal
-                title="Manage Allowed IP Addresses"
+                title={t("Manage Allowed IP Addresses")}
                 width={800}
                 visible={isAllowedIPModalVisible}
                 onCancel={() => setIsAllowedIPModalVisible(false)}
                 footer={[
                   <Button className="mx-1" key="add" onClick={() => setIsAddIPModalVisible(true)}>
-                    Add IP Address
+                    {t("Add IP Address")}
                   </Button>,
                   <Button key="close" onClick={() => setIsAllowedIPModalVisible(false)}>
-                    Close
+                    {t("Close")}
                   </Button>,
                 ]}
               >
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableHeaderCell>IP Address</TableHeaderCell>
-                      <TableHeaderCell className="text-right">Action</TableHeaderCell>
+                      <TableHeaderCell>{t("IP Address")}</TableHeaderCell>
+                      <TableHeaderCell className="text-right">{t("Action")}</TableHeaderCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -590,7 +592,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                         <TableCell className="text-right">
                           {ip !== all_ip_address_allowed && (
                             <Button onClick={() => handleDeleteIP(ip)} color="red" size="xs">
-                              Delete
+                              {t("Delete")}
                             </Button>
                           )}
                         </TableCell>
@@ -601,41 +603,41 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
               </Modal>
 
               <Modal
-                title="Add Allowed IP Address"
+                title={t("Add Allowed IP Address")}
                 visible={isAddIPModalVisible}
                 onCancel={() => setIsAddIPModalVisible(false)}
                 footer={null}
               >
                 <Form onFinish={handleAddIP}>
-                  <Form.Item name="ip" rules={[{ required: true, message: "Please enter an IP address" }]}>
-                    <Input placeholder="Enter IP address" />
+                  <Form.Item name="ip" rules={[{ required: true, message: t("Please enter an IP address") }]}>
+                    <Input placeholder={t("Enter IP address")} />
                   </Form.Item>
                   <Form.Item>
-                    <Button2 htmlType="submit">Add IP Address</Button2>
+                    <Button2 htmlType="submit">{t("Add IP Address")}</Button2>
                   </Form.Item>
                 </Form>
               </Modal>
 
               <Modal
-                title="Confirm Delete"
+                title={t("Confirm Delete")}
                 visible={isDeleteIPModalVisible}
                 onCancel={() => setIsDeleteIPModalVisible(false)}
                 onOk={confirmDeleteIP}
                 footer={[
                   <Button className="mx-1" key="delete" onClick={() => confirmDeleteIP()}>
-                    Yes
+                    {t("Yes")}
                   </Button>,
                   <Button key="close" onClick={() => setIsDeleteIPModalVisible(false)}>
-                    Close
+                    {t("Close")}
                   </Button>,
                 ]}
               >
-                <p>Are you sure you want to delete the IP address: {ipToDelete}?</p>
+                <p>{t("Are you sure you want to delete the IP address:")} {ipToDelete}?</p>
               </Modal>
 
               {/* UI Access Control Modal */}
               <Modal
-                title="UI Access Control Settings"
+                title={t("UI Access Control Settings")}
                 visible={isUIAccessControlModalVisible}
                 width={600}
                 footer={null}
@@ -646,13 +648,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                   accessToken={accessToken}
                   onSuccess={() => {
                     handleUIAccessControlOk();
-                    NotificationsManager.success("UI Access Control settings updated successfully");
+                    NotificationsManager.success(t("UI Access Control settings updated successfully"));
                   }}
                 />
               </Modal>
             </div>
-            <Callout title="Login without SSO" color="teal">
-              If you need to login without sso, you can access{" "}
+            <Callout title={t("Login without SSO")} color="teal">
+              {t("If you need to login without sso, you can access")}{" "}
               <a href={nonSssoUrl} target="_blank">
                 <b>{nonSssoUrl}</b>{" "}
               </a>

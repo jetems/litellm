@@ -16,6 +16,7 @@ import { InputNumber } from "antd";
 import {
   TrashIcon,
 } from "@heroicons/react/outline";
+import { useTranslate } from "@/i18n";
 
 interface BudgetSettingsPageProps {
   accessToken: string | null;
@@ -29,6 +30,7 @@ interface budgetSettingsItem {
 }
 
 const BudgetSettings: React.FC<BudgetSettingsPageProps> = ({ accessToken }) => {
+  const t = useTranslate();
   const [budgetSettings, setBudgetSettings] = useState<budgetSettingsItem[]>([]);
   useEffect(() => {
     if (!accessToken) {
@@ -90,8 +92,8 @@ const BudgetSettings: React.FC<BudgetSettingsPageProps> = ({ accessToken }) => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableHeaderCell>Setting</TableHeaderCell>
-              <TableHeaderCell>Value</TableHeaderCell>
+              <TableHeaderCell>{t("Setting")}</TableHeaderCell>
+              <TableHeaderCell>{t("Value")}</TableHeaderCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -120,9 +122,9 @@ const BudgetSettings: React.FC<BudgetSettingsPageProps> = ({ accessToken }) => {
                   ) : null}
                 </TableCell>
                 <TableCell>
-                  <Button onClick={() => handleUpdateField(value.field_name, index)}>Update</Button>
+                  <Button onClick={() => handleUpdateField(value.field_name, index)}>{t("Update")}</Button>
                   <Icon icon={TrashIcon} color="red" onClick={() => handleResetField(value.field_name, index)}>
-                    Reset
+                    {t("Reset")}
                   </Icon>
                 </TableCell>
               </TableRow>

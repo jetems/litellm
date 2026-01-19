@@ -40,6 +40,7 @@ import TopModelView from "./TopModelView";
 import useTeams from "@/app/(dashboard)/hooks/useTeams";
 import EndpointUsage from "../EndpointUsage/EndpointUsage";
 import NewBadge from "../../../common_components/NewBadge";
+import { useTranslate } from "@/i18n";
 
 interface EntityMetrics {
   metrics: {
@@ -107,6 +108,7 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
       total_tokens: 0,
     },
   });
+  const t = useTranslate();
   const { teams } = useTeams();
 
   const modelMetrics = processActivityData(spendData, "models", teams || []);
@@ -378,11 +380,11 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
   };
 
   const getFilterLabel = (entityType: string) => {
-    return `Filter by ${entityType}`;
+    return t(`Filter by ${entityType}`);
   };
 
   const getFilterPlaceholder = (entityType: string) => {
-    return `Select ${entityType} to filter...`;
+    return t(`Select ${entityType} to filter...`);
   };
 
   const capitalizedEntityLabel = entityType.charAt(0).toUpperCase() + entityType.slice(1);
@@ -403,10 +405,10 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
       <TabGroup>
         <NewBadge>
           <TabList variant="solid" className="mt-1">
-            <Tab>Cost</Tab>
-            <Tab>{entityType === "agent" ? "Request / Token Consumption" : "Model Activity"}</Tab>
-            <Tab>Key Activity</Tab>
-            <Tab>Endpoint Activity</Tab>
+            <Tab>{t("Cost")}</Tab>
+            <Tab>{entityType === "agent" ? t("Request / Token Consumption") : t("Model Activity")}</Tab>
+            <Tab>{t("Key Activity")}</Tab>
+            <Tab>{t("Endpoint Activity")}</Tab>
           </TabList>
         </NewBadge>
         <TabPanels>
@@ -415,34 +417,34 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
               {/* Total Spend Card */}
               <Col numColSpan={2}>
                 <Card>
-                  <Title>{capitalizedEntityLabel} Spend Overview</Title>
+                  <Title>{capitalizedEntityLabel} {t("Spend Overview")}</Title>
                   <Grid numItems={5} className="gap-4 mt-4">
                     <Card>
-                      <Title>Total Spend</Title>
+                      <Title>{t("Total Spend")}</Title>
                       <Text className="text-2xl font-bold mt-2">
                         ${formatNumberWithCommas(spendData.metadata.total_spend, 2)}
                       </Text>
                     </Card>
                     <Card>
-                      <Title>Total Requests</Title>
+                      <Title>{t("Total Requests")}</Title>
                       <Text className="text-2xl font-bold mt-2">
                         {spendData.metadata.total_api_requests.toLocaleString()}
                       </Text>
                     </Card>
                     <Card>
-                      <Title>Successful Requests</Title>
+                      <Title>{t("Successful Requests")}</Title>
                       <Text className="text-2xl font-bold mt-2 text-green-600">
                         {spendData.metadata.total_successful_requests.toLocaleString()}
                       </Text>
                     </Card>
                     <Card>
-                      <Title>Failed Requests</Title>
+                      <Title>{t("Failed Requests")}</Title>
                       <Text className="text-2xl font-bold mt-2 text-red-600">
                         {spendData.metadata.total_failed_requests.toLocaleString()}
                       </Text>
                     </Card>
                     <Card>
-                      <Title>Total Tokens</Title>
+                      <Title>{t("Total Tokens")}</Title>
                       <Text className="text-2xl font-bold mt-2">
                         {spendData.metadata.total_tokens.toLocaleString()}
                       </Text>
@@ -454,7 +456,7 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
               {/* Daily Spend Chart */}
               <Col numColSpan={2}>
                 <Card>
-                  <Title>Daily Spend</Title>
+                  <Title>{t("Daily Spend")}</Title>
                   <BarChart
                     data={[...spendData.results].sort(
                       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
@@ -472,16 +474,16 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
                       return (
                         <div className="bg-white p-4 shadow-lg rounded-lg border">
                           <p className="font-bold">{data.date}</p>
-                          <p className="text-cyan-500">Total Spend: ${formatNumberWithCommas(data.metrics.spend, 2)}</p>
-                          <p className="text-gray-600">Total Requests: {data.metrics.api_requests}</p>
-                          <p className="text-gray-600">Successful: {data.metrics.successful_requests}</p>
-                          <p className="text-gray-600">Failed: {data.metrics.failed_requests}</p>
-                          <p className="text-gray-600">Total Tokens: {data.metrics.total_tokens}</p>
+                          <p className="text-cyan-500">{t("Total Spend")}: ${formatNumberWithCommas(data.metrics.spend, 2)}</p>
+                          <p className="text-gray-600">{t("Total Requests")}: {data.metrics.api_requests}</p>
+                          <p className="text-gray-600">{t("Successful")}: {data.metrics.successful_requests}</p>
+                          <p className="text-gray-600">{t("Failed")}: {data.metrics.failed_requests}</p>
+                          <p className="text-gray-600">{t("Total Tokens")}: {data.metrics.total_tokens}</p>
                           <p className="text-gray-600">
-                            Total {capitalizedEntityLabel}s: {entityCount}
+                            {t("Total")} {capitalizedEntityLabel}s: {entityCount}
                           </p>
                           <div className="mt-2 border-t pt-2">
-                            <p className="font-semibold">Spend by {capitalizedEntityLabel}:</p>
+                            <p className="font-semibold">{t("Spend by")} {capitalizedEntityLabel}:</p>
                             {Object.entries(data.breakdown.entities || {})
                               .sort(([, a], [, b]) => {
                                 const spendA = (a as EntityMetrics).metrics.spend;
@@ -514,10 +516,10 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
                 <Card>
                   <div className="flex flex-col space-y-4">
                     <div className="flex flex-col space-y-2">
-                      <Title>Spend Per {capitalizedEntityLabel}</Title>
-                      <Subtitle className="text-xs">Showing Top 5 by Spend</Subtitle>
+                      <Title>{t("Spend Per")} {capitalizedEntityLabel}</Title>
+                      <Subtitle className="text-xs">{t("Showing Top 5 by Spend")}</Subtitle>
                       <div className="flex items-center text-sm text-gray-500">
-                        <span>Get Started by Tracking cost per {capitalizedEntityLabel} </span>
+                        <span>{t("Get Started by Tracking cost per")} {capitalizedEntityLabel} </span>
                         <a
                           href="https://docs.litellm.ai/docs/proxy/enterprise#spend-tracking"
                           className="text-blue-500 hover:text-blue-700 ml-1"
@@ -544,13 +546,13 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
                             return (
                               <div className="bg-white p-4 shadow-lg rounded-lg border">
                                 <p className="font-bold">{data.metadata.alias}</p>
-                                <p className="text-cyan-500">Spend: ${formatNumberWithCommas(data.metrics.spend, 4)}</p>
-                                <p className="text-gray-600">Requests: {data.metrics.api_requests.toLocaleString()}</p>
+                                <p className="text-cyan-500">{t("Spend")}: ${formatNumberWithCommas(data.metrics.spend, 4)}</p>
+                                <p className="text-gray-600">{t("Requests")}: {data.metrics.api_requests.toLocaleString()}</p>
                                 <p className="text-green-600">
-                                  Successful: {data.metrics.successful_requests.toLocaleString()}
+                                  {t("Successful")}: {data.metrics.successful_requests.toLocaleString()}
                                 </p>
-                                <p className="text-red-600">Failed: {data.metrics.failed_requests.toLocaleString()}</p>
-                                <p className="text-gray-600">Tokens: {data.metrics.total_tokens.toLocaleString()}</p>
+                                <p className="text-red-600">{t("Failed")}: {data.metrics.failed_requests.toLocaleString()}</p>
+                                <p className="text-gray-600">{t("Tokens")}: {data.metrics.total_tokens.toLocaleString()}</p>
                               </div>
                             );
                           }}
@@ -562,10 +564,10 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
                             <TableHead>
                               <TableRow>
                                 <TableHeaderCell>{capitalizedEntityLabel}</TableHeaderCell>
-                                <TableHeaderCell>Spend</TableHeaderCell>
-                                <TableHeaderCell className="text-green-600">Successful</TableHeaderCell>
-                                <TableHeaderCell className="text-red-600">Failed</TableHeaderCell>
-                                <TableHeaderCell>Tokens</TableHeaderCell>
+                                <TableHeaderCell>{t("Spend")}</TableHeaderCell>
+                                <TableHeaderCell className="text-green-600">{t("Successful")}</TableHeaderCell>
+                                <TableHeaderCell className="text-red-600">{t("Failed")}</TableHeaderCell>
+                                <TableHeaderCell>{t("Tokens")}</TableHeaderCell>
                               </TableRow>
                             </TableHead>
                             <TableBody>
@@ -596,7 +598,7 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
               {/* Top API Keys */}
               <Col numColSpan={1}>
                 <Card>
-                  <Title>Top Virtual Keys</Title>
+                  <Title>{t("Top Virtual Keys")}</Title>
                   <TopKeyView topKeys={getTopAPIKeys()} teams={null} showTags={entityType === "tag"} />
                 </Card>
               </Col>
@@ -604,7 +606,7 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
               {/* Top Models */}
               <Col numColSpan={1}>
                 <Card>
-                  <Title>{entityType === "agent" ? "Top Agents" : "Top Models"}</Title>
+                  <Title>{entityType === "agent" ? t("Top Agents") : t("Top Models")}</Title>
                   <TopModelView topModels={getTopModels()} />
                 </Card>
               </Col>
@@ -613,7 +615,7 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
               <Col numColSpan={2}>
                 <Card>
                   <div className="flex flex-col space-y-4">
-                    <Title>Provider Usage</Title>
+                    <Title>{t("Provider Usage")}</Title>
                     <Grid numItems={2}>
                       <Col numColSpan={1}>
                         <DonutChart
@@ -629,11 +631,11 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
                         <Table>
                           <TableHead>
                             <TableRow>
-                              <TableHeaderCell>Provider</TableHeaderCell>
-                              <TableHeaderCell>Spend</TableHeaderCell>
-                              <TableHeaderCell className="text-green-600">Successful</TableHeaderCell>
-                              <TableHeaderCell className="text-red-600">Failed</TableHeaderCell>
-                              <TableHeaderCell>Tokens</TableHeaderCell>
+                              <TableHeaderCell>{t("Provider")}</TableHeaderCell>
+                              <TableHeaderCell>{t("Spend")}</TableHeaderCell>
+                              <TableHeaderCell className="text-green-600">{t("Successful")}</TableHeaderCell>
+                              <TableHeaderCell className="text-red-600">{t("Failed")}</TableHeaderCell>
+                              <TableHeaderCell>{t("Tokens")}</TableHeaderCell>
                             </TableRow>
                           </TableHead>
                           <TableBody>

@@ -3,7 +3,7 @@ import moment from "moment";
 import { useRef, useState, useEffect, useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { uiAuditLogsCall, keyListCall } from "../networking";
-import { AuditLogEntry, auditLogColumns } from "./columns";
+import { AuditLogEntry, getAuditLogColumns } from "./columns";
 import { Text } from "@tremor/react";
 import { Team } from "../key_team_helpers/key_list";
 import { formatNumberWithCommas } from "@/utils/dataUtils";
@@ -33,6 +33,7 @@ export default function AuditLogs({
 }: AuditLogsProps) {
   const t = useTranslate();
   const [startTime, setStartTime] = useState<string>(moment().subtract(24, "hours").format("YYYY-MM-DDTHH:mm"));
+  const columns = useMemo(() => getAuditLogColumns(t), [t]);
 
   const actionFilterRef = useRef<HTMLDivElement>(null);
   const tableFilterRef = useRef<HTMLDivElement>(null);
@@ -630,14 +631,14 @@ export default function AuditLogs({
                 <button
                   onClick={() => setClientCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={allLogsQuery.isLoading || clientCurrentPage === 1}
-                  className="px-3 py-1 text-sm border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-1 text-sm border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed min-w-[80px] whitespace-nowrap"
                 >
                   {t("Previous")}
                 </button>
                 <button
                   onClick={() => setClientCurrentPage((p) => Math.min(totalFilteredPages, p + 1))}
                   disabled={allLogsQuery.isLoading || clientCurrentPage === totalFilteredPages}
-                  className="px-3 py-1 text-sm border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-1 text-sm border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed min-w-[80px] whitespace-nowrap"
                 >
                   {t("Next")}
                 </button>
@@ -646,7 +647,7 @@ export default function AuditLogs({
           </div>
         </div>
         <DataTable
-          columns={auditLogColumns}
+          columns={columns}
           data={paginatedViewOfFilteredLogs}
           renderSubComponent={renderSubComponent}
           getRowCanExpand={() => true}

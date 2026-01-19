@@ -155,8 +155,8 @@ const SchemaFormFields: React.FC<SchemaFormFieldsProps> = ({
     const type = getPropertyType(property);
     const isRequired = schemaProperties?.required?.includes(key);
 
-    const label = overrideLabels[key] || property.title || formatLabel(key);
-    const tooltip = overrideTooltips[key] || property.description;
+    const label = overrideLabels[key] || t(property.title || formatLabel(key));
+    const tooltip = overrideTooltips[key] || (property.description ? t(property.description) : undefined);
 
     const rules = [];
     if (isRequired) {

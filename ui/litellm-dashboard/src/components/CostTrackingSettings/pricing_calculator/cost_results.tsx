@@ -5,6 +5,7 @@ import { DollarOutlined, LoadingOutlined } from "@ant-design/icons";
 import { CostEstimateResponse } from "../types";
 import { formatNumberWithCommas } from "@/utils/dataUtils";
 import ExportDropdown from "./export_dropdown";
+import { useTranslate } from "@/i18n";
 
 interface CostResultsProps {
   result: CostEstimateResponse | null;
@@ -25,11 +26,12 @@ const formatRequests = (value: number | null | undefined): string => {
 };
 
 const CostResults: React.FC<CostResultsProps> = ({ result, loading }) => {
+  const t = useTranslate();
   if (!result && !loading) {
     return (
       <div className="py-8 text-center border border-dashed border-gray-300 rounded-lg">
         <Text className="text-gray-500">
-          Select a model to see cost estimates
+          {t("Select a model to see cost estimates")}
         </Text>
       </div>
     );
@@ -39,7 +41,7 @@ const CostResults: React.FC<CostResultsProps> = ({ result, loading }) => {
     return (
       <div className="py-8 text-center">
         <Spin indicator={<LoadingOutlined spin />} />
-        <Text className="text-gray-500 block mt-2">Calculating costs...</Text>
+        <Text className="text-gray-500 block mt-2">{t("Calculating costs...")}</Text>
       </div>
     );
   }
@@ -52,9 +54,9 @@ const CostResults: React.FC<CostResultsProps> = ({ result, loading }) => {
 
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <Text className="text-lg font-semibold text-gray-900">Cost Estimate</Text>
+          <Text className="text-lg font-semibold text-gray-900">{t("Cost Estimate")}</Text>
           <Text className="text-sm text-gray-500 block mt-1">
-            Model: {result.model} {result.provider && `(${result.provider})`}
+            {t("Model")}: {result.model} {result.provider && `(${result.provider})`}
           </Text>
         </div>
         <div className="flex items-center gap-2">
@@ -63,11 +65,11 @@ const CostResults: React.FC<CostResultsProps> = ({ result, loading }) => {
         </div>
       </div>
 
-      <Card size="small" title="Per-Request Cost Breakdown">
+      <Card size="small" title={t("Per-Request Cost Breakdown")}>
         <Row gutter={16}>
           <Col span={6}>
             <Statistic
-              title="Total Cost"
+              title={t("Total Cost")}
               value={formatCost(result.cost_per_request)}
               valueStyle={{ color: "#1890ff", fontSize: "18px" }}
               prefix={<DollarOutlined />}
@@ -75,21 +77,21 @@ const CostResults: React.FC<CostResultsProps> = ({ result, loading }) => {
           </Col>
           <Col span={6}>
             <Statistic
-              title="Input Cost"
+              title={t("Input Cost")}
               value={formatCost(result.input_cost_per_request)}
               valueStyle={{ fontSize: "16px" }}
             />
           </Col>
           <Col span={6}>
             <Statistic
-              title="Output Cost"
+              title={t("Output Cost")}
               value={formatCost(result.output_cost_per_request)}
               valueStyle={{ fontSize: "16px" }}
             />
           </Col>
           <Col span={6}>
             <Statistic
-              title="Margin/Fee"
+              title={t("Margin/Fee")}
               value={formatCost(result.margin_cost_per_request)}
               valueStyle={{
                 fontSize: "16px",
@@ -103,12 +105,12 @@ const CostResults: React.FC<CostResultsProps> = ({ result, loading }) => {
       {result.daily_cost !== null && (
         <Card
           size="small"
-          title={`Daily Costs (${formatRequests(result.num_requests_per_day)} requests/day)`}
+          title={`${t("Daily Costs")} (${formatRequests(result.num_requests_per_day)} ${t("requests/day")})`}
         >
           <Row gutter={16}>
             <Col span={6}>
               <Statistic
-                title="Total Daily"
+                title={t("Total Daily")}
                 value={formatCost(result.daily_cost)}
                 valueStyle={{ color: "#52c41a", fontSize: "18px" }}
                 prefix={<DollarOutlined />}
@@ -116,21 +118,21 @@ const CostResults: React.FC<CostResultsProps> = ({ result, loading }) => {
             </Col>
             <Col span={6}>
               <Statistic
-                title="Input Cost"
+                title={t("Input Cost")}
                 value={formatCost(result.daily_input_cost)}
                 valueStyle={{ fontSize: "16px" }}
               />
             </Col>
             <Col span={6}>
               <Statistic
-                title="Output Cost"
+                title={t("Output Cost")}
                 value={formatCost(result.daily_output_cost)}
                 valueStyle={{ fontSize: "16px" }}
               />
             </Col>
             <Col span={6}>
               <Statistic
-                title="Margin/Fee"
+                title={t("Margin/Fee")}
                 value={formatCost(result.daily_margin_cost)}
                 valueStyle={{
                   fontSize: "16px",
@@ -145,12 +147,12 @@ const CostResults: React.FC<CostResultsProps> = ({ result, loading }) => {
       {result.monthly_cost !== null && (
         <Card
           size="small"
-          title={`Monthly Costs (${formatRequests(result.num_requests_per_month)} requests/month)`}
+          title={`${t("Monthly Costs")} (${formatRequests(result.num_requests_per_month)} ${t("requests/month")})`}
         >
           <Row gutter={16}>
             <Col span={6}>
               <Statistic
-                title="Total Monthly"
+                title={t("Total Monthly")}
                 value={formatCost(result.monthly_cost)}
                 valueStyle={{ color: "#722ed1", fontSize: "18px" }}
                 prefix={<DollarOutlined />}
@@ -158,21 +160,21 @@ const CostResults: React.FC<CostResultsProps> = ({ result, loading }) => {
             </Col>
             <Col span={6}>
               <Statistic
-                title="Input Cost"
+                title={t("Input Cost")}
                 value={formatCost(result.monthly_input_cost)}
                 valueStyle={{ fontSize: "16px" }}
               />
             </Col>
             <Col span={6}>
               <Statistic
-                title="Output Cost"
+                title={t("Output Cost")}
                 value={formatCost(result.monthly_output_cost)}
                 valueStyle={{ fontSize: "16px" }}
               />
             </Col>
             <Col span={6}>
               <Statistic
-                title="Margin/Fee"
+                title={t("Margin/Fee")}
                 value={formatCost(result.monthly_margin_cost)}
                 valueStyle={{
                   fontSize: "16px",
@@ -186,13 +188,13 @@ const CostResults: React.FC<CostResultsProps> = ({ result, loading }) => {
 
       {(result.input_cost_per_token || result.output_cost_per_token) && (
         <div className="text-sm text-gray-500 mt-4">
-          <Text className="font-medium">Token Pricing: </Text>
+          <Text className="font-medium">{t("Token Pricing")}: </Text>
           {result.input_cost_per_token && (
-            <span>Input: ${formatNumberWithCommas(result.input_cost_per_token * 1_000_000, 2)}/1M tokens</span>
+            <span>{t("Input")}: ${formatNumberWithCommas(result.input_cost_per_token * 1_000_000, 2)}/1M {t("tokens")}</span>
           )}
           {result.input_cost_per_token && result.output_cost_per_token && " | "}
           {result.output_cost_per_token && (
-            <span>Output: ${formatNumberWithCommas(result.output_cost_per_token * 1_000_000, 2)}/1M tokens</span>
+            <span>{t("Output")}: ${formatNumberWithCommas(result.output_cost_per_token * 1_000_000, 2)}/1M {t("tokens")}</span>
           )}
         </div>
       )}

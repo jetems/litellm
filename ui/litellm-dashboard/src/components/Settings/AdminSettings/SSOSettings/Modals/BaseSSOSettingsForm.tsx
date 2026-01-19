@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslate } from "@/i18n";
 import { TextInput } from "@tremor/react";
 import { Checkbox, Form, Input, Select } from "antd";
 import React from "react";
@@ -87,16 +88,16 @@ export const ssoProviderConfigs: Record<string, SSOProviderConfig> = {
 };
 
 // Helper function to render provider fields
-export const renderProviderFields = (provider: string) => {
+export const renderProviderFields = (provider: string, t: any) => {
   const config = ssoProviderConfigs[provider];
   if (!config) return null;
 
   return config.fields.map((field) => (
     <Form.Item
       key={field.name}
-      label={field.label}
+      label={t(field.label)}
       name={field.name}
-      rules={[{ required: true, message: `Please enter the ${field.label.toLowerCase()}` }]}
+      rules={[{ required: true, message: `${t("Please enter the")} ${t(field.label).toLowerCase()}` }]}
     >
       {field.name.includes("client") ? <Input.Password /> : <TextInput placeholder={field.placeholder} />}
     </Form.Item>
@@ -104,13 +105,14 @@ export const renderProviderFields = (provider: string) => {
 };
 
 const BaseSSOSettingsForm: React.FC<BaseSSOSettingsFormProps> = ({ form, onFormSubmit }) => {
+  const t = useTranslate();
   return (
     <div>
       <Form form={form} onFinish={onFormSubmit} labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} labelAlign="left">
         <Form.Item
-          label="SSO Provider"
+          label={t("SSO Provider")}
           name="sso_provider"
-          rules={[{ required: true, message: "Please select an SSO provider" }]}
+          rules={[{ required: true, message: t("Please select an SSO provider") }]}
         >
           <Select>
             {Object.entries(ssoProviderLogoMap).map(([value, logo]) => (
@@ -138,32 +140,32 @@ const BaseSSOSettingsForm: React.FC<BaseSSOSettingsFormProps> = ({ form, onFormS
         >
           {({ getFieldValue }) => {
             const provider = getFieldValue("sso_provider");
-            return provider ? renderProviderFields(provider) : null;
+            return provider ? renderProviderFields(provider, t) : null;
           }}
         </Form.Item>
 
         <Form.Item
-          label="Proxy Admin Email"
+          label={t("Proxy Admin Email")}
           name="user_email"
-          rules={[{ required: true, message: "Please enter the email of the proxy admin" }]}
+          rules={[{ required: true, message: t("Please enter the email of the proxy admin") }]}
         >
           <TextInput />
         </Form.Item>
         <Form.Item
-          label="Proxy Base URL"
+          label={t("Proxy Base URL")}
           name="proxy_base_url"
           normalize={(value) => value?.trim()}
           rules={[
-            { required: true, message: "Please enter the proxy base url" },
+            { required: true, message: t("Please enter the proxy base url") },
             {
               pattern: /^https?:\/\/.+/,
-              message: "URL must start with http:// or https://",
+              message: t("URL must start with http:// or https://"),
             },
             {
               validator: (_, value) => {
                 // Only check for trailing slash if the URL starts with http:// or https://
                 if (value && /^https?:\/\/.+/.test(value) && value.endsWith("/")) {
-                  return Promise.reject("URL must not end with a trailing slash");
+                  return Promise.reject(t("URL must not end with a trailing slash"));
                 }
                 return Promise.resolve();
               },
@@ -180,7 +182,7 @@ const BaseSSOSettingsForm: React.FC<BaseSSOSettingsFormProps> = ({ form, onFormS
           {({ getFieldValue }) => {
             const provider = getFieldValue("sso_provider");
             return provider === "okta" || provider === "generic" ? (
-              <Form.Item label="Use Role Mappings" name="use_role_mappings" valuePropName="checked">
+              <Form.Item label={t("Use Role Mappings")} name="use_role_mappings" valuePropName="checked">
                 <Checkbox />
               </Form.Item>
             ) : null;
@@ -200,9 +202,9 @@ const BaseSSOSettingsForm: React.FC<BaseSSOSettingsFormProps> = ({ form, onFormS
             const supportsRoleMappings = provider === "okta" || provider === "generic";
             return useRoleMappings && supportsRoleMappings ? (
               <Form.Item
-                label="Group Claim"
+                label={t("Group Claim")}
                 name="group_claim"
-                rules={[{ required: true, message: "Please enter the group claim" }]}
+                rules={[{ required: true, message: t("Please enter the group claim") }]}
               >
                 <TextInput />
               </Form.Item>
@@ -223,28 +225,28 @@ const BaseSSOSettingsForm: React.FC<BaseSSOSettingsFormProps> = ({ form, onFormS
             const supportsRoleMappings = provider === "okta" || provider === "generic";
             return useRoleMappings && supportsRoleMappings ? (
               <>
-                <Form.Item label="Default Role" name="default_role" initialValue="Internal User">
+                <Form.Item label={t("Default Role")} name="default_role" initialValue="Internal User">
                   <Select>
-                    <Select.Option value="internal_user_viewer">Internal Viewer</Select.Option>
-                    <Select.Option value="internal_user">Internal User</Select.Option>
-                    <Select.Option value="proxy_admin_viewer">Admin Viewer</Select.Option>
-                    <Select.Option value="proxy_admin">Proxy Admin</Select.Option>
+                    <Select.Option value="internal_user_viewer">{t("Internal Viewer")}</Select.Option>
+                    <Select.Option value="internal_user">{t("Internal User")}</Select.Option>
+                    <Select.Option value="proxy_admin_viewer">{t("Admin Viewer")}</Select.Option>
+                    <Select.Option value="proxy_admin">{t("Proxy Admin")}</Select.Option>
                   </Select>
                 </Form.Item>
 
-                <Form.Item label="Proxy Admin Teams" name="proxy_admin_teams">
+                <Form.Item label={t("Proxy Admin Teams")} name="proxy_admin_teams">
                   <TextInput />
                 </Form.Item>
 
-                <Form.Item label="Admin Viewer Teams" name="admin_viewer_teams">
+                <Form.Item label={t("Admin Viewer Teams")} name="admin_viewer_teams">
                   <TextInput />
                 </Form.Item>
 
-                <Form.Item label="Internal User Teams" name="internal_user_teams">
+                <Form.Item label={t("Internal User Teams")} name="internal_user_teams">
                   <TextInput />
                 </Form.Item>
 
-                <Form.Item label="Internal Viewer Teams" name="internal_viewer_teams">
+                <Form.Item label={t("Internal Viewer Teams")} name="internal_viewer_teams">
                   <TextInput />
                 </Form.Item>
               </>

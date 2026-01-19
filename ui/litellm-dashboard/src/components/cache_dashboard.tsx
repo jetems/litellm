@@ -16,6 +16,7 @@ import {
   Text,
 } from "@tremor/react";
 import React, { useEffect, useState } from "react";
+import { useTranslate } from "../i18n";
 import NotificationsManager from "./molecules/notifications_manager";
 import UsageDatePicker from "./shared/usage_date_picker";
 
@@ -97,6 +98,7 @@ const deepParse = (input: any) => {
 };
 
 const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole, userID, premiumUser }) => {
+  const t = useTranslate();
   const [filteredData, setFilteredData] = useState<uiData[]>([]);
   const [selectedApiKeys, setSelectedApiKeys] = useState<string[]>([]);
   const [selectedModels, setSelectedModels] = useState<string[]>([]);
@@ -239,7 +241,7 @@ const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole
 
   const runCachingHealthCheck = async () => {
     try {
-      NotificationsManager.info("Running cache health check...");
+      NotificationsManager.info(t("Running cache health check..."));
       setHealthCheckResponse("");
       const response = await cachingHealthCheckCall(accessToken !== null ? accessToken : "");
       console.log("CACHING HEALTH CHECK RESPONSE", response);
@@ -260,7 +262,7 @@ const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole
           errorData = { message: error.message };
         }
       } else {
-        errorData = { message: "Unknown error occurred" };
+        errorData = { message: t("Unknown error occurred") };
       }
       setHealthCheckResponse({ error: errorData });
     }
@@ -270,13 +272,13 @@ const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole
     <TabGroup className="gap-2 p-8 h-full w-full mt-2 mb-8">
       <TabList className="flex justify-between mt-2 w-full items-center">
         <div className="flex">
-          <Tab>Cache Analytics</Tab>
-          <Tab>Cache Health</Tab>
-          <Tab>Cache Settings</Tab>
+          <Tab>{t("Cache Analytics")}</Tab>
+          <Tab>{t("Cache Health")}</Tab>
+          <Tab>{t("Cache Settings")}</Tab>
         </div>
 
         <div className="flex items-center space-x-2">
-          {lastRefreshed && <Text>Last Refreshed: {lastRefreshed}</Text>}
+          {lastRefreshed && <Text>{t("Last Refreshed:")} {lastRefreshed}</Text>}
           <Icon
             icon={RefreshIcon} // Modify as necessary for correct icon name
             variant="shadow"
@@ -292,7 +294,7 @@ const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole
             <Grid numItems={3} className="gap-4 mt-4">
               <Col>
                 <MultiSelect
-                  placeholder="Select Virtual Keys"
+                  placeholder={t("Select Virtual Keys")}
                   value={selectedApiKeys}
                   onValueChange={setSelectedApiKeys}
                 >
@@ -304,7 +306,7 @@ const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole
                 </MultiSelect>
               </Col>
               <Col>
-                <MultiSelect placeholder="Select Models" value={selectedModels} onValueChange={setSelectedModels}>
+                <MultiSelect placeholder={t("Select Models")} value={selectedModels} onValueChange={setSelectedModels}>
                   {uniqueModels.map((model) => (
                     <MultiSelectItem key={model} value={model}>
                       {model}
@@ -326,7 +328,7 @@ const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-4">
               <Card>
                 <p className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">
-                  Cache Hit Ratio
+                  {t("Cache Hit Ratio")}
                 </p>
                 <div className="mt-2 flex items-baseline space-x-2.5">
                   <p className="text-tremor-metric font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
@@ -336,7 +338,7 @@ const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole
               </Card>
               <Card>
                 <p className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">
-                  Cache Hits
+                  {t("Cache Hits")}
                 </p>
                 <div className="mt-2 flex items-baseline space-x-2.5">
                   <p className="text-tremor-metric font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
@@ -347,7 +349,7 @@ const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole
 
               <Card>
                 <p className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">
-                  Cached Tokens
+                  {t("Cached Tokens")}
                 </p>
                 <div className="mt-2 flex items-baseline space-x-2.5">
                   <p className="text-tremor-metric font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
@@ -357,9 +359,9 @@ const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole
               </Card>
             </div>
 
-            <Subtitle className="mt-4">Cache Hits vs API Requests</Subtitle>
+            <Subtitle className="mt-4">{t("Cache Hits vs API Requests")}</Subtitle>
             <BarChart
-              title="Cache Hits vs API Requests"
+              title={t("Cache Hits vs API Requests")}
               data={filteredData}
               stack={true}
               index="name"
@@ -369,7 +371,7 @@ const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole
               yAxisWidth={48}
             />
 
-            <Subtitle className="mt-4">Cached Completion Tokens vs Generated Completion Tokens</Subtitle>
+            <Subtitle className="mt-4">{t("Cached Completion Tokens vs Generated Completion Tokens")}</Subtitle>
             <BarChart
               className="mt-6"
               data={filteredData}

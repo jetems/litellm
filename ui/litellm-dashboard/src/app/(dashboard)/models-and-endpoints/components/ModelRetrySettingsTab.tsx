@@ -74,7 +74,9 @@ const ModelRetrySettingsTab = ({
       ) : (
         <>
           <Title>{t("Retry Policy for")} {selectedModelGroup}</Title>
-          <Text className="mb-6">{t("Model-specific retry settings. Falls back to global defaults if not set.")}</Text>
+          <Text className="mb-6">
+            {t("Model-specific retry settings. Falls back to global defaults if not set.")}
+          </Text>
         </>
       )}
       {retryPolicyMap && (

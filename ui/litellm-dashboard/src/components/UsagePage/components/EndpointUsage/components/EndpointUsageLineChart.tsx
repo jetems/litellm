@@ -1,6 +1,7 @@
 import { Card, LineChart, Title } from "@tremor/react";
 import { useMemo } from "react";
 import { DailyData } from "../../../types";
+import { useTranslate } from "@/i18n";
 
 interface EndpointUsageLineChartProps {
   dailyData?: { results: DailyData[] };
@@ -43,6 +44,7 @@ function transformDailyDataToChart(dailyData: DailyData[]): Array<Record<string,
 }
 
 export function EndpointUsageLineChart({ dailyData, endpointData }: EndpointUsageLineChartProps) {
+  const t = useTranslate();
   const chartData = useMemo(() => {
     if (!dailyData?.results || dailyData.results.length === 0) {
       return [];
@@ -64,7 +66,7 @@ export function EndpointUsageLineChart({ dailyData, endpointData }: EndpointUsag
   return (
     <Card className="mb-6">
       <div className="flex items-center justify-between mb-4">
-        <Title>Endpoint Usage Trends</Title>
+        <Title>{t("Endpoint Usage Trends")}</Title>
       </div>
       <LineChart
         className="h-80"

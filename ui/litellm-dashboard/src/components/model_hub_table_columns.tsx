@@ -52,10 +52,11 @@ export const modelHubColumns = (
   showModal: (model: ModelHubData) => void,
   copyToClipboard: (text: string) => void,
   publicPage: boolean = false,
+  t: (key: string) => string
 ): ColumnDef<ModelHubData>[] => {
   const allColumns: ColumnDef<ModelHubData>[] = [
     {
-      header: "Public Model Name",
+      header: t("Public Model Name"),
       accessorKey: "model_group",
       enableSorting: true,
       sortingFn: "alphanumeric",
@@ -66,7 +67,7 @@ export const modelHubColumns = (
           <div className="space-y-1">
             <div className="flex items-center space-x-2">
               <Text className="font-medium text-sm">{model.model_group}</Text>
-              <Tooltip title="Copy model name">
+              <Tooltip title={t("Copy model name")}>
                 <CopyOutlined
                   onClick={() => copyToClipboard(model.model_group)}
                   className="cursor-pointer text-gray-500 hover:text-blue-500 text-xs"
@@ -82,7 +83,7 @@ export const modelHubColumns = (
       },
     },
     {
-      header: "Provider",
+      header: t("Provider"),
       accessorKey: "providers",
       enableSorting: true,
       sortingFn: (rowA, rowB) => {
@@ -109,7 +110,7 @@ export const modelHubColumns = (
       },
     },
     {
-      header: "Mode",
+      header: t("Mode"),
       accessorKey: "mode",
       enableSorting: true,
       sortingFn: "alphanumeric",
@@ -129,7 +130,7 @@ export const modelHubColumns = (
       },
     },
     {
-      header: "Tokens",
+      header: t("Tokens"),
       accessorKey: "max_input_tokens",
       enableSorting: true,
       sortingFn: (rowA, rowB) => {
@@ -154,7 +155,7 @@ export const modelHubColumns = (
       },
     },
     {
-      header: "Cost/1M",
+      header: t("Cost/1M"),
       accessorKey: "input_cost_per_token",
       enableSorting: true,
       sortingFn: (rowA, rowB) => {
@@ -176,7 +177,7 @@ export const modelHubColumns = (
       },
     },
     {
-      header: "Features",
+      header: t("Features"),
       accessorKey: "capabilities",
       enableSorting: false,
       cell: ({ row }) => {
@@ -200,7 +201,7 @@ export const modelHubColumns = (
       },
     },
     {
-      header: "Public",
+      header: t("Public"),
       accessorKey: "is_public_model_group",
       enableSorting: true,
       sortingFn: (rowA, rowB) => {
@@ -213,11 +214,11 @@ export const modelHubColumns = (
 
         return model.is_public_model_group === true ? (
           <Badge color="green" size="xs">
-            Yes
+            {t("Yes")}
           </Badge>
         ) : (
           <Badge color="gray" size="xs">
-            No
+            {t("No")}
           </Badge>
         );
       },
@@ -226,7 +227,7 @@ export const modelHubColumns = (
       },
     },
     {
-      header: "Details",
+      header: t("Details"),
       id: "details",
       enableSorting: false,
       cell: ({ row }) => {
@@ -234,8 +235,8 @@ export const modelHubColumns = (
 
         return (
           <Button size="xs" variant="secondary" onClick={() => showModal(model)} icon={InfoCircleOutlined}>
-            <span className="hidden lg:inline">Details</span>
-            <span className="lg:hidden">Info</span>
+            <span className="hidden lg:inline">{t("Details")}</span>
+            <span className="lg:hidden">{t("Info")}</span>
           </Button>
         );
       },

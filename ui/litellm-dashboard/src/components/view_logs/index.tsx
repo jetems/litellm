@@ -1,11 +1,11 @@
 import moment from "moment";
 import { useQuery } from "@tanstack/react-query";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { uiSpendLogsCall, keyInfoV1Call, sessionSpendLogsCall, keyListCall, allEndUsersCall } from "../networking";
 import { DataTable } from "./table";
-import { columns, LogEntry } from "./columns";
+import { getColumns, LogEntry } from "./columns";
 import { Row } from "@tanstack/react-table";
 import { prefetchLogDetails } from "./prefetch";
 import { RequestResponsePanel } from "./RequestResponsePanel";
@@ -28,6 +28,7 @@ import AuditLogs from "./audit_logs";
 import { getTimeRangeDisplay } from "./logs_utils";
 import { formatNumberWithCommas } from "@/utils/dataUtils";
 import { truncateString } from "@/utils/textUtils";
+import { useTranslate } from "@/i18n";
 
 interface SpendLogsTableProps {
   accessToken: string | null;
@@ -59,6 +60,7 @@ export default function SpendLogsTable({
   allTeams,
   premiumUser,
 }: SpendLogsTableProps) {
+  const t = useTranslate();
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [showColumnDropdown, setShowColumnDropdown] = useState(false);
@@ -96,6 +98,8 @@ export default function SpendLogsTable({
     // default to true if nothing is stored
     return storedValue !== null ? JSON.parse(storedValue) : true;
   });
+
+  const columns = useMemo(() => getColumns(t), [t]);
 
   useEffect(() => {
     sessionStorage.setItem("isLiveTail", JSON.stringify(isLiveTail));
@@ -149,7 +153,7 @@ export default function SpendLogsTable({
   const LiveTailControls = () => {
     return (
       <div className="flex items-center gap-2">
-        <span className="text-sm font-medium text-gray-900">Live Tail</span>
+        <span className="text-sm font-medium text-gray-900">{t("Live Tail")}</span>
         <Switch color="green" checked={isLiveTail} defaultChecked={true} onChange={setIsLiveTail} />
       </div>
     );
@@ -355,7 +359,7 @@ export default function SpendLogsTable({
     sessionLogs.data?.data?.map((log) => ({
       ...log,
       onKeyHashClick: (keyHash: string) => setSelectedKeyIdInfoView(keyHash),
-      onSessionClick: (sessionId: string) => {},
+      onSessionClick: (sessionId: string) => { },
     })) || [];
 
   // Add this function to handle manual refresh
@@ -388,7 +392,7 @@ export default function SpendLogsTable({
   const logFilterOptions: FilterOption[] = [
     {
       name: "Team ID",
-      label: "Team ID",
+      label: t("Team ID"),
       isSearchable: true,
       searchFn: async (searchText: string) => {
         if (!allTeams || allTeams.length === 0) return [];
@@ -406,21 +410,21 @@ export default function SpendLogsTable({
     },
     {
       name: "Status",
-      label: "Status",
+      label: t("Status"),
       isSearchable: false,
       options: [
-        { label: "Success", value: "success" },
-        { label: "Failure", value: "failure" },
+        { label: t("Success"), value: "success" },
+        { label: t("Failure"), value: "failure" },
       ],
     },
     {
       name: "Model",
-      label: "Model",
+      label: t("Model"),
       isSearchable: false,
     },
     {
       name: "Key Alias",
-      label: "Key Alias",
+      label: t("Key Alias"),
       isSearchable: true,
       searchFn: async (searchText: string) => {
         if (!accessToken) return [];
@@ -434,7 +438,7 @@ export default function SpendLogsTable({
     },
     {
       name: "End User",
-      label: "End User",
+      label: t("End User"),
       isSearchable: true,
       searchFn: async (searchText: string) => {
         if (!accessToken) return [];
@@ -447,7 +451,7 @@ export default function SpendLogsTable({
     },
     {
       name: "Error Code",
-      label: "Error Code",
+      label: t("Error Code"),
       isSearchable: true,
       searchFn: async (searchText: string) => {
         return extractErrorCodes(logsData.data, searchText);
@@ -455,7 +459,7 @@ export default function SpendLogsTable({
     },
     {
       name: "Key Hash",
-      label: "Key Hash",
+      label: t("Key Hash"),
       isSearchable: false,
     },
   ];
@@ -475,19 +479,21 @@ export default function SpendLogsTable({
 
   const formatTimeUnit = (value: number, unit: string) => {
     if (value === 1) {
-      if (unit === "minutes") return "minute";
-      if (unit === "hours") return "hour";
-      if (unit === "days") return "day";
+      if (value === 1) {
+        if (unit === "minutes") return t("minute");
+        if (unit === "hours") return t("hour");
+        if (unit === "days") return t("day");
+      }
     }
     return unit;
   };
 
   const quickSelectOptions = [
-    { label: "Last 15 Minutes", value: 15, unit: "minutes" },
-    { label: "Last Hour", value: 1, unit: "hours" },
-    { label: "Last 4 Hours", value: 4, unit: "hours" },
-    { label: "Last 24 Hours", value: 24, unit: "hours" },
-    { label: "Last 7 Days", value: 7, unit: "days" },
+    { label: t("Last 15 Minutes"), value: 15, unit: "minutes" },
+    { label: t("Last Hour"), value: 1, unit: "hours" },
+    { label: t("Last 4 Hours"), value: 4, unit: "hours" },
+    { label: t("Last 24 Hours"), value: 24, unit: "hours" },
+    { label: t("Last 7 Days"), value: 7, unit: "days" },
   ];
 
   const selectedOption = quickSelectOptions.find(
@@ -500,8 +506,8 @@ export default function SpendLogsTable({
     <div className="w-full max-w-screen p-6 overflow-x-hidden box-border">
       <TabGroup defaultIndex={0} onIndexChange={(index) => setActiveTab(index === 0 ? "request logs" : "audit logs")}>
         <TabList>
-          <Tab>Request Logs</Tab>
-          <Tab>Audit Logs</Tab>
+          <Tab>{t("Request Logs")}</Tab>
+          <Tab>{t("Audit Logs")}</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
@@ -509,16 +515,16 @@ export default function SpendLogsTable({
               <h1 className="text-xl font-semibold">
                 {selectedSessionId ? (
                   <>
-                    Session: <span className="font-mono">{selectedSessionId}</span>
+                    {t("Session")}: <span className="font-mono">{selectedSessionId}</span>
                     <button
                       className="ml-4 px-3 py-1 text-sm border rounded hover:bg-gray-50"
                       onClick={() => setSelectedSessionId(null)}
                     >
-                      ← Back to All Logs
+                      ← {t("Back to All Logs")}
                     </button>
                   </>
                 ) : (
-                  "Request Logs"
+                  t("Request Logs")
                 )}
               </h1>
             </div>
@@ -537,7 +543,7 @@ export default function SpendLogsTable({
                   data={sessionData}
                   renderSubComponent={RequestViewer}
                   getRowCanExpand={() => true}
-                  // Optionally: add session-specific row expansion state
+                // Optionally: add session-specific row expansion state
                 />
               </div>
             ) : (
@@ -554,7 +560,7 @@ export default function SpendLogsTable({
                         <div className="relative w-64 min-w-0 flex-shrink-0">
                           <input
                             type="text"
-                            placeholder="Search by Request ID"
+                            placeholder={t("Search by Request ID")}
                             className="w-full px-3 py-2 pl-8 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -597,9 +603,8 @@ export default function SpendLogsTable({
                                   {quickSelectOptions.map((option) => (
                                     <button
                                       key={option.label}
-                                      className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 rounded-md ${
-                                        displayLabel === option.label ? "bg-blue-50 text-blue-600" : ""
-                                      }`}
+                                      className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 rounded-md ${displayLabel === option.label ? "bg-blue-50 text-blue-600" : ""
+                                        }`}
                                       onClick={() => {
                                         setEndTime(moment().format("YYYY-MM-DDTHH:mm"));
                                         setStartTime(
@@ -617,12 +622,11 @@ export default function SpendLogsTable({
                                   ))}
                                   <div className="border-t my-2" />
                                   <button
-                                    className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 rounded-md ${
-                                      isCustomDate ? "bg-blue-50 text-blue-600" : ""
-                                    }`}
+                                    className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 rounded-md ${isCustomDate ? "bg-blue-50 text-blue-600" : ""
+                                      }`}
                                     onClick={() => setIsCustomDate(!isCustomDate)}
                                   >
-                                    Custom Range
+                                    {t("Custom Range")}
                                   </button>
                                 </div>
                               </div>
@@ -649,7 +653,7 @@ export default function SpendLogsTable({
                                 d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                               />
                             </svg>
-                            <span>Refresh</span>
+                            <span>{t("Refresh")}</span>
                           </button>
                         </div>
 
@@ -666,7 +670,7 @@ export default function SpendLogsTable({
                                 className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                               />
                             </div>
-                            <span className="text-gray-500">to</span>
+                            <span className="text-gray-500">{t("to")}</span>
                             <div>
                               <input
                                 type="datetime-local"
@@ -684,32 +688,32 @@ export default function SpendLogsTable({
 
                       <div className="flex items-center space-x-4">
                         <span className="text-sm text-gray-700 whitespace-nowrap">
-                          Showing {logs.isLoading ? "..." : filteredLogs ? (currentPage - 1) * pageSize + 1 : 0} -{" "}
+                          {t("Showing")} {logs.isLoading ? "..." : filteredLogs ? (currentPage - 1) * pageSize + 1 : 0} -{" "}
                           {logs.isLoading
                             ? "..."
                             : filteredLogs
                               ? Math.min(currentPage * pageSize, filteredLogs.total)
                               : 0}{" "}
-                          of {logs.isLoading ? "..." : filteredLogs ? filteredLogs.total : 0} results
+                          {t("of")} {logs.isLoading ? "..." : filteredLogs ? filteredLogs.total : 0} {t("results")}
                         </span>
                         <div className="flex items-center space-x-2">
                           <span className="text-sm text-gray-700 min-w-[90px]">
-                            Page {logs.isLoading ? "..." : currentPage} of{" "}
+                            {t("Page")} {logs.isLoading ? "..." : currentPage} {t("of")}{" "}
                             {logs.isLoading ? "..." : filteredLogs ? filteredLogs.total_pages : 1}
                           </span>
                           <button
                             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                             disabled={logs.isLoading || currentPage === 1}
-                            className="px-3 py-1 text-sm border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-4 py-1 text-sm border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed min-w-[80px] whitespace-nowrap"
                           >
-                            Previous
+                            {t("Previous")}
                           </button>
                           <button
                             onClick={() => setCurrentPage((p) => Math.min(filteredLogs.total_pages || 1, p + 1))}
                             disabled={logs.isLoading || currentPage === (filteredLogs.total_pages || 1)}
-                            className="px-3 py-1 text-sm border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-4 py-1 text-sm border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed min-w-[80px] whitespace-nowrap"
                           >
-                            Next
+                            {t("Next")}
                           </button>
                         </div>
                       </div>
@@ -718,13 +722,13 @@ export default function SpendLogsTable({
                   {isLiveTail && currentPage === 1 && (
                     <div className="mb-4 px-4 py-2 bg-green-50 border border-greem-200 rounded-md flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-green-700">Auto-refreshing every 15 seconds</span>
+                        <span className="text-sm text-green-700">{t("Auto-refreshing every 15 seconds")}</span>
                       </div>
                       <button
                         onClick={() => setIsLiveTail(false)}
                         className="text-sm text-green-600 hover:text-green-800"
                       >
-                        Stop
+                        {t("Stop")}
                       </button>
                     </div>
                   )}
@@ -756,6 +760,7 @@ export default function SpendLogsTable({
 }
 
 export function RequestViewer({ row }: { row: Row<LogEntry> }) {
+  const t = useTranslate();
   // Helper function to clean metadata by removing specific fields
   const formatData = (input: any) => {
     if (typeof input === "string") {
@@ -844,12 +849,12 @@ export function RequestViewer({ row }: { row: Row<LogEntry> }) {
       {/* Combined Info Card */}
       <div className="bg-white rounded-lg shadow w-full max-w-full overflow-hidden">
         <div className="p-4 border-b">
-          <h3 className="text-lg font-medium">Request Details</h3>
+          <h3 className="text-lg font-medium">{t("Request Details")}</h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 w-full max-w-full overflow-hidden">
           <div className="space-y-2">
             <div className="flex">
-              <span className="font-medium w-1/3">Request ID:</span>
+              <span className="font-medium w-1/3">{t("Request ID")}:</span>
               {row.original.request_id.length > 64 ? (
                 <Tooltip title={row.original.request_id}>
                   <span className="font-mono text-sm">{truncatedRequestId}</span>
@@ -859,41 +864,41 @@ export function RequestViewer({ row }: { row: Row<LogEntry> }) {
               )}
             </div>
             <div className="flex">
-              <span className="font-medium w-1/3">Model:</span>
+              <span className="font-medium w-1/3">{t("Model")}:</span>
               <span>{row.original.model}</span>
             </div>
             <div className="flex">
-              <span className="font-medium w-1/3">Model ID:</span>
+              <span className="font-medium w-1/3">{t("Model ID")}:</span>
               <span>{row.original.model_id}</span>
             </div>
             <div className="flex">
-              <span className="font-medium w-1/3">Call Type:</span>
+              <span className="font-medium w-1/3">{t("Call Type")}:</span>
               <span>{row.original.call_type}</span>
             </div>
             <div className="flex">
-              <span className="font-medium w-1/3">Provider:</span>
+              <span className="font-medium w-1/3">{t("Provider")}:</span>
               <span>{row.original.custom_llm_provider || "-"}</span>
             </div>
             <div className="flex">
-              <span className="font-medium w-1/3">API Base:</span>
+              <span className="font-medium w-1/3">{t("API Base")}:</span>
               <Tooltip title={row.original.api_base || "-"}>
                 <span className="max-w-[15ch] truncate block">{row.original.api_base || "-"}</span>
               </Tooltip>
             </div>
             {row?.original?.requester_ip_address && (
               <div className="flex">
-                <span className="font-medium w-1/3">IP Address:</span>
+                <span className="font-medium w-1/3">{t("IP Address")}:</span>
                 <span>{row?.original?.requester_ip_address}</span>
               </div>
             )}
             {hasGuardrailData && (
               <div className="flex">
-                <span className="font-medium w-1/3">Guardrail:</span>
+                <span className="font-medium w-1/3">{t("Guardrail")}:</span>
                 <div>
                   <span className="font-mono">{primaryGuardrailLabel}</span>
                   {totalMaskedEntities > 0 && (
                     <span className="ml-2 px-2 py-0.5 bg-blue-50 text-blue-700 rounded-md text-xs font-medium">
-                      {totalMaskedEntities} masked
+                      {totalMaskedEntities} {t("masked")}
                     </span>
                   )}
                 </div>
@@ -902,60 +907,59 @@ export function RequestViewer({ row }: { row: Row<LogEntry> }) {
           </div>
           <div className="space-y-2">
             <div className="flex">
-              <span className="font-medium w-1/3">Tokens:</span>
+              <span className="font-medium w-1/3">{t("Tokens")}:</span>
               <span>
-                {row.original.total_tokens} ({row.original.prompt_tokens} prompt tokens +{" "}
-                {row.original.completion_tokens} completion tokens)
+                {row.original.total_tokens} ({row.original.prompt_tokens} {t("prompt tokens")} +{" "}
+                {row.original.completion_tokens} {t("completion tokens")})
               </span>
             </div>
             <div className="flex">
-              <span className="font-medium w-1/3">Cache Read Tokens:</span>
+              <span className="font-medium w-1/3">{t("Cache Read Tokens")}:</span>
               <span>
                 {formatNumberWithCommas(row.original.metadata?.additional_usage_values?.cache_read_input_tokens || 0)}
               </span>
             </div>
             <div className="flex">
-              <span className="font-medium w-1/3">Cache Creation Tokens:</span>
+              <span className="font-medium w-1/3">{t("Cache Creation Tokens")}:</span>
               <span>
                 {formatNumberWithCommas(row.original.metadata?.additional_usage_values.cache_creation_input_tokens)}
               </span>
             </div>
             <div className="flex">
-              <span className="font-medium w-1/3">Cost:</span>
+              <span className="font-medium w-1/3">{t("Cost")}:</span>
               <span>${formatNumberWithCommas(row.original.spend || 0, 6)}</span>
             </div>
             <div className="flex">
-              <span className="font-medium w-1/3">Cache Hit:</span>
+              <span className="font-medium w-1/3">{t("Cache Hit")}:</span>
               <span>{row.original.cache_hit}</span>
             </div>
 
             <div className="flex">
-              <span className="font-medium w-1/3">Status:</span>
+              <span className="font-medium w-1/3">{t("Status")}:</span>
               <span
-                className={`px-2 py-1 rounded-md text-xs font-medium inline-block text-center w-16 ${
-                  (row.original.metadata?.status || "Success").toLowerCase() !== "failure"
-                    ? "bg-green-100 text-green-800"
-                    : "bg-red-100 text-red-800"
-                }`}
+                className={`px-2 py-1 rounded-md text-xs font-medium inline-block text-center w-16 ${(row.original.metadata?.status || "Success").toLowerCase() !== "failure"
+                  ? "bg-green-100 text-green-800"
+                  : "bg-red-100 text-red-800"
+                  }`}
               >
                 {(row.original.metadata?.status || "Success").toLowerCase() !== "failure" ? "Success" : "Failure"}
               </span>
             </div>
             <div className="flex">
-              <span className="font-medium w-1/3">Start Time:</span>
+              <span className="font-medium w-1/3">{t("Start Time")}:</span>
               <span>{row.original.startTime}</span>
             </div>
             <div className="flex">
-              <span className="font-medium w-1/3">End Time:</span>
+              <span className="font-medium w-1/3">{t("End Time")}:</span>
               <span>{row.original.endTime}</span>
             </div>
             <div className="flex">
-              <span className="font-medium w-1/3">Duration:</span>
+              <span className="font-medium w-1/3">{t("Duration")}:</span>
               <span>{row.original.duration} s.</span>
             </div>
             {row.original.metadata?.litellm_overhead_time_ms !== undefined && (
               <div className="flex">
-                <span className="font-medium w-1/3">LiteLLM Overhead:</span>
+                <span className="font-medium w-1/3">{t("LiteLLM Overhead")}:</span>
                 <span>{row.original.metadata.litellm_overhead_time_ms} ms</span>
               </div>
             )}
@@ -995,7 +999,7 @@ export function RequestViewer({ row }: { row: Row<LogEntry> }) {
       {row.original.request_tags && Object.keys(row.original.request_tags).length > 0 && (
         <div className="bg-white rounded-lg shadow">
           <div className="flex justify-between items-center p-4 border-b">
-            <h3 className="text-lg font-medium">Request Tags</h3>
+            <h3 className="text-lg font-medium">{t("Request Tags")}</h3>
           </div>
           <div className="p-4">
             <div className="flex flex-wrap gap-2">
@@ -1013,13 +1017,13 @@ export function RequestViewer({ row }: { row: Row<LogEntry> }) {
       {row.original.metadata && Object.keys(row.original.metadata).length > 0 && (
         <div className="bg-white rounded-lg shadow">
           <div className="flex justify-between items-center p-4 border-b">
-            <h3 className="text-lg font-medium">Metadata</h3>
+            <h3 className="text-lg font-medium">{t("Metadata")}</h3>
             <button
               onClick={() => {
                 navigator.clipboard.writeText(JSON.stringify(row.original.metadata, null, 2));
               }}
               className="p-1 hover:bg-gray-200 rounded"
-              title="Copy metadata"
+              title={t("Copy metadata")}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

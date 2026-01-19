@@ -67,12 +67,12 @@ const MCPPermissionManagement: React.FC<MCPPermissionManagementProps> = ({
           <div className="flex items-start justify-between gap-4">
             <div>
               <span className="text-sm font-medium text-gray-700 flex items-center">
-                Allow All LiteLLM Keys
-                <Tooltip title="When enabled, every API key can access this MCP server.">
+                {t("Allow All LiteLLM Keys")}
+                <Tooltip title={t("When enabled, every API key can access this MCP server.")}>
                   <InfoCircleOutlined className="ml-2 text-blue-400 hover:text-blue-600 cursor-help" />
                 </Tooltip>
               </span>
-              <p className="text-sm text-gray-600 mt-1">Enable if this server should be &quot;public&quot; to all keys.</p>
+              <p className="text-sm text-gray-600 mt-1">{t("Enable if this server should be \"public\" to all keys.")}</p>
             </div>
             <Form.Item
               name="allow_all_keys"

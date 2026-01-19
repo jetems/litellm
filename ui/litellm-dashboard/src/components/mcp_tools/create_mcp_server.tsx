@@ -439,7 +439,7 @@ const CreateMCPServer: React.FC<CreateMCPServerProps> = ({
               ]}
             >
               <TextInput
-                placeholder="e.g., GitHub_MCP, Zapier_MCP, etc."
+                placeholder={t("e.g., GitHub_MCP, Zapier_MCP, etc.")}
                 className="rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500"
               />
             </Form.Item>
@@ -465,7 +465,7 @@ const CreateMCPServer: React.FC<CreateMCPServerProps> = ({
               ]}
             >
               <TextInput
-                placeholder="e.g., GitHub_MCP, Zapier_MCP, etc."
+                placeholder={t("e.g., GitHub_MCP, Zapier_MCP, etc.")}
                 className="rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                 onChange={() => setAliasManuallyEdited(true)}
               />
@@ -516,7 +516,7 @@ const CreateMCPServer: React.FC<CreateMCPServerProps> = ({
                 ]}
               >
                 <Input
-                  placeholder="https://your-mcp-server.com"
+                  placeholder={t("https://your-mcp-server.com")}
                   className="rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                 />
               </Form.Item>
@@ -618,8 +618,8 @@ const CreateMCPServer: React.FC<CreateMCPServerProps> = ({
                 <Form.Item
                   label={
                     <span className="text-sm font-medium text-gray-700 flex items-center">
-                      Authorization URL Override (optional)
-                      <Tooltip title="Optional override for the authorization endpoint.">
+                      {t("Authorization URL Override (optional)")}
+                      <Tooltip title={t("Optional override for the authorization endpoint.")}>
                         <InfoCircleOutlined className="ml-2 text-blue-400 hover:text-blue-600 cursor-help" />
                       </Tooltip>
                     </span>
@@ -627,15 +627,15 @@ const CreateMCPServer: React.FC<CreateMCPServerProps> = ({
                   name="authorization_url"
                 >
                   <TextInput
-                    placeholder="https://example.com/oauth/authorize"
+                    placeholder={t("https://example.com/oauth/authorize")}
                     className="rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                   />
                 </Form.Item>
                 <Form.Item
                   label={
                     <span className="text-sm font-medium text-gray-700 flex items-center">
-                      Token URL Override (optional)
-                      <Tooltip title="Optional override for the token endpoint.">
+                      {t("Token URL Override (optional)")}
+                      <Tooltip title={t("Optional override for the token endpoint.")}>
                         <InfoCircleOutlined className="ml-2 text-blue-400 hover:text-blue-600 cursor-help" />
                       </Tooltip>
                     </span>
@@ -643,15 +643,15 @@ const CreateMCPServer: React.FC<CreateMCPServerProps> = ({
                   name="token_url"
                 >
                   <TextInput
-                    placeholder="https://example.com/oauth/token"
+                    placeholder={t("https://example.com/oauth/token")}
                     className="rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                   />
                 </Form.Item>
                 <Form.Item
                   label={
                     <span className="text-sm font-medium text-gray-700 flex items-center">
-                      Registration URL Override (optional)
-                      <Tooltip title="Optional orverride for the dynamic client registration endpoint.">
+                      {t("Registration URL Override (optional)")}
+                      <Tooltip title={t("Optional orverride for the dynamic client registration endpoint.")}>
                         <InfoCircleOutlined className="ml-2 text-blue-400 hover:text-blue-600 cursor-help" />
                       </Tooltip>
                     </span>
@@ -659,7 +659,7 @@ const CreateMCPServer: React.FC<CreateMCPServerProps> = ({
                   name="registration_url"
                 >
                   <TextInput
-                    placeholder="https://example.com/oauth/register"
+                    placeholder={t("https://example.com/oauth/register")}
                     className="rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                   />
                 </Form.Item>

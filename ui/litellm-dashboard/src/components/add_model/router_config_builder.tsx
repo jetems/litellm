@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Card, Button, Input, InputNumber, Select as AntdSelect, Tooltip, Collapse } from "antd";
 import { PlusOutlined, DeleteOutlined, InfoCircleOutlined, DownOutlined } from "@ant-design/icons";
 import { Text } from "@tremor/react";
+import { useTranslate } from "@/i18n";
 import { ModelGroup } from "../playground/llm_calls/fetch_models";
 
 const { TextArea } = Input;
@@ -35,6 +36,7 @@ interface RouterConfigBuilderProps {
 }
 
 const RouterConfigBuilder: React.FC<RouterConfigBuilderProps> = ({ modelInfo, value, onChange }) => {
+  const t = useTranslate();
   const [routes, setRoutes] = useState<Route[]>([]);
   const [showJsonPreview, setShowJsonPreview] = useState<boolean>(false);
   const [expandedRoutes, setExpandedRoutes] = useState<string[]>([]);
@@ -137,20 +139,20 @@ const RouterConfigBuilder: React.FC<RouterConfigBuilderProps> = ({ modelInfo, va
       {/* Routes Configuration Header */}
       <div className="flex justify-between items-center mb-6 w-full">
         <div className="flex items-center gap-2">
-          <Text className="text-lg font-semibold">Routes Configuration</Text>
-          <Tooltip title="Configure routing logic to automatically select the best model based on user input patterns">
+          <Text className="text-lg font-semibold">{t("Routes Configuration")}</Text>
+          <Tooltip title={t("Configure routing logic to automatically select the best model based on user input patterns")}>
             <InfoCircleOutlined className="text-gray-400" />
           </Tooltip>
         </div>
         <Button type="primary" icon={<PlusOutlined />} onClick={addRoute} className="bg-blue-600 hover:bg-blue-700">
-          Add Route
+          {t("Add Route")}
         </Button>
       </div>
 
       {/* Routes */}
       {routes.length === 0 ? (
         <div className="text-center py-12 text-gray-500 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200 mb-6">
-          <Text>No routes configured. Click &ldquo;Add Route&rdquo; to get started.</Text>
+          <Text>{t("No routes configured. Click \"Add Route\" to get started.")}</Text>
         </div>
       ) : (
         <div className="space-y-3 mb-6 w-full">
@@ -167,7 +169,7 @@ const RouterConfigBuilder: React.FC<RouterConfigBuilderProps> = ({ modelInfo, va
                     label: (
                       <div className="flex justify-between items-center py-2">
                         <Text className="font-medium text-base">
-                          Route {index + 1}: {route.model || "Unnamed"}
+                          {t("Route")} {index + 1}: {route.model || t("Unnamed")}
                         </Text>
                         <Button
                           type="text"
@@ -185,11 +187,11 @@ const RouterConfigBuilder: React.FC<RouterConfigBuilderProps> = ({ modelInfo, va
                       <div className="px-6 pb-6 w-full">
                         {/* Model Selection */}
                         <div className="mb-4 w-full">
-                          <Text className="text-sm font-medium mb-2 block">Model</Text>
+                          <Text className="text-sm font-medium mb-2 block">{t("Model")}</Text>
                           <AntdSelect
                             value={route.model}
                             onChange={(value) => updateRoute(route.id, "model", value)}
-                            placeholder="Select model"
+                            placeholder={t("Select model")}
                             showSearch
                             style={{ width: "100%" }}
                             options={modelOptions}
@@ -198,11 +200,11 @@ const RouterConfigBuilder: React.FC<RouterConfigBuilderProps> = ({ modelInfo, va
 
                         {/* Description */}
                         <div className="mb-4 w-full">
-                          <Text className="text-sm font-medium mb-2 block">Description</Text>
+                          <Text className="text-sm font-medium mb-2 block">{t("Description")}</Text>
                           <TextArea
                             value={route.description}
                             onChange={(e) => updateRoute(route.id, "description", e.target.value)}
-                            placeholder="Describe when this route should be used..."
+                            placeholder={t("Describe when this route should be used...")}
                             rows={2}
                             style={{ width: "100%" }}
                           />
@@ -211,8 +213,8 @@ const RouterConfigBuilder: React.FC<RouterConfigBuilderProps> = ({ modelInfo, va
                         {/* Score Threshold */}
                         <div className="mb-4 w-full">
                           <div className="flex items-center gap-2 mb-2">
-                            <Text className="text-sm font-medium">Score Threshold</Text>
-                            <Tooltip title="Minimum similarity score to route to this model (0-1)">
+                            <Text className="text-sm font-medium">{t("Score Threshold")}</Text>
+                            <Tooltip title={t("Minimum similarity score to route to this model (0-1)")}>
                               <InfoCircleOutlined className="text-gray-400" />
                             </Tooltip>
                           </div>
@@ -230,19 +232,19 @@ const RouterConfigBuilder: React.FC<RouterConfigBuilderProps> = ({ modelInfo, va
                         {/* Example Utterances */}
                         <div className="w-full">
                           <div className="flex items-center gap-2 mb-2">
-                            <Text className="text-sm font-medium">Example Utterances</Text>
-                            <Tooltip title="Training examples for this route. Type an utterance and press Enter to add it.">
+                            <Text className="text-sm font-medium">{t("Example Utterances")}</Text>
+                            <Tooltip title={t("Training examples for this route. Type an utterance and press Enter to add it.")}>
                               <InfoCircleOutlined className="text-gray-400" />
                             </Tooltip>
                           </div>
                           <Text className="text-xs text-gray-500 mb-2">
-                            Type an utterance and press Enter to add it. You can also paste multiple lines.
+                            {t("Type an utterance and press Enter to add it. You can also paste multiple lines.")}
                           </Text>
                           <AntdSelect
                             mode="tags"
                             value={route.utterances}
                             onChange={(utterances) => updateRoute(route.id, "utterances", utterances)}
-                            placeholder="Type an utterance and press Enter..."
+                            placeholder={t("Type an utterance and press Enter...")}
                             style={{ width: "100%" }}
                             tokenSeparators={["\n"]}
                             maxTagCount="responsive"
@@ -262,9 +264,9 @@ const RouterConfigBuilder: React.FC<RouterConfigBuilderProps> = ({ modelInfo, va
       {/* JSON Preview */}
       <div className="border-t pt-6 w-full">
         <div className="flex justify-between items-center mb-4 w-full">
-          <Text className="text-lg font-semibold">JSON Preview</Text>
+          <Text className="text-lg font-semibold">{t("JSON Preview")}</Text>
           <Button type="link" onClick={() => setShowJsonPreview(!showJsonPreview)} className="text-blue-600 p-0">
-            {showJsonPreview ? "Hide" : "Show"}
+            {showJsonPreview ? t("Hide") : t("Show")}
           </Button>
         </div>
 

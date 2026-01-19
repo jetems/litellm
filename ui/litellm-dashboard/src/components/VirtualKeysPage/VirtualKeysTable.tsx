@@ -32,6 +32,7 @@ import { KeyResponse, Team } from "../key_team_helpers/key_list";
 import FilterComponent, { FilterOption } from "../molecules/filter";
 import { Organization } from "../networking";
 import KeyInfoView from "../templates/key_info_view";
+import { useTranslate } from "@/i18n";
 
 interface VirtualKeysTableProps {
   teams: Team[] | null;
@@ -49,6 +50,7 @@ interface VirtualKeysTableProps {
  */
 
 export function VirtualKeysTable({ teams, organizations, onSortChange, currentSort }: VirtualKeysTableProps) {
+  const t = useTranslate();
   const [selectedKey, setSelectedKey] = useState<KeyResponse | null>(null);
   const [sorting, setSorting] = React.useState<SortingState>(() => {
     if (currentSort) {
@@ -120,7 +122,7 @@ export function VirtualKeysTable({ teams, organizations, onSortChange, currentSo
     {
       id: "token",
       accessorKey: "token",
-      header: "Key ID",
+      header: t("Key ID"),
       size: 150,
       cell: (info) => (
         <div className="overflow-hidden">
@@ -140,7 +142,7 @@ export function VirtualKeysTable({ teams, organizations, onSortChange, currentSo
     {
       id: "key_alias",
       accessorKey: "key_alias",
-      header: "Key Alias",
+      header: t("Key Alias"),
       size: 150,
       cell: (info) => {
         const value = info.getValue() as string;
@@ -157,25 +159,25 @@ export function VirtualKeysTable({ teams, organizations, onSortChange, currentSo
     {
       id: "key_name",
       accessorKey: "key_name",
-      header: "Secret Key",
+      header: t("Secret Key"),
       size: 120,
       cell: (info) => <span className="font-mono text-xs">{info.getValue() as string}</span>,
     },
     {
       id: "team_alias",
       accessorKey: "team_id",
-      header: "Team Alias",
+      header: t("Team Alias"),
       size: 120,
       cell: ({ row, getValue }) => {
         const teamId = getValue() as string;
         const team = teams?.find((t) => t.team_id === teamId);
-        return team?.team_alias || "Unknown";
+        return team?.team_alias || t("Unknown");
       },
     },
     {
       id: "team_id",
       accessorKey: "team_id",
-      header: "Team ID",
+      header: t("Team ID"),
       size: 120,
       cell: (info) => (
         <Tooltip title={info.getValue() as string}>
@@ -186,14 +188,14 @@ export function VirtualKeysTable({ teams, organizations, onSortChange, currentSo
     {
       id: "organization_id",
       accessorKey: "organization_id",
-      header: "Organization ID",
+      header: t("Organization ID"),
       size: 140,
       cell: (info) => (info.getValue() ? info.renderValue() : "-"),
     },
     {
       id: "user_email",
       accessorKey: "user",
-      header: "User Email",
+      header: t("User Email"),
       size: 160,
       cell: (info) => {
         const user = info.getValue() as any;
@@ -211,7 +213,7 @@ export function VirtualKeysTable({ teams, organizations, onSortChange, currentSo
     {
       id: "user_id",
       accessorKey: "user_id",
-      header: "User ID",
+      header: t("User ID"),
       size: 120,
       cell: (info) => {
         const userId = info.getValue() as string | null;
@@ -228,7 +230,7 @@ export function VirtualKeysTable({ teams, organizations, onSortChange, currentSo
     {
       id: "created_at",
       accessorKey: "created_at",
-      header: "Created At",
+      header: t("Created At"),
       size: 120,
       cell: (info) => {
         const value = info.getValue();
@@ -238,7 +240,7 @@ export function VirtualKeysTable({ teams, organizations, onSortChange, currentSo
     {
       id: "created_by",
       accessorKey: "created_by",
-      header: "Created By",
+      header: t("Created By"),
       size: 120,
       cell: (info) => {
         const value = info.getValue() as string | null;
@@ -255,39 +257,39 @@ export function VirtualKeysTable({ teams, organizations, onSortChange, currentSo
     {
       id: "updated_at",
       accessorKey: "updated_at",
-      header: "Updated At",
+      header: t("Updated At"),
       size: 120,
       cell: (info) => {
         const value = info.getValue();
-        return value ? new Date(value as string).toLocaleDateString() : "Never";
+        return value ? new Date(value as string).toLocaleDateString() : t("Never");
       },
     },
     {
       id: "expires",
       accessorKey: "expires",
-      header: "Expires",
+      header: t("Expires"),
       size: 120,
       cell: (info) => {
         const value = info.getValue();
-        return value ? new Date(value as string).toLocaleDateString() : "Never";
+        return value ? new Date(value as string).toLocaleDateString() : t("Never");
       },
     },
     {
       id: "spend",
       accessorKey: "spend",
-      header: "Spend (USD)",
+      header: t("Spend (USD)"),
       size: 100,
       cell: (info) => formatNumberWithCommas(info.getValue() as number, 4),
     },
     {
       id: "max_budget",
       accessorKey: "max_budget",
-      header: "Budget (USD)",
+      header: t("Budget (USD)"),
       size: 110,
       cell: (info) => {
         const maxBudget = info.getValue() as number | null;
         if (maxBudget === null) {
-          return "Unlimited";
+          return t("Unlimited");
         }
         return `$${formatNumberWithCommas(maxBudget)}`;
       },
@@ -295,17 +297,17 @@ export function VirtualKeysTable({ teams, organizations, onSortChange, currentSo
     {
       id: "budget_reset_at",
       accessorKey: "budget_reset_at",
-      header: "Budget Reset",
+      header: t("Budget Reset"),
       size: 130,
       cell: (info) => {
         const value = info.getValue();
-        return value ? new Date(value as string).toLocaleString() : "Never";
+        return value ? new Date(value as string).toLocaleString() : t("Never");
       },
     },
     {
       id: "models",
       accessorKey: "models",
-      header: "Models",
+      header: t("Models"),
       size: 200,
       cell: (info) => {
         const models = info.getValue() as string[];
@@ -315,7 +317,7 @@ export function VirtualKeysTable({ teams, organizations, onSortChange, currentSo
               <div className="flex flex-col">
                 {models.length === 0 ? (
                   <Badge size={"xs"} className="mb-1" color="red">
-                    <Text>All Proxy Models</Text>
+                    <Text>{t("All Proxy Models")}</Text>
                   </Badge>
                 ) : (
                   <>
@@ -339,7 +341,7 @@ export function VirtualKeysTable({ teams, organizations, onSortChange, currentSo
                         {models.slice(0, 3).map((model, index) =>
                           model === "all-proxy-models" ? (
                             <Badge key={index} size={"xs"} color="red">
-                              <Text>All Proxy Models</Text>
+                              <Text>{t("All Proxy Models")}</Text>
                             </Badge>
                           ) : (
                             <Badge key={index} size={"xs"} color="blue">
@@ -354,7 +356,7 @@ export function VirtualKeysTable({ teams, organizations, onSortChange, currentSo
                         {models.length > 3 && !expandedAccordions[info.row.id] && (
                           <Badge size={"xs"} color="gray" className="cursor-pointer">
                             <Text>
-                              +{models.length - 3} {models.length - 3 === 1 ? "more model" : "more models"}
+                              +{models.length - 3} {models.length - 3 === 1 ? t("more model") : t("more models")}
                             </Text>
                           </Badge>
                         )}
@@ -363,7 +365,7 @@ export function VirtualKeysTable({ teams, organizations, onSortChange, currentSo
                             {models.slice(3).map((model, index) =>
                               model === "all-proxy-models" ? (
                                 <Badge key={index + 3} size={"xs"} color="red">
-                                  <Text>All Proxy Models</Text>
+                                  <Text>{t("All Proxy Models")}</Text>
                                 </Badge>
                               ) : (
                                 <Badge key={index + 3} size={"xs"} color="blue">
@@ -389,14 +391,14 @@ export function VirtualKeysTable({ teams, organizations, onSortChange, currentSo
     },
     {
       id: "rate_limits",
-      header: "Rate Limits",
+      header: t("Rate Limits"),
       size: 140,
       cell: ({ row }) => {
         const key = row.original;
         return (
           <div>
-            <div>TPM: {key.tpm_limit !== null ? key.tpm_limit : "Unlimited"}</div>
-            <div>RPM: {key.rpm_limit !== null ? key.rpm_limit : "Unlimited"}</div>
+            <div>TPM: {key.tpm_limit !== null ? key.tpm_limit : t("Unlimited")}</div>
+            <div>RPM: {key.rpm_limit !== null ? key.rpm_limit : t("Unlimited")}</div>
           </div>
         );
       },
@@ -406,7 +408,7 @@ export function VirtualKeysTable({ teams, organizations, onSortChange, currentSo
   const filterOptions: FilterOption[] = [
     {
       name: "Team ID",
-      label: "Team ID",
+      label: t("Team ID"),
       isSearchable: true,
       searchFn: async (searchText: string) => {
         if (!allTeams || allTeams.length === 0) return [];
@@ -425,7 +427,7 @@ export function VirtualKeysTable({ teams, organizations, onSortChange, currentSo
     },
     {
       name: "Organization ID",
-      label: "Organization ID",
+      label: t("Organization ID"),
       isSearchable: true,
       searchFn: async (searchText: string) => {
         if (!allOrganizations || allOrganizations.length === 0) return [];
@@ -444,7 +446,7 @@ export function VirtualKeysTable({ teams, organizations, onSortChange, currentSo
     },
     {
       name: "Key Alias",
-      label: "Key Alias",
+      label: t("Key Alias"),
       isSearchable: true,
       searchFn: async (searchText) => {
         const filteredKeyAliases = allKeyAliases.filter((key) => {
@@ -550,7 +552,7 @@ export function VirtualKeysTable({ teams, organizations, onSortChange, currentSo
               <Skeleton.Node active style={{ width: 200, height: 20 }} />
             ) : (
               <span className="inline-flex text-sm text-gray-700">
-                Showing {rangeLabel} of {totalCount} results
+                {t("Showing")} {rangeLabel} {t("of")} {totalCount} {t("results")}
               </span>
             )}
 
@@ -559,7 +561,7 @@ export function VirtualKeysTable({ teams, organizations, onSortChange, currentSo
                 <Skeleton.Node active style={{ width: 74, height: 20 }} />
               ) : (
                 <span className="text-sm text-gray-700">
-                  Page {pageIndex + 1} of {table.getPageCount()}
+                  {t("Page")} {pageIndex + 1} {t("of")} {table.getPageCount()}
                 </span>
               )}
 
@@ -571,7 +573,7 @@ export function VirtualKeysTable({ teams, organizations, onSortChange, currentSo
                   disabled={isLoading || isFetching || !table.getCanPreviousPage()}
                   className="px-3 py-1 text-sm border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Previous
+                  {t("Previous")}
                 </button>
               )}
 
@@ -583,7 +585,7 @@ export function VirtualKeysTable({ teams, organizations, onSortChange, currentSo
                   disabled={isLoading || isFetching || !table.getCanNextPage()}
                   className="px-3 py-1 text-sm border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Next
+                  {t("Next")}
                 </button>
               )}
             </div>
@@ -599,11 +601,10 @@ export function VirtualKeysTable({ teams, organizations, onSortChange, currentSo
                           <TableHeaderCell
                             key={header.id}
                             data-header-id={header.id}
-                            className={`py-1 h-8 relative hover:bg-gray-50 ${
-                              header.id === "actions"
-                                ? "sticky right-0 bg-white shadow-[-4px_0_8px_-6px_rgba(0,0,0,0.1)]"
-                                : ""
-                            }`}
+                            className={`py-1 h-8 relative hover:bg-gray-50 ${header.id === "actions"
+                              ? "sticky right-0 bg-white shadow-[-4px_0_8px_-6px_rgba(0,0,0,0.1)]"
+                              : ""
+                              }`}
                             style={{
                               width: header.getSize(),
                               position: "relative",
@@ -669,7 +670,7 @@ export function VirtualKeysTable({ teams, organizations, onSortChange, currentSo
                       <TableRow>
                         <TableCell colSpan={columns.length} className="h-8 text-center">
                           <div className="text-center text-gray-500">
-                            <p>🚅 Loading keys...</p>
+                            <p>🚅 {t("Loading keys...")}</p>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -696,7 +697,7 @@ export function VirtualKeysTable({ teams, organizations, onSortChange, currentSo
                       <TableRow>
                         <TableCell colSpan={columns.length} className="h-8 text-center">
                           <div className="text-center text-gray-500">
-                            <p>No keys found</p>
+                            <p>{t("No keys found")}</p>
                           </div>
                         </TableCell>
                       </TableRow>

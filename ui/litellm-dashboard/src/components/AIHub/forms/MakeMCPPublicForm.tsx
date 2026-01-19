@@ -4,6 +4,7 @@ import { Text, Title, Badge } from "@tremor/react";
 import { makeMCPPublicCall } from "../../networking";
 import NotificationsManager from "../../molecules/notifications_manager";
 import { MCPServerData } from "@/components/mcp_hub_table_columns";
+import { useTranslate } from "@/i18n";
 
 const { Step } = Steps;
 
@@ -22,6 +23,7 @@ const MakeMCPPublicForm: React.FC<MakeMCPPublicFormProps> = ({
   mcpHubData,
   onSuccess,
 }) => {
+  const t = useTranslate();
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedServers, setSelectedServers] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
@@ -37,7 +39,7 @@ const MakeMCPPublicForm: React.FC<MakeMCPPublicFormProps> = ({
   const handleNext = () => {
     if (currentStep === 0) {
       if (selectedServers.size === 0) {
-        NotificationsManager.fromBackend("Please select at least one MCP server to make public");
+        NotificationsManager.fromBackend(t("Please select at least one MCP server to make public"));
         return;
       }
       setCurrentStep(1);
@@ -84,7 +86,7 @@ const MakeMCPPublicForm: React.FC<MakeMCPPublicFormProps> = ({
 
   const handleSubmit = async () => {
     if (selectedServers.size === 0) {
-      NotificationsManager.fromBackend("Please select at least one MCP server to make public");
+      NotificationsManager.fromBackend(t("Please select at least one MCP server to make public"));
       return;
     }
 
@@ -95,12 +97,12 @@ const MakeMCPPublicForm: React.FC<MakeMCPPublicFormProps> = ({
       // Make batch API call for all servers
       await makeMCPPublicCall(accessToken, serverIdsToMakePublic);
 
-      NotificationsManager.success(`Successfully made ${serverIdsToMakePublic.length} MCP server(s) public!`);
+      NotificationsManager.success(`${t("Successfully made")} ${serverIdsToMakePublic.length} ${t("MCP server(s) public!")}`);
       handleClose();
       onSuccess();
     } catch (error) {
       console.error("Error making MCP servers public:", error);
-      NotificationsManager.fromBackend("Failed to make MCP servers public. Please try again.");
+      NotificationsManager.fromBackend(t("Failed to make MCP servers public. Please try again."));
     } finally {
       setLoading(false);
     }
@@ -114,7 +116,7 @@ const MakeMCPPublicForm: React.FC<MakeMCPPublicFormProps> = ({
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <Title>Select MCP Servers to Make Public</Title>
+          <Title>{t("Select MCP Servers to Make Public")}</Title>
           <div className="flex items-center space-x-2">
             <Checkbox
               checked={allServersSelected}
@@ -122,21 +124,20 @@ const MakeMCPPublicForm: React.FC<MakeMCPPublicFormProps> = ({
               onChange={(e) => handleSelectAll(e.target.checked)}
               disabled={mcpHubData.length === 0}
             >
-              Select All {mcpHubData.length > 0 && `(${mcpHubData.length})`}
+              {t("Select All")} {mcpHubData.length > 0 && `(${mcpHubData.length})`}
             </Checkbox>
           </div>
         </div>
 
         <Text className="text-sm text-gray-600">
-          Select the MCP servers you want to be visible on the public model hub. Users will still require a valid
-          Virtual Key to use these servers.
+          {t("Select the MCP servers you want to be visible on the public model hub. Users will still require a valid Virtual Key to use these servers.")}
         </Text>
 
         <div className="max-h-96 overflow-y-auto border rounded-lg p-4">
           <div className="space-y-3">
             {mcpHubData.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
-                <Text>No MCP servers available.</Text>
+                <Text>{t("No MCP servers available.")}</Text>
               </div>
             ) : (
               mcpHubData.map((server) => {
@@ -155,7 +156,7 @@ const MakeMCPPublicForm: React.FC<MakeMCPPublicFormProps> = ({
                         <Text className="font-medium">{server.server_name}</Text>
                         {isPublic && (
                           <Badge color="emerald" size="sm">
-                            Public
+                            {t("Public")}
                           </Badge>
                         )}
                         <Badge color="blue" size="sm">
@@ -183,7 +184,7 @@ const MakeMCPPublicForm: React.FC<MakeMCPPublicFormProps> = ({
                             </Badge>
                           ))}
                           {server.allowed_tools.length > 3 && (
-                            <Text className="text-xs text-gray-500">+{server.allowed_tools.length - 3} more</Text>
+                            <Text className="text-xs text-gray-500">+{server.allowed_tools.length - 3} {t("more")}</Text>
                           )}
                         </div>
                       )}
@@ -198,7 +199,7 @@ const MakeMCPPublicForm: React.FC<MakeMCPPublicFormProps> = ({
         {selectedServers.size > 0 && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
             <Text className="text-sm text-blue-800">
-              <strong>{selectedServers.size}</strong> MCP server{selectedServers.size !== 1 ? "s" : ""} selected
+              <strong>{selectedServers.size}</strong> {t("MCP server")}{selectedServers.size !== 1 ? "s" : ""} {t("selected")}
             </Text>
           </div>
         )}
@@ -209,17 +210,17 @@ const MakeMCPPublicForm: React.FC<MakeMCPPublicFormProps> = ({
   const renderStep2Content = () => {
     return (
       <div className="space-y-4">
-        <Title>Confirm Making MCP Servers Public</Title>
+        <Title>{t("Confirm Making MCP Servers Public")}</Title>
 
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <Text className="text-sm text-yellow-800">
-            <strong>Warning:</strong> Once you make these MCP servers public, anyone who can go to the{" "}
-            <code>/ui/model_hub_table</code> will be able to know they exist on the proxy.
+            <strong>{t("Warning:")}</strong> {t("Once you make these MCP servers public, anyone who can go to the")} { }
+            <code>/ui/model_hub_table</code> {t("will be able to know they exist on the proxy.")}
           </Text>
         </div>
 
         <div className="space-y-3">
-          <Text className="font-medium">MCP Servers to be made public:</Text>
+          <Text className="font-medium">{t("MCP Servers to be made public:")}</Text>
           <div className="max-h-48 overflow-y-auto border rounded-lg p-3">
             <div className="space-y-2">
               {Array.from(selectedServers).map((serverId) => {
@@ -261,8 +262,7 @@ const MakeMCPPublicForm: React.FC<MakeMCPPublicFormProps> = ({
 
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
           <Text className="text-sm text-blue-800">
-            Total: <strong>{selectedServers.size}</strong> MCP server{selectedServers.size !== 1 ? "s" : ""} will be
-            made public
+            {t("Total:")} <strong>{selectedServers.size}</strong> {t("MCP server")}{selectedServers.size !== 1 ? "s" : ""} {t("will be made public")}
           </Text>
         </div>
       </div>
@@ -284,19 +284,19 @@ const MakeMCPPublicForm: React.FC<MakeMCPPublicFormProps> = ({
     return (
       <div className="flex justify-between mt-6">
         <Button onClick={currentStep === 0 ? handleClose : handlePrevious}>
-          {currentStep === 0 ? "Cancel" : "Previous"}
+          {currentStep === 0 ? t("Cancel") : t("Previous")}
         </Button>
 
         <div className="flex space-x-2">
           {currentStep === 0 && (
             <Button onClick={handleNext} disabled={selectedServers.size === 0}>
-              Next
+              {t("Next")}
             </Button>
           )}
 
           {currentStep === 1 && (
             <Button onClick={handleSubmit} loading={loading}>
-              Make Public
+              {t("Make Public")}
             </Button>
           )}
         </div>
@@ -306,7 +306,7 @@ const MakeMCPPublicForm: React.FC<MakeMCPPublicFormProps> = ({
 
   return (
     <Modal
-      title="Make MCP Servers Public"
+      title={t("Make MCP Servers Public")}
       open={visible}
       onCancel={handleClose}
       footer={null}
@@ -315,8 +315,8 @@ const MakeMCPPublicForm: React.FC<MakeMCPPublicFormProps> = ({
     >
       <Form form={form} layout="vertical">
         <Steps current={currentStep} className="mb-6">
-          <Step title="Select Servers" />
-          <Step title="Confirm" />
+          <Step title={t("Select Servers")} />
+          <Step title={t("Confirm")} />
         </Steps>
 
         {renderStepContent()}

@@ -28,6 +28,7 @@ import NotificationsManager from "../../../components/molecules/notifications_ma
 import PassThroughSettings from "../../../components/pass_through_settings";
 import TeamInfoView from "../../../components/team/team_info";
 import useAuthorized from "../hooks/useAuthorized";
+import { useTranslate } from "@/i18n";
 
 interface ModelDashboardProps {
   token: string | null;
@@ -47,6 +48,7 @@ interface GlobalRetryPolicyObject {
 }
 
 const ModelsAndEndpointsView: React.FC<ModelDashboardProps> = ({ premiumUser, teams }) => {
+  const t = useTranslate();
   const { accessToken, token, userRole, userId: userID } = useAuthorized();
   const [addModelForm] = Form.useForm();
   const [lastRefreshed, setLastRefreshed] = useState("");
@@ -219,8 +221,8 @@ const ModelsAndEndpointsView: React.FC<ModelDashboardProps> = ({ premiumUser, te
     const { Title, Paragraph } = Typography;
     return (
       <div>
-        <Title level={1}>Access Denied</Title>
-        <Paragraph>Ask your proxy admin for access to view all models</Paragraph>
+        <Title level={1}>{t("Access Denied")}</Title>
+        <Paragraph>{t("Ask your proxy admin for access to view all models")}</Paragraph>
       </div>
     );
   }
@@ -236,7 +238,7 @@ const ModelsAndEndpointsView: React.FC<ModelDashboardProps> = ({ premiumUser, te
             return `${field.name.join(".")}: ${field.errors.join(", ")}`;
           })
           .join(" | ") || "Unknown validation error";
-      NotificationsManager.fromBackend(`Please fill in the following required fields: ${errorMessages}`);
+      NotificationsManager.fromBackend(`${t("Please fill in the following required fields:")} ${errorMessages}`);
     }
   };
 
@@ -267,11 +269,11 @@ const ModelsAndEndpointsView: React.FC<ModelDashboardProps> = ({ premiumUser, te
           {/* Model Management Header */}
           <div className="flex justify-between items-center mb-4">
             <div>
-              <h2 className="text-lg font-semibold">Model Management</h2>
+              <h2 className="text-lg font-semibold">{t("Model Management")}</h2>
               {!all_admin_roles.includes(userRole) ? (
-                <p className="text-sm text-gray-600">Add models for teams you are an admin for.</p>
+                <p className="text-sm text-gray-600">{t("Add models for teams you are an admin for.")}</p>
               ) : (
-                <p className="text-sm text-gray-600">Add and manage models for the proxy</p>
+                <p className="text-sm text-gray-600">{t("Add and manage models for the proxy")}</p>
               )}
             </div>
           </div>
@@ -282,10 +284,9 @@ const ModelsAndEndpointsView: React.FC<ModelDashboardProps> = ({ premiumUser, te
               <PlusCircleOutlined style={{ fontSize: "18px", color: "#6366f1" }} />
             </div>
             <div className="flex-1 min-w-0">
-              <h4 className="text-gray-900 font-semibold text-sm m-0">Missing a provider?</h4>
+              <h4 className="text-gray-900 font-semibold text-sm m-0">{t("Missing a provider?")}</h4>
               <p className="text-gray-500 text-xs m-0 mt-0.5">
-                The LiteLLM engineering team is constantly adding support for new LLM models, providers, endpoints. If
-                you don&apos;t see the one you need, let us know and we&apos;ll prioritize it.
+                {t("The LiteLLM engineering team is constantly adding support for new LLM models, providers, endpoints. If you don't see the one you need, let us know and we'll prioritize it.")}
               </p>
             </div>
             <a
@@ -294,7 +295,7 @@ const ModelsAndEndpointsView: React.FC<ModelDashboardProps> = ({ premiumUser, te
               rel="noopener noreferrer"
               className="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-[#6366f1] hover:bg-[#5558e3] text-white text-sm font-medium rounded-lg transition-colors"
             >
-              Request Provider
+              {t("Request Provider")}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-4 w-4"
@@ -331,18 +332,18 @@ const ModelsAndEndpointsView: React.FC<ModelDashboardProps> = ({ premiumUser, te
             <TabGroup index={selectedTabIndex} onIndexChange={setSelectedTabIndex} className="gap-2 h-[75vh] w-full ">
               <TabList className="flex justify-between mt-2 w-full items-center">
                 <div className="flex">
-                  {all_admin_roles.includes(userRole) ? <Tab>All Models</Tab> : <Tab>Your Models</Tab>}
-                  {!shouldHideAddModelTab && <Tab>Add Model</Tab>}
-                  {all_admin_roles.includes(userRole) && <Tab>LLM Credentials</Tab>}
-                  {all_admin_roles.includes(userRole) && <Tab>Pass-Through Endpoints</Tab>}
-                  {all_admin_roles.includes(userRole) && <Tab>Health Status</Tab>}
-                  {all_admin_roles.includes(userRole) && <Tab>Model Retry Settings</Tab>}
-                  {all_admin_roles.includes(userRole) && <Tab>Model Group Alias</Tab>}
-                  {all_admin_roles.includes(userRole) && <Tab>Price Data Reload</Tab>}
+                  {all_admin_roles.includes(userRole) ? <Tab>{t("All Models")}</Tab> : <Tab>{t("Your Models")}</Tab>}
+                  {!shouldHideAddModelTab && <Tab>{t("Add Model")}</Tab>}
+                  {all_admin_roles.includes(userRole) && <Tab>{t("LLM Credentials")}</Tab>}
+                  {all_admin_roles.includes(userRole) && <Tab>{t("Pass-Through Endpoints")}</Tab>}
+                  {all_admin_roles.includes(userRole) && <Tab>{t("Health Status")}</Tab>}
+                  {all_admin_roles.includes(userRole) && <Tab>{t("Model Retry Settings")}</Tab>}
+                  {all_admin_roles.includes(userRole) && <Tab>{t("Model Group Alias")}</Tab>}
+                  {all_admin_roles.includes(userRole) && <Tab>{t("Price Data Reload")}</Tab>}
                 </div>
 
                 <div className="flex items-center space-x-2">
-                  {lastRefreshed && <Text>Last Refreshed: {lastRefreshed}</Text>}
+                  {lastRefreshed && <Text>{t("Last Refreshed:")} {lastRefreshed}</Text>}
                   <Icon
                     icon={RefreshIcon} // Modify as necessary for correct icon name
                     variant="shadow"

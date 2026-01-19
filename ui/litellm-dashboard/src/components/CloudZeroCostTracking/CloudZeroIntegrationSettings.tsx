@@ -1,3 +1,4 @@
+import { useTranslate } from "@/i18n";
 import { useCloudZeroDryRun } from "@/app/(dashboard)/hooks/cloudzero/useCloudZeroDryRun";
 import { useCloudZeroExport } from "@/app/(dashboard)/hooks/cloudzero/useCloudZeroExport";
 import { useCloudZeroDeleteSettings } from "@/app/(dashboard)/hooks/cloudzero/useCloudZeroSettings";
@@ -15,6 +16,7 @@ interface CloudZeroIntegrationSettingsProps {
 }
 
 export function CloudZeroIntegrationSettings({ settings, onSettingsUpdated }: CloudZeroIntegrationSettingsProps) {
+  const t = useTranslate();
   const { accessToken } = useAuthorized();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -30,10 +32,10 @@ export function CloudZeroIntegrationSettings({ settings, onSettingsUpdated }: Cl
       { limit: 10 },
       {
         onSuccess: (data) => {
-          message.success("Dry run completed successfully");
+          message.success(t("Dry run completed successfully"));
         },
         onError: (error) => {
-          message.error(error?.message || "Failed to perform dry run");
+          message.error(error?.message || t("Failed to perform dry run"));
         },
       },
     );
@@ -48,10 +50,10 @@ export function CloudZeroIntegrationSettings({ settings, onSettingsUpdated }: Cl
       { operation: "replace_hourly" },
       {
         onSuccess: () => {
-          message.success("Data successfully exported to CloudZero");
+          message.success(t("Data successfully exported to CloudZero"));
         },
         onError: (error) => {
-          message.error(error?.message || "Failed to export data");
+          message.error(error?.message || t("Failed to export data"));
         },
       },
     );
@@ -79,12 +81,12 @@ export function CloudZeroIntegrationSettings({ settings, onSettingsUpdated }: Cl
 
     deleteMutation.mutate(undefined, {
       onSuccess: () => {
-        message.success("CloudZero integration deleted successfully");
+        message.success(t("CloudZero integration deleted successfully"));
         setIsDeleteModalOpen(false);
         onSettingsUpdated();
       },
       onError: (error) => {
-        message.error(error?.message || "Failed to delete CloudZero integration");
+        message.error(error?.message || t("Failed to delete CloudZero integration"));
       },
     });
   };
@@ -99,16 +101,16 @@ export function CloudZeroIntegrationSettings({ settings, onSettingsUpdated }: Cl
         <Card
           title={
             <div className="flex items-center gap-2">
-              <span className="text-lg font-semibold">CloudZero Configuration</span>
+              <span className="text-lg font-semibold">{t("CloudZero Configuration")}</span>
               <Tag color="success" className="ml-2 capitalize">
-                {settings.status || "Active"}
+                {settings.status || t("Active")}
               </Tag>
             </div>
           }
           extra={
             <div className="flex gap-2">
               <Button icon={<Edit size={16} />} onClick={handleEdit} className="flex items-center gap-2">
-                Edit
+                {t("Edit")}
               </Button>
               <Button
                 danger
@@ -116,7 +118,7 @@ export function CloudZeroIntegrationSettings({ settings, onSettingsUpdated }: Cl
                 onClick={handleDeleteClick}
                 className="flex items-center gap-2"
               >
-                Delete
+                {t("Delete")}
               </Button>
             </div>
           }
@@ -133,23 +135,23 @@ export function CloudZeroIntegrationSettings({ settings, onSettingsUpdated }: Cl
               xs: 1,
             }}
           >
-            <Descriptions.Item label="API Key (Redacted)">
+            <Descriptions.Item label={t("API Key (Redacted)")}>
               <span className="font-mono text-gray-600">
-                {settings.api_key_masked || <span className="text-gray-400 italic">Not configured</span>}
+                {settings.api_key_masked || <span className="text-gray-400 italic">{t("Not configured")}</span>}
               </span>
             </Descriptions.Item>
-            <Descriptions.Item label="Connection ID">
+            <Descriptions.Item label={t("Connection ID")}>
               <span className="font-mono text-gray-600">
-                {settings.connection_id || <span className="text-gray-400 italic">Not configured</span>}
+                {settings.connection_id || <span className="text-gray-400 italic">{t("Not configured")}</span>}
               </span>
             </Descriptions.Item>
-            <Descriptions.Item label="Timezone">
-              {settings.timezone || <span className="text-gray-400 italic">Default (UTC)</span>}
+            <Descriptions.Item label={t("Timezone")}>
+              {settings.timezone || <span className="text-gray-400 italic">{t("Default (UTC)")}</span>}
             </Descriptions.Item>
           </Descriptions>
 
           <Divider orientation="left" className="text-gray-500">
-            Actions
+            {t("Actions")}
           </Divider>
 
           <div className="flex flex-wrap gap-4 mb-6">
@@ -159,15 +161,15 @@ export function CloudZeroIntegrationSettings({ settings, onSettingsUpdated }: Cl
               icon={<Play size={16} />}
               className="flex items-center gap-2"
             >
-              Run Dry Run Simulation
+              {t("Run Dry Run Simulation")}
             </Button>
 
             <Popconfirm
-              title="Export Data to CloudZero"
-              description="This will push the current accumulated cost data to CloudZero. Continue?"
+              title={t("Export Data to CloudZero")}
+              description={t("This will push the current accumulated cost data to CloudZero. Continue?")}
               onConfirm={handleExport}
-              okText="Export"
-              cancelText="Cancel"
+              okText={t("Export")}
+              cancelText={t("Cancel")}
             >
               <Button
                 type="primary"
@@ -175,7 +177,7 @@ export function CloudZeroIntegrationSettings({ settings, onSettingsUpdated }: Cl
                 icon={<Upload size={16} />}
                 className="flex items-center gap-2"
               >
-                Export Data Now
+                {t("Export Data Now")}
               </Button>
             </Popconfirm>
           </div>
@@ -183,10 +185,10 @@ export function CloudZeroIntegrationSettings({ settings, onSettingsUpdated }: Cl
           {dryRunResult && (
             <div className="mt-6 animate-in fade-in slide-in-from-top-4 duration-300">
               <Alert
-                message="Dry Run Results"
+                message={t("Dry Run Results")}
                 description={
                   <div className="mt-2">
-                    <p className="mb-2 text-gray-600">Simulation output for connection: {settings.connection_id}</p>
+                    <p className="mb-2 text-gray-600">{t("Simulation output for connection")}: {settings.connection_id}</p>
                     <pre className="bg-gray-50 p-4 rounded-md border border-gray-200 overflow-x-auto text-xs font-mono text-gray-800">
                       {dryRunResult}
                     </pre>
@@ -210,18 +212,18 @@ export function CloudZeroIntegrationSettings({ settings, onSettingsUpdated }: Cl
 
       <DeleteResourceModal
         isOpen={isDeleteModalOpen}
-        title="Delete CloudZero Integration?"
-        message="Are you sure you want to delete this CloudZero integration? All associated settings and configurations will be permanently removed."
-        resourceInformationTitle="Integration Details"
+        title={t("Delete CloudZero Integration?")}
+        message={t("Are you sure you want to delete this CloudZero integration? All associated settings and configurations will be permanently removed.")}
+        resourceInformationTitle={t("Integration Details")}
         resourceInformation={[
           {
-            label: "Connection ID",
+            label: t("Connection ID"),
             value: settings.connection_id,
             code: true,
           },
           {
-            label: "Timezone",
-            value: settings.timezone || "Default (UTC)",
+            label: t("Timezone"),
+            value: settings.timezone || t("Default (UTC)"),
           },
         ]}
         onCancel={handleDeleteCancel}

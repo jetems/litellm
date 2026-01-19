@@ -13,6 +13,7 @@ import MCPConnect from "./mcp_connect";
 import { mcpServerColumns } from "./mcp_server_columns";
 import { MCPServerView } from "./mcp_server_view";
 import { MCPServer, MCPServerProps, Team } from "./types";
+import { useTranslate } from "@/i18n";
 
 const { Text: AntdText, Title: AntdTitle } = Typography;
 const EDIT_OAUTH_UI_STATE_KEY = "litellm-mcp-oauth-edit-state";
@@ -20,6 +21,7 @@ const EDIT_OAUTH_UI_STATE_KEY = "litellm-mcp-oauth-edit-state";
 const { Option } = Select;
 
 const MCPServers: React.FC<MCPServerProps> = ({ accessToken, userRole, userID }) => {
+  const t = useTranslate();
   const { data: mcpServers, isLoading: isLoadingServers, refetch } = useMCPServers();
 
   // Fetch health status for all servers
@@ -165,8 +167,9 @@ const MCPServers: React.FC<MCPServerProps> = ({ accessToken, userRole, userID })
         },
         handleDelete,
         isLoadingHealth,
+        t
       ),
-    [userRole, isLoadingHealth],
+    [userRole, isLoadingHealth, t],
   );
 
   function handleDelete(server_id: string) {
@@ -181,7 +184,7 @@ const MCPServers: React.FC<MCPServerProps> = ({ accessToken, userRole, userID })
     try {
       setIsDeletingServer(true);
       await deleteMCPServer(accessToken, serverIdToDelete);
-      NotificationsManager.success("Deleted MCP Server successfully");
+      NotificationsManager.success(t("Deleted MCP Server successfully"));
       refetch();
     } catch (error) {
       console.error("Error deleting the mcp server:", error);
@@ -247,18 +250,18 @@ const MCPServers: React.FC<MCPServerProps> = ({ accessToken, userRole, userID })
           <div className="flex flex-col space-y-4">
             <div className="flex items-center justify-between bg-gray-50 rounded-lg p-4 border-2 border-gray-200">
               <div className="flex items-center gap-4">
-                <Text className="text-lg font-semibold text-gray-900">Current Team:</Text>
+                <Text className="text-lg font-semibold text-gray-900">{t("Current Team:")}</Text>
                 <Select value={selectedTeam} onChange={handleTeamChange} style={{ width: 300 }}>
                   <Option value="all">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                      <span className="font-medium">{isInternalUser ? "All Available Servers" : "All Servers"}</span>
+                      <span className="font-medium">{isInternalUser ? t("All Available Servers") : t("All Servers")}</span>
                     </div>
                   </Option>
                   <Option value="personal">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="font-medium">Personal</span>
+                      <span className="font-medium">{t("Personal")}</span>
                     </div>
                   </Option>
                   {uniqueTeams.map((team) => (
@@ -271,8 +274,8 @@ const MCPServers: React.FC<MCPServerProps> = ({ accessToken, userRole, userID })
                   ))}
                 </Select>
                 <Text className="text-lg font-semibold text-gray-900 ml-6">
-                  Access Group:
-                  <Tooltip title="An MCP Access Group is a set of users or teams that have permission to access specific MCP servers. Use access groups to control and organize who can connect to which servers.">
+                  {t("Access Group:")}
+                  <Tooltip title={t("An MCP Access Group is a set of users or teams that have permission to access specific MCP servers. Use access groups to control and organize who can connect to which servers.")}>
                     <QuestionCircleOutlined style={{ marginLeft: 4, color: "#888" }} />
                   </Tooltip>
                 </Text>
@@ -280,7 +283,7 @@ const MCPServers: React.FC<MCPServerProps> = ({ accessToken, userRole, userID })
                   <Option value="all">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                      <span className="font-medium">All Access Groups</span>
+                      <span className="font-medium">{t("All Access Groups")}</span>
                     </div>
                   </Option>
                   {uniqueMcpAccessGroups.map((group) => (
@@ -303,8 +306,8 @@ const MCPServers: React.FC<MCPServerProps> = ({ accessToken, userRole, userID })
             renderSubComponent={() => <div></div>}
             getRowCanExpand={() => false}
             isLoading={isLoadingServers}
-            noDataMessage="No MCP servers configured"
-            loadingMessage="🚅 Loading MCP servers..."
+            noDataMessage={t("No MCP servers configured")}
+            loadingMessage={t("🚅 Loading MCP servers...")}
           />
         </div>
       </div>
@@ -314,35 +317,35 @@ const MCPServers: React.FC<MCPServerProps> = ({ accessToken, userRole, userID })
     <div className="w-full h-full p-6">
       <Modal
         open={isDeleteModalOpen}
-        title="Delete MCP Server?"
+        title={t("Delete MCP Server?")}
         onOk={confirmDelete}
-        okText={isDeletingServer ? "Deleting..." : "Delete"}
+        okText={isDeletingServer ? t("Deleting...") : t("Delete")}
         onCancel={cancelDelete}
-        cancelText="Cancel"
+        cancelText={t("Cancel")}
         cancelButtonProps={{ disabled: isDeletingServer }}
         okButtonProps={{ danger: true }}
         confirmLoading={isDeletingServer}
       >
         <div className="space-y-4">
-          <AntdText>Are you sure you want to delete this MCP Server? This action cannot be undone.</AntdText>
+          <AntdText>{t("Are you sure you want to delete this MCP Server? This action cannot be undone.")}</AntdText>
 
           {serverToDelete && (
             <div className="mt-4 p-4 bg-red-50 rounded-lg border border-red-200">
               <AntdTitle level={5} className="mb-3 text-gray-900">
-                Server Information
+                {t("Server Information")}
               </AntdTitle>
               <Descriptions column={1} size="small">
                 {serverToDelete.server_name && (
-                  <Descriptions.Item label={<span className="font-semibold text-gray-700">Server Name</span>}>
+                  <Descriptions.Item label={<span className="font-semibold text-gray-700">{t("Server Name")}</span>}>
                     <AntdText className="text-sm">{serverToDelete.server_name}</AntdText>
                   </Descriptions.Item>
                 )}
                 {serverToDelete.alias && (
-                  <Descriptions.Item label={<span className="font-semibold text-gray-700">Alias</span>}>
+                  <Descriptions.Item label={<span className="font-semibold text-gray-700">{t("Alias")}</span>}>
                     <AntdText className="text-sm">{serverToDelete.alias}</AntdText>
                   </Descriptions.Item>
                 )}
-                <Descriptions.Item label={<span className="font-semibold text-gray-700">Server ID</span>}>
+                <Descriptions.Item label={<span className="font-semibold text-gray-700">{t("Server ID")}</span>}>
                   <AntdText code className="text-sm">
                     {serverToDelete.server_id}
                   </AntdText>
@@ -365,18 +368,18 @@ const MCPServers: React.FC<MCPServerProps> = ({ accessToken, userRole, userID })
         setModalVisible={setModalVisible}
         availableAccessGroups={uniqueMcpAccessGroups}
       />
-      <Title>MCP Servers</Title>
-      <Text className="text-tremor-content mt-2">Configure and manage your MCP servers</Text>
+      <Title>{t("MCP Servers")}</Title>
+      <Text className="text-tremor-content mt-2">{t("Configure and manage your MCP servers")}</Text>
       {isAdminRole(userRole) && (
         <Button className="mt-4 mb-4" onClick={() => setModalVisible(true)}>
-          + Add New MCP Server
+          {t("+ Add New MCP Server")}
         </Button>
       )}
       <TabGroup className="w-full h-full">
         <TabList className="flex justify-between mt-2 w-full items-center">
           <div className="flex">
-            <Tab>All Servers</Tab>
-            <Tab>Connect</Tab>
+            <Tab>{t("All Servers")}</Tab>
+            <Tab>{t("Connect")}</Tab>
           </div>
         </TabList>
         <TabPanels>

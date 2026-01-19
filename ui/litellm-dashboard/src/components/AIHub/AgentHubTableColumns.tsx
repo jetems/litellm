@@ -32,10 +32,11 @@ export const getAgentHubTableColumns = (
   showModal: (agent: AgentHubData) => void,
   copyToClipboard: (text: string) => void,
   publicPage: boolean = false,
+  t: (key: string) => string
 ): ColumnDef<AgentHubData>[] => {
   const allColumns: ColumnDef<AgentHubData>[] = [
     {
-      header: "Agent Name",
+      header: t("Agent Name"),
       accessorKey: "name",
       enableSorting: true,
       sortingFn: "alphanumeric",
@@ -46,7 +47,7 @@ export const getAgentHubTableColumns = (
           <div className="space-y-1">
             <div className="flex items-center space-x-2">
               <Text className="font-medium text-sm">{agent.name}</Text>
-              <Tooltip title="Copy agent name">
+              <Tooltip title={t("Copy agent name")}>
                 <CopyOutlined
                   onClick={() => copyToClipboard(agent.name)}
                   className="cursor-pointer text-gray-500 hover:text-blue-500 text-xs"
@@ -62,7 +63,7 @@ export const getAgentHubTableColumns = (
       },
     },
     {
-      header: "Description",
+      header: t("Description"),
       accessorKey: "description",
       enableSorting: true,
       sortingFn: "alphanumeric",
@@ -76,7 +77,7 @@ export const getAgentHubTableColumns = (
       },
     },
     {
-      header: "Version",
+      header: t("Version"),
       accessorKey: "version",
       enableSorting: true,
       sortingFn: "alphanumeric",
@@ -94,7 +95,7 @@ export const getAgentHubTableColumns = (
       },
     },
     {
-      header: "Protocol",
+      header: t("Protocol"),
       accessorKey: "protocolVersion",
       enableSorting: true,
       sortingFn: "alphanumeric",
@@ -108,7 +109,7 @@ export const getAgentHubTableColumns = (
       },
     },
     {
-      header: "Skills",
+      header: t("Skills"),
       accessorKey: "skills",
       enableSorting: false,
       cell: ({ row }) => {
@@ -118,7 +119,7 @@ export const getAgentHubTableColumns = (
         return (
           <div className="space-y-1">
             <Text className="text-xs font-medium">
-              {skills.length} skill{skills.length !== 1 ? "s" : ""}
+              {skills.length} {t("skill")}{skills.length !== 1 ? "s" : ""}
             </Text>
             {skills.length > 0 && (
               <div className="flex flex-wrap gap-1">
@@ -135,7 +136,7 @@ export const getAgentHubTableColumns = (
       },
     },
     {
-      header: "Capabilities",
+      header: t("Capabilities"),
       accessorKey: "capabilities",
       enableSorting: false,
       cell: ({ row }) => {
@@ -161,7 +162,7 @@ export const getAgentHubTableColumns = (
       },
     },
     {
-      header: "I/O Modes",
+      header: t("I/O Modes"),
       accessorKey: "defaultInputModes",
       enableSorting: false,
       cell: ({ row }) => {
@@ -185,7 +186,7 @@ export const getAgentHubTableColumns = (
       },
     },
     {
-      header: "Public",
+      header: t("Public"),
       accessorKey: "is_public",
       enableSorting: true,
       sortingFn: (rowA, rowB) => {
@@ -194,16 +195,15 @@ export const getAgentHubTableColumns = (
         return publicA - publicB;
       },
       cell: ({ row }) => {
-        console.log(`CHECKPOINT 1: ${JSON.stringify(row.original)}`);
         const agent = row.original;
 
         return agent.is_public === true ? (
           <Badge color="green" size="xs">
-            Yes
+            {t("Yes")}
           </Badge>
         ) : (
           <Badge color="gray" size="xs">
-            No
+            {t("No")}
           </Badge>
         );
       },
@@ -212,7 +212,7 @@ export const getAgentHubTableColumns = (
       },
     },
     {
-      header: "Details",
+      header: t("Details"),
       id: "details",
       enableSorting: false,
       cell: ({ row }) => {
@@ -220,8 +220,8 @@ export const getAgentHubTableColumns = (
 
         return (
           <Button size="xs" variant="secondary" onClick={() => showModal(agent)} icon={InfoCircleOutlined}>
-            <span className="hidden lg:inline">Details</span>
-            <span className="lg:hidden">Info</span>
+            <span className="hidden lg:inline">{t("Details")}</span>
+            <span className="lg:hidden">{t("Info")}</span>
           </Button>
         );
       },

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslate } from "@/i18n";
 import NotificationsManager from "@/components/molecules/notifications_manager";
 import { parseErrorMessage } from "@/components/shared/errorUtils";
 import { Button, Form, Modal, Space } from "antd";
@@ -15,6 +16,7 @@ interface AddSSOSettingsModalProps {
 }
 
 const AddSSOSettingsModal: React.FC<AddSSOSettingsModalProps> = ({ isVisible, onCancel, onSuccess }) => {
+  const t = useTranslate();
   const [form] = Form.useForm();
   const { mutateAsync, isPending } = useEditSSOSettings();
 
@@ -24,11 +26,11 @@ const AddSSOSettingsModal: React.FC<AddSSOSettingsModalProps> = ({ isVisible, on
 
     await mutateAsync(payload, {
       onSuccess: () => {
-        NotificationsManager.success("SSO settings added successfully");
+        NotificationsManager.success(t("SSO settings added successfully"));
         onSuccess();
       },
       onError: (error) => {
-        NotificationsManager.fromBackend("Failed to save SSO settings: " + parseErrorMessage(error));
+        NotificationsManager.fromBackend(`${t("Failed to save SSO settings: ")} ${parseErrorMessage(error)}`);
       },
     });
   };
@@ -40,16 +42,16 @@ const AddSSOSettingsModal: React.FC<AddSSOSettingsModalProps> = ({ isVisible, on
 
   return (
     <Modal
-      title="Add SSO"
+      title={t("Add SSO")}
       open={isVisible}
       width={800}
       footer={
         <Space>
           <Button onClick={handleCancel} disabled={isPending}>
-            Cancel
+            {t("Cancel")}
           </Button>
           <Button loading={isPending} onClick={() => form.submit()}>
-            {isPending ? "Adding..." : "Add SSO"}
+            {isPending ? t("Adding...") : t("Add SSO")}
           </Button>
         </Space>
       }

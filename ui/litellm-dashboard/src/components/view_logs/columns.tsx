@@ -5,6 +5,7 @@ import { Tooltip } from "antd";
 import React, { useState } from "react";
 import { getProviderLogoAndName } from "../provider_info_helpers";
 import { TimeCell } from "./time_cell";
+import { useTranslate } from "@/i18n";
 
 // Helper to get the appropriate logo URL
 const getLogoUrl = (row: LogEntry, provider: string) => {
@@ -48,7 +49,7 @@ export type LogEntry = {
   onSessionClick?: (sessionId: string) => void;
 };
 
-export const columns: ColumnDef<LogEntry>[] = [
+export const getColumns = (t: any): ColumnDef<LogEntry>[] => [
   {
     id: "expander",
     header: () => null,
@@ -90,12 +91,12 @@ export const columns: ColumnDef<LogEntry>[] = [
     },
   },
   {
-    header: "Time",
+    header: t("Time"),
     accessorKey: "startTime",
     cell: (info: any) => <TimeCell utcTime={info.getValue()} />,
   },
   {
-    header: "Status",
+    header: t("Status"),
     accessorKey: "metadata.status",
     cell: (info: any) => {
       const status = info.getValue() || "Success";
@@ -103,17 +104,16 @@ export const columns: ColumnDef<LogEntry>[] = [
 
       return (
         <span
-          className={`px-2 py-1 rounded-md text-xs font-medium inline-block text-center w-16 ${
-            isSuccess ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-          }`}
+          className={`px-2 py-1 rounded-md text-xs font-medium inline-block text-center w-16 ${isSuccess ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+            }`}
         >
-          {isSuccess ? "Success" : "Failure"}
+          {isSuccess ? t("Success") : t("Failure")}
         </span>
       );
     },
   },
   {
-    header: "Session ID",
+    header: t("Session ID"),
     accessorKey: "session_id",
     cell: (info: any) => {
       const value = String(info.getValue() || "");
@@ -134,7 +134,7 @@ export const columns: ColumnDef<LogEntry>[] = [
   },
 
   {
-    header: "Request ID",
+    header: t("Request ID"),
     accessorKey: "request_id",
     cell: (info: any) => (
       <Tooltip title={String(info.getValue() || "")}>
@@ -143,7 +143,7 @@ export const columns: ColumnDef<LogEntry>[] = [
     ),
   },
   {
-    header: "Cost",
+    header: t("Cost"),
     accessorKey: "spend",
     cell: (info: any) => (
       <Tooltip title={`$${String(info.getValue() || 0)} `}>
@@ -152,7 +152,7 @@ export const columns: ColumnDef<LogEntry>[] = [
     ),
   },
   {
-    header: "Duration (s)",
+    header: t("Duration (s)"),
     accessorKey: "duration",
     cell: (info: any) => (
       <Tooltip title={String(info.getValue() || "-")}>
@@ -161,7 +161,7 @@ export const columns: ColumnDef<LogEntry>[] = [
     ),
   },
   {
-    header: "Team Name",
+    header: t("Team Name"),
     accessorKey: "metadata.user_api_key_team_alias",
     cell: (info: any) => (
       <Tooltip title={String(info.getValue() || "-")}>
@@ -170,7 +170,7 @@ export const columns: ColumnDef<LogEntry>[] = [
     ),
   },
   {
-    header: "Key Hash",
+    header: t("Key Hash"),
     accessorKey: "metadata.user_api_key",
     cell: (info: any) => {
       const value = String(info.getValue() || "-");
@@ -189,7 +189,7 @@ export const columns: ColumnDef<LogEntry>[] = [
     },
   },
   {
-    header: "Key Name",
+    header: t("Key Name"),
     accessorKey: "metadata.user_api_key_alias",
     cell: (info: any) => (
       <Tooltip title={String(info.getValue() || "-")}>
@@ -198,7 +198,7 @@ export const columns: ColumnDef<LogEntry>[] = [
     ),
   },
   {
-    header: "Model",
+    header: t("Model"),
     accessorKey: "model",
     cell: (info: any) => {
       const row = info.row.original;
@@ -225,7 +225,7 @@ export const columns: ColumnDef<LogEntry>[] = [
     },
   },
   {
-    header: "Tokens",
+    header: t("Tokens"),
     accessorKey: "total_tokens",
     cell: (info: any) => {
       const row = info.row.original;
@@ -240,7 +240,7 @@ export const columns: ColumnDef<LogEntry>[] = [
     },
   },
   {
-    header: "Internal User",
+    header: t("Internal User"),
     accessorKey: "user",
     cell: (info: any) => (
       <Tooltip title={String(info.getValue() || "-")}>
@@ -249,7 +249,7 @@ export const columns: ColumnDef<LogEntry>[] = [
     ),
   },
   {
-    header: "End User",
+    header: t("End User"),
     accessorKey: "end_user",
     cell: (info: any) => (
       <Tooltip title={String(info.getValue() || "-")}>
@@ -259,7 +259,7 @@ export const columns: ColumnDef<LogEntry>[] = [
   },
 
   {
-    header: "Tags",
+    header: t("Tags"),
     accessorKey: "request_tags",
     cell: (info: any) => {
       const tags = info.getValue();
@@ -379,6 +379,7 @@ export const RequestResponsePanel = ({ request, response }: { request: any; resp
 
 // New component for collapsible JSON display
 const CollapsibleJsonCell = ({ jsonData }: { jsonData: any }) => {
+  const t = useTranslate();
   const [isExpanded, setIsExpanded] = React.useState(false);
   const jsonString = JSON.stringify(jsonData, null, 2);
 
@@ -389,7 +390,7 @@ const CollapsibleJsonCell = ({ jsonData }: { jsonData: any }) => {
   return (
     <div>
       <button onClick={() => setIsExpanded(!isExpanded)} className="text-blue-500 hover:text-blue-700 text-xs">
-        {isExpanded ? "Hide JSON" : "Show JSON"} ({Object.keys(jsonData).length} fields)
+        {isExpanded ? t("Hide JSON") : t("Show JSON")} ({Object.keys(jsonData).length} {t("fields")})
       </button>
       {isExpanded && (
         <pre className="mt-2 p-2 bg-gray-50 border rounded text-xs overflow-auto max-h-60">{jsonString}</pre>
@@ -418,7 +419,7 @@ const getActionBadge = (action: string) => {
   );
 };
 
-export const auditLogColumns: ColumnDef<AuditLogEntry>[] = [
+export const getAuditLogColumns = (t: any): ColumnDef<AuditLogEntry>[] => [
   {
     id: "expander",
     header: () => null,
@@ -456,31 +457,31 @@ export const auditLogColumns: ColumnDef<AuditLogEntry>[] = [
     },
   },
   {
-    header: "Timestamp",
+    header: t("Timestamp"),
     accessorKey: "updated_at",
     cell: (info: any) => <TimeCell utcTime={info.getValue()} />,
   },
   {
-    header: "Table Name",
+    header: t("Table Name"),
     accessorKey: "table_name",
     cell: (info: any) => {
       const tableName = info.getValue();
       let displayValue = tableName;
       switch (tableName) {
         case "LiteLLM_VerificationToken":
-          displayValue = "Keys";
+          displayValue = t("Keys");
           break;
         case "LiteLLM_TeamTable":
-          displayValue = "Teams";
+          displayValue = t("Teams");
           break;
         case "LiteLLM_OrganizationTable":
-          displayValue = "Organizations";
+          displayValue = t("Organizations");
           break;
         case "LiteLLM_UserTable":
-          displayValue = "Users";
+          displayValue = t("Users");
           break;
         case "LiteLLM_ProxyModelTable":
-          displayValue = "Models";
+          displayValue = t("Models");
           break;
         default:
           displayValue = tableName;
@@ -489,12 +490,12 @@ export const auditLogColumns: ColumnDef<AuditLogEntry>[] = [
     },
   },
   {
-    header: "Action",
+    header: t("Action"),
     accessorKey: "action",
     cell: (info: any) => <span>{getActionBadge(info.getValue())}</span>,
   },
   {
-    header: "Changed By",
+    header: t("Changed By"),
     accessorKey: "changed_by",
     cell: (info: any) => {
       const changedBy = info.row.original.changed_by;
@@ -516,7 +517,7 @@ export const auditLogColumns: ColumnDef<AuditLogEntry>[] = [
     },
   },
   {
-    header: "Affected Item ID",
+    header: t("Affected Item ID"),
     accessorKey: "object_id",
     cell: (props) => {
       const ObjectIdDisplay = () => {
@@ -536,7 +537,7 @@ export const auditLogColumns: ColumnDef<AuditLogEntry>[] = [
         };
 
         return (
-          <Tooltip title={copied ? "Copied!" : String(objectId)}>
+          <Tooltip title={copied ? t("Copied!") : String(objectId)}>
             <span className="max-w-[20ch] truncate block cursor-pointer hover:text-blue-600" onClick={handleCopy}>
               {String(objectId)}
             </span>

@@ -1,3 +1,4 @@
+import { useTranslate } from "@/i18n";
 import { useCloudZeroSettings } from "@/app/(dashboard)/hooks/cloudzero/useCloudZeroSettings";
 import useAuthorized from "@/app/(dashboard)/hooks/useAuthorized";
 import { Card, Typography } from "antd";
@@ -9,6 +10,7 @@ import { createQueryKeys } from "@/app/(dashboard)/hooks/common/queryKeysFactory
 import { CloudZeroIntegrationSettings } from "./CloudZeroIntegrationSettings";
 
 export default function CloudZeroCostTracking() {
+  const t = useTranslate();
   const { accessToken } = useAuthorized();
   const { data: settings, isLoading, error } = useCloudZeroSettings(accessToken);
   const queryClient = useQueryClient();
@@ -28,7 +30,7 @@ export default function CloudZeroCostTracking() {
   if (isLoading) {
     return (
       <Card>
-        <Typography.Text>Loading CloudZero settings...</Typography.Text>
+        <Typography.Text>{t("Loading CloudZero settings...")}</Typography.Text>
       </Card>
     );
   }
@@ -37,7 +39,7 @@ export default function CloudZeroCostTracking() {
     return (
       <Card>
         <Typography.Text className="text-red-600">
-          Error loading CloudZero settings: {error instanceof Error ? error.message : String(error)}
+          {t("Error loading CloudZero settings")}: {error instanceof Error ? error.message : String(error)}
         </Typography.Text>
       </Card>
     );

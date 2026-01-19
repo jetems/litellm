@@ -24,11 +24,10 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { ConfigProvider, Layout, Menu } from "antd";
+import { ConfigProvider, Layout, Menu, Badge } from "antd";
 import { useMemo } from "react";
 import { all_admin_roles, internalUserRoles, isAdminRole, rolesWithWriteAccess } from "../utils/roles";
 import type { Organization } from "./networking";
-import UsageIndicator from "./usage_indicator";
 import NewBadge from "./common_components/NewBadge";
 import { useTranslate } from "@/i18n";
 const { Sider } = Layout;
@@ -81,64 +80,68 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, defaultSelectedKey, collapse
   // Menu groups organized by category
   const menuGroups: MenuGroup[] = [
     {
-      groupLabel: "AI GATEWAY",
+      groupLabel: t("AI GATEWAY"),
       items: [
         {
           key: "api-keys",
           page: "api-keys",
-          label: "Virtual Keys",
+          label: t("Virtual Keys"),
           icon: <KeyOutlined />,
         },
         {
           key: "llm-playground",
           page: "llm-playground",
-          label: "Playground",
+          label: t("Playground"),
           icon: <PlayCircleOutlined />,
           roles: rolesWithWriteAccess,
         },
         {
           key: "models",
           page: "models",
-          label: "Models + Endpoints",
+          label: t("Models + Endpoints"),
           icon: <BlockOutlined />,
           roles: rolesWithWriteAccess,
         },
         {
           key: "agents",
           page: "agents",
-          label: <span className="flex items-center gap-4">Agents</span>,
+          label: (
+            <span className="flex items-center gap-4">
+              {t("Agents")} <Badge color="blue" count="New" />
+            </span>
+          ),
           icon: <RobotOutlined />,
           roles: rolesWithWriteAccess,
         },
         {
           key: "mcp-servers",
           page: "mcp-servers",
-          label: "MCP Servers",
+          label: t("MCP Servers"),
           icon: <ToolOutlined />,
         },
         {
           key: "guardrails",
           page: "guardrails",
-          label: "Guardrails",
+          label: t("Guardrails"),
           icon: <SafetyOutlined />,
           roles: all_admin_roles,
         },
         {
           key: "tools",
           page: "tools",
-          label: "Tools",
+          label: t("Tools"),
           icon: <ToolOutlined />,
           children: [
             {
               key: "search-tools",
               page: "search-tools",
-              label: "Search Tools",
+              label: t("Search Tools"),
               icon: <SearchOutlined />,
             },
             {
               key: "vector-stores",
               page: "vector-stores",
-              label: "Vector Stores",
+              label: t("Vector Stores"),
               icon: <DatabaseOutlined />,
               roles: all_admin_roles,
             },
@@ -147,7 +150,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, defaultSelectedKey, collapse
       ],
     },
     {
-      groupLabel: "OBSERVABILITY",
+      groupLabel: t("OBSERVABILITY"),
       items: [
         {
           key: "new_usage",
@@ -156,103 +159,103 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, defaultSelectedKey, collapse
           roles: [...all_admin_roles, ...internalUserRoles],
           label: (
             <span className="flex items-center gap-4">
-              Usage <NewBadge />
+              {t("Usage")} <NewBadge />
             </span>
           ),
         },
         {
           key: "logs",
           page: "logs",
-          label: "Logs",
+          label: t("Logs"),
           icon: <LineChartOutlined />,
         },
       ],
     },
     {
-      groupLabel: "ACCESS CONTROL",
+      groupLabel: t("ACCESS CONTROL"),
       items: [
         {
           key: "users",
           page: "users",
-          label: "Internal Users",
+          label: t("Internal Users"),
           icon: <UserOutlined />,
           roles: all_admin_roles,
         },
         {
           key: "teams",
           page: "teams",
-          label: "Teams",
+          label: t("Teams"),
           icon: <TeamOutlined />,
         },
         {
           key: "organizations",
           page: "organizations",
-          label: "Organizations",
+          label: t("Organizations"),
           icon: <BankOutlined />,
           roles: all_admin_roles,
         },
         {
           key: "budgets",
           page: "budgets",
-          label: "Budgets",
+          label: t("Budgets"),
           icon: <CreditCardOutlined />,
           roles: all_admin_roles,
         },
       ],
     },
     {
-      groupLabel: "DEVELOPER TOOLS",
+      groupLabel: t("DEVELOPER TOOLS"),
       items: [
         {
           key: "api_ref",
           page: "api_ref",
-          label: "API Reference",
+          label: t("API Reference"),
           icon: <ApiOutlined />,
         },
         {
           key: "model-hub-table",
           page: "model-hub-table",
-          label: "AI Hub",
+          label: t("AI Hub"),
           icon: <AppstoreOutlined />,
         },
         {
           key: "experimental",
           page: "experimental",
-          label: "Experimental",
+          label: t("Experimental"),
           icon: <ExperimentOutlined />,
           children: [
             {
               key: "caching",
               page: "caching",
-              label: "Caching",
+              label: t("Caching"),
               icon: <DatabaseOutlined />,
               roles: all_admin_roles,
             },
             {
               key: "prompts",
               page: "prompts",
-              label: "Prompts",
+              label: t("Prompts"),
               icon: <FileTextOutlined />,
               roles: all_admin_roles,
             },
             {
               key: "transform-request",
               page: "transform-request",
-              label: "API Playground",
+              label: t("API Playground"),
               icon: <ApiOutlined />,
               roles: [...all_admin_roles, ...internalUserRoles],
             },
             {
               key: "tag-management",
               page: "tag-management",
-              label: "Tag Management",
+              label: t("Tag Management"),
               icon: <TagsOutlined />,
               roles: all_admin_roles,
             },
             {
               key: "4",
               page: "usage",
-              label: "Old Usage",
+              label: t("Old Usage"),
               icon: <BarChartOutlined />,
             },
           ],
@@ -260,48 +263,48 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, defaultSelectedKey, collapse
       ],
     },
     {
-      groupLabel: "SETTINGS",
+      groupLabel: t("SETTINGS"),
       roles: all_admin_roles,
       items: [
         {
           key: "settings",
           page: "settings",
-          label: <span className="flex items-center gap-4">Settings</span>,
+          label: <span className="flex items-center gap-4">{t("Settings")}</span>,
           icon: <SettingOutlined />,
           roles: all_admin_roles,
           children: [
             {
               key: "router-settings",
               page: "router-settings",
-              label: "Router Settings",
+              label: t("Router Settings"),
               icon: <SettingOutlined />,
               roles: all_admin_roles,
             },
             {
               key: "logging-and-alerts",
               page: "logging-and-alerts",
-              label: "Logging & Alerts",
+              label: t("Logging & Alerts"),
               icon: <SettingOutlined />,
               roles: all_admin_roles,
             },
             {
               key: "admin-panel",
               page: "admin-panel",
-              label: "Admin Settings",
+              label: t("Admin Settings"),
               icon: <SettingOutlined />,
               roles: all_admin_roles,
             },
             {
               key: "cost-tracking",
               page: "cost-tracking",
-              label: "Cost Tracking",
+              label: t("Cost Tracking"),
               icon: <BarChartOutlined />,
               roles: all_admin_roles,
             },
             {
               key: "ui-theme",
               page: "ui-theme",
-              label: "UI Theme",
+              label: t("UI Theme"),
               icon: <BgColorsOutlined />,
               roles: all_admin_roles,
             },
@@ -438,7 +441,6 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, defaultSelectedKey, collapse
             items={buildMenuItems()}
           />
         </ConfigProvider>
-        {isAdminRole(userRole) && !collapsed && <UsageIndicator accessToken={accessToken} width={220} />}
       </Sider>
     </Layout>
   );
