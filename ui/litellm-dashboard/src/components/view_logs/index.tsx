@@ -937,12 +937,12 @@ export function RequestViewer({ row }: { row: Row<LogEntry> }) {
             <div className="flex">
               <span className="font-medium w-1/3">{t("Status")}:</span>
               <span
-                className={`px-2 py-1 rounded-md text-xs font-medium inline-block text-center w-16 ${(row.original.metadata?.status || "Success").toLowerCase() !== "failure"
+                className={`px-2 py-1 rounded-md text-xs font-medium inline-block text-center w-16 ${(row.original.metadata?.status || t("Success")).toLowerCase() !== "failure"
                   ? "bg-green-100 text-green-800"
                   : "bg-red-100 text-red-800"
                   }`}
               >
-                {(row.original.metadata?.status || "Success").toLowerCase() !== "failure" ? "Success" : "Failure"}
+                {(row.original.metadata?.status || t("Success")).toLowerCase() !== "failure" ? t("Success") : "Failure"}
               </span>
             </div>
             <div className="flex">

@@ -99,7 +99,7 @@ export const getColumns = (t: any): ColumnDef<LogEntry>[] => [
     header: t("Status"),
     accessorKey: "metadata.status",
     cell: (info: any) => {
-      const status = info.getValue() || "Success";
+      const status = info.getValue() || t("Success");
       const isSuccess = status.toLowerCase() !== "failure";
 
       return (

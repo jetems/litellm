@@ -439,7 +439,7 @@ export function VirtualKeysTable({ teams, organizations, onSortChange, currentSo
         return filteredOrgs
           .filter((org) => org.organization_id !== null && org.organization_id !== undefined)
           .map((org) => ({
-            label: `${org.organization_id || "Unknown"} (${org.organization_id})`,
+            label: `${org.organization_id || t("Unknown")} (${org.organization_id})`,
             value: org.organization_id as string,
           }));
       },

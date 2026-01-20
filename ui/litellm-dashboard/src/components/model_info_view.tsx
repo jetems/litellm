@@ -276,7 +276,7 @@ export default function ModelInfoView({
     return (
       <div className="p-4">
         <TremorButton icon={ArrowLeftIcon} variant="light" onClick={onClose} className="mb-4">
-          Back to Models
+          {t("Back to Models")}
         </TremorButton>
         <Text>Model not found</Text>
       </div>

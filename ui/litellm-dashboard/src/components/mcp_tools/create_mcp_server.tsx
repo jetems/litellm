@@ -459,7 +459,7 @@ const CreateMCPServer: React.FC<CreateMCPServerProps> = ({
                 {
                   validator: (_, value) =>
                     value && value.includes("-")
-                      ? Promise.reject(t("Alias cannot contain '-' (hyphen). Please use '_' (underscore) instead."))
+                      ? Promise.reject("Alias cannot contain '-' (hyphen). Please use '_' (underscore) instead.")
                       : Promise.resolve(),
                 },
               ]}

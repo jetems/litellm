@@ -142,8 +142,34 @@ def restore_translations(src_dir, backup_file, target_file_input=None):
                     prefix = match.group(2)
                     if prefix:
                         return match.group(0) # Already wrapped
-                    else:
-                        return f"{match.group(1)}t({s}){match.group(4)}"
+                    
+                    # Check context: key={...} or ref={...} should not be translated
+                    start_pos = match.start()
+                    full_text = match.string
+                    idx = start_pos - 1
+                    
+                    # Skip whitespace
+                    while idx >= 0 and full_text[idx].isspace():
+                        idx -= 1
+                        
+                    if idx >= 0 and full_text[idx] == '=':
+                        idx -= 1
+                        while idx >= 0 and full_text[idx].isspace():
+                            idx -= 1
+                            
+                        # Check prop name ending at idx
+                        # Look back for "key" or "ref"
+                        # Simple check: extract word
+                        end_prop_name = idx + 1
+                        while idx >= 0 and (full_text[idx].isalnum() or full_text[idx] in '-_'):
+                            idx -= 1
+                        start_prop_name = idx + 1
+                        
+                        prop_name = full_text[start_prop_name:end_prop_name]
+                        if prop_name in ['key', 'ref']:
+                             return match.group(0) # Exclude
+                             
+                    return f"{match.group(1)}t({s}){match.group(4)}"
                 
                 content = pattern_jsx_expr.sub(replace_jsx_expr, content)
                 
@@ -153,8 +179,12 @@ def restore_translations(src_dir, backup_file, target_file_input=None):
                     inner_text = s[1:-1]
                     escaped_inner = re.escape(inner_text)
                     
-                    pattern_attr = re.compile(rf'=\s*(["\']){escaped_inner}\1')
-                    content = pattern_attr.sub(rf'={{t({s})}}', content)
+                    
+                    # Context 2: JSX Attribute prop="foo" -> prop={t("foo")}
+                    # USER REQUEST: Do NOT translate strings after = or == or ===.
+                    # This disables Context 2 entirely.
+                    # pattern_attr = re.compile(rf'(?<![=!<>])=\s*(["\']){escaped_inner}\1')
+                    # content = pattern_attr.sub(rf'={{t({s})}}', content)
                     
                     # Context 3: Raw usage func("foo") -> func(t("foo"))
                     # Check if already wrapped by t( ... )
@@ -164,8 +194,52 @@ def restore_translations(src_dir, backup_file, target_file_input=None):
                         prefix = match.group(1)
                         if prefix:
                             return match.group(0)
-                        else:
-                            return f"t({s})"
+                        
+                        # Check context: avoid replacing if assignment or key
+                        # Scan backwards from match start
+                        start_pos = match.start()
+                        full_text = match.string
+                        idx = start_pos - 1
+                        
+                        # Skip whitespace
+                        while idx >= 0 and full_text[idx].isspace():
+                            idx -= 1
+                            
+                        if idx >= 0:
+                            char = full_text[idx]
+                            # Exclude if preceded by =, :, or [
+                            if char in ['=', ':', '[']:
+                                return match.group(0) # Found exclusion char, skip
+                                
+                        # Check if inside console.log/warn/error
+                        # Scan backwards limited chars, ignore if we hit ; or { or }
+                        paren_balance = 0
+                        scan_idx = start_pos - 1
+                        limit_idx = max(0, start_pos - 500) # Limit lookback
+                        
+                        found_console = False
+                        while scan_idx >= limit_idx:
+                            char = full_text[scan_idx]
+                            if char == ')':
+                                paren_balance += 1
+                            elif char == '(':
+                                if paren_balance == 0:
+                                     # This is the opening paren of our call!
+                                     # Check what precedes it
+                                     pre_text = full_text[limit_idx:scan_idx] # Text before (
+                                     if re.search(r'console\.(log|warn|error|info|debug)\s*$', pre_text):
+                                          found_console = True
+                                     break # Found opening paren, decision made
+                                else:
+                                    paren_balance -= 1
+                            elif char in ';{}':
+                                break # Stop at statement boundary
+                            scan_idx -= 1
+                            
+                        if found_console:
+                            return match.group(0)
+
+                        return f"t({s})"
                             
                     # Note: We must be careful not to double replace if Context 1 or 2 already handled it.
                     # But pattern_raw doesn't overlap with pattern_attr (quoted vs unquoted in regex perspective? no).

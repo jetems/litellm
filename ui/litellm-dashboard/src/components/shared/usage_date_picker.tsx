@@ -70,7 +70,7 @@ const UsageDatePicker: React.FC<UsageDatePickerProps> = ({
   // This only triggers AFTER user has actually made a selection
   const handleDateChange = useCallback(
     (newValue: DateRangePickerValue) => {
-      // Show "Selected" feedback ONLY after actual selection is made
+      // Show t("Selected") feedback ONLY after actual selection is made
       setShowSelectedFeedback(true);
 
       // Hide the feedback after a short time

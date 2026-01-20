@@ -111,7 +111,7 @@ const HealthCheckComponent: React.FC<HealthCheckComponentProps> = ({
               const fullError = checkData.error_message || undefined;
 
               healthStatusMap[targetModelName] = {
-                status: checkData.status || "unknown",
+                status: checkData.status || t("unknown"),
                 lastCheck: checkData.checked_at ? new Date(checkData.checked_at).toLocaleString() : "None",
                 lastSuccess:
                   checkData.status === "healthy"
@@ -305,7 +305,7 @@ const HealthCheckComponent: React.FC<HealthCheckComponentProps> = ({
             setModelHealthStatuses((prev) => ({
               ...prev,
               [modelName]: {
-                status: checkData.status || prev[modelName]?.status || "unknown",
+                status: checkData.status || prev[modelName]?.status || t("unknown"),
                 lastCheck: checkData.checked_at
                   ? new Date(checkData.checked_at).toLocaleString()
                   : prev[modelName]?.lastCheck || "None",
@@ -445,7 +445,7 @@ const HealthCheckComponent: React.FC<HealthCheckComponentProps> = ({
               return {
                 ...prev,
                 [modelName]: {
-                  status: checkData.status || currentStatus?.status || "unknown",
+                  status: checkData.status || currentStatus?.status || t("unknown"),
                   lastCheck: checkData.checked_at
                     ? new Date(checkData.checked_at).toLocaleString()
                     : currentStatus?.lastCheck || "None",
@@ -491,11 +491,11 @@ const HealthCheckComponent: React.FC<HealthCheckComponentProps> = ({
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "healthy":
+      case t("healthy"):
         return <Badge color="emerald">{t("healthy")}</Badge>;
-      case "unhealthy":
+      case t("unhealthy"):
         return <Badge color="red">{t("unhealthy")}</Badge>;
-      case "checking":
+      case t("checking"):
         return <Badge color="blue">{t("checking")}</Badge>;
       case "none":
         return <Badge color="gray">none</Badge>;

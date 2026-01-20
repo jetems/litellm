@@ -38,7 +38,7 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
       return Promise.resolve();
     }
     if (isNaN(Number(value)) || Number(value) < 0) {
-      return Promise.reject(t("Please enter a valid positive number"));
+      return Promise.reject("Please enter a valid positive number");
     }
     return Promise.resolve();
   };

@@ -66,7 +66,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
           </TableCell>
           {value.premium_field ? (
             premiumUser ? (
-              <Form.Item name={value.field_name}>
+              <Form.Item name={t(value.field_name)}>
                 <TableCell>
                   {value.field_type === "Integer" ? (
                     <InputNumber
@@ -95,7 +95,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
             )
           ) : (
             <Form.Item
-              name={value.field_name}
+              name={t(value.field_name)}
               className="mb-0"
               valuePropName={value.field_type === "Boolean" ? "checked" : "value"}
             >

@@ -41,7 +41,7 @@ const AddPromptForm: React.FC<AddPromptFormProps> = ({ visible, onClose, accessT
       }
 
       if (promptIntegration === "dotprompt" && fileList.length === 0) {
-        NotificationsManager.fromBackend("Please upload a .prompt file");
+        NotificationsManager.fromBackend(t("Please upload a .prompt file"));
         return;
       }
 
