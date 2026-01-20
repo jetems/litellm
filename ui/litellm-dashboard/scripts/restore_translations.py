@@ -128,7 +128,8 @@ def restore_translations(src_dir, backup_file, target_file_input=None):
 
             # --- 3. Restore t(...) calls ---
             t_items = data.get('t_calls', []) or data.get('t_strings', [])
-            
+            T_items = set(data.get('T_components', [])) # Use set for fast lookup
+
             for s in t_items:
                 if not s: continue
                 escaped_s = re.escape(s)
@@ -175,6 +176,10 @@ def restore_translations(src_dir, backup_file, target_file_input=None):
                     content = pattern_raw.sub(replace_raw, content)
 
                     # Context 4: Text content >foo< -> >{t("foo")}
+                    # SKIP IF extracted as a T component
+                    if inner_text in T_items:
+                        continue
+
                     # Add lookarounds to ensure we are NOT inside a <T> tag
                     # (?<!<T>) ensures the opening > is not preceded by <T
                     # (?!/T>) ensures the closing < is not followed by /T>
@@ -182,15 +187,21 @@ def restore_translations(src_dir, backup_file, target_file_input=None):
                     content = pattern_text.sub(rf'>\1{{t({s})}}\2<', content)
             
             # --- 4. Restore <T> ---
-            T_items = data.get('T_components', [])
-            for s in T_items:
+            # Re-iterate T_items (sorted list preferred for deterministic behavior)
+            sorted_T_items = sorted(list(T_items), key=len, reverse=True) # Match longer strings first?
+            
+            for s in sorted_T_items:
                 if not s: continue
                 escaped_s = re.escape(s)
                 # Use negative lookahead (?!/T>) to verify we aren't already inside a <T> tag
                 # We want to match >s< but NOT if it is >s</T>
+                # Allow flexible whitespace around the content
                 pattern_T = re.compile(rf'>(\s*){escaped_s}(\s*)<(?!/T>)')
                 
                 def replace_T(match):
+                    # Preserve original surrounding whitespace if possible, or normalize?
+                    # match.group(1) is pre-whitespace, match.group(2) is post-whitespace
+                    # We wrap the content in <T>...</T>
                     return f">{match.group(1)}<T>{s}</T>{match.group(2)}<"
 
                 content = pattern_T.sub(replace_T, content)

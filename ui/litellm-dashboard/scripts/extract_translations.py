@@ -72,7 +72,7 @@ def extract_from_file(full_path):
         t_calls = parse_t_calls(content)
         
         T_pattern = re.compile(r'<T>(.*?)</T>', re.DOTALL)
-        T_matches = T_pattern.findall(content)
+        T_matches = [m.strip() for m in T_pattern.findall(content)]
         
         # Extract imports with line numbers
         imports = []
