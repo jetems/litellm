@@ -2796,5 +2796,8 @@
     "Select or enter allowed pass through routes": "选择或输入允许的直通路由",
     "Custom Proxy Base URL": "自定义代理基础 URL",
     "Optional: Enter custom proxy URL (e.g., http://localhost:5000)": "可选：输入自定义代理 URL（例如：http://localhost:5000）",
-    "Select MCP servers to use in your conversation.": "选择在对话中使用的 MCP 服务器。"
+    "Select MCP servers to use in your conversation.": "选择在对话中使用的 MCP 服务器。",
+    "Vector Store ID": "向量存储 ID",
+    "Back to Users": "返回用户",
+    "User Settings": "用户设置"
 }

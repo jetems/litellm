@@ -159,7 +159,7 @@ const AgentFormFields: React.FC<AgentFormFieldsProps> = ({ showAgentName = true 
 
         {/* Cost Configuration */}
         <Panel header={t(AGENT_FORM_CONFIG.cost.title)} key={AGENT_FORM_CONFIG.cost.key}>
-          <CostConfigFields />
+          <CostConfigFields t={t} />
         </Panel>
 
         {/* LiteLLM Parameters */}

@@ -2796,5 +2796,8 @@
     "Affected Item ID": "Affected Item ID",
     "e.g., auto_router_1, smart_routing": "e.g., auto_router_1, smart_routing",
     "Make Models Public": "Make Models Public",
-    "Invalid callback value": "Invalid callback value"
+    "Invalid callback value": "Invalid callback value",
+    "Vector Store ID": "Vector Store ID",
+    "Back to Users": "Back to Users",
+    "User Settings": "User Settings"
 }
