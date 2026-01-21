@@ -5357,6 +5357,75 @@
       }
     ]
   },
+  "components/templates/key_edit_view.tsx": {
+    "t_calls": [
+      "\"Agents / Access Groups\"",
+      "\"All Team Models\"",
+      "\"Allowed Pass Through Routes\"",
+      "\"Can call LLM API + Management routes\"",
+      "\"Can call only LLM API routes (chat/completions, embeddings, etc.)\"",
+      "\"Can call only management routes (user/team/key management)\"",
+      "\"Cancel\"",
+      "\"Current: \"",
+      "\"Daily\"",
+      "\"Default\"",
+      "\"Disable Global Guardrails\"",
+      "\"Enter a numerical value\"",
+      "\"Error fetching tags: \"",
+      "\"Guardrails\"",
+      "\"Key Alias\"",
+      "\"Key Type\"",
+      "\"LLM API\"",
+      "\"Logging Settings\"",
+      "\"MCP Servers / Access Groups\"",
+      "\"Management\"",
+      "\"Max Budget (USD)\"",
+      "\"Max Parallel Requests\"",
+      "\"Metadata\"",
+      "\"Model RPM Limit\"",
+      "\"Model TPM Limit\"",
+      "\"Models field is disabled for this key type\"",
+      "\"Models\"",
+      "\"Monthly\"",
+      "\"No\"",
+      "\"Prompts\"",
+      "\"RPM Limit\"",
+      "\"Reset Budget\"",
+      "\"Save Changes\"",
+      "\"Select MCP servers or access groups (optional)\"",
+      "\"Select agents or access groups (optional)\"",
+      "\"Select key type\"",
+      "\"Select models\"",
+      "\"Select or enter allowed pass through routes\"",
+      "\"Select or enter prompts\"",
+      "\"Select or enter tags\"",
+      "\"Select team\"",
+      "\"Select vector stores\"",
+      "\"Setting allowed pass through routes by key is a premium feature\"",
+      "\"Setting prompts by key is a premium feature\"",
+      "\"TPM Limit\"",
+      "\"Tags\"",
+      "\"Team ID\"",
+      "\"Vector Stores\"",
+      "\"Weekly\"",
+      "\"When enabled, this key will bypass any guardrails configured to run on every request (global guardrails)\"",
+      "\"Yes\"",
+      "\"n/a\""
+    ],
+    "T_components": [],
+    "imports": [
+      {
+        "line": 3,
+        "content": "import { useTranslate } from \"@/i18n\";"
+      }
+    ],
+    "hooks": [
+      {
+        "line": 85,
+        "content": "const t = useTranslate();"
+      }
+    ]
+  },
   "components/templates/key_info_view.tsx": {
     "t_calls": [
       "\"Allowed Pass Through Routes\"",
@@ -5398,7 +5467,8 @@
       "\"This is a LiteLLM Enterprise feature, and requires a valid key to use.\"",
       "\"Unlimited\"",
       "\"Updated\"",
-      "\"of\""
+      "\"of\"",
+      "backButtonText"
     ],
     "T_components": [],
     "imports": [
@@ -6709,6 +6779,8 @@
       "\"Disable Global Guardrails\"",
       "\"Enter metadata as JSON\"",
       "\"Enter tags\"",
+      "\"Error creating the key: \"",
+      "\"Failed to search for users\"",
       "\"Guardrails\"",
       "\"How often the budget should reset. For example, setting 'daily' will reset the budget every 24 hours\"",
       "\"JSON object with additional information about this key. Used for tracking or custom logic\"",
@@ -6717,10 +6789,12 @@
       "\"Key Name\"",
       "\"Key Ownership\"",
       "\"Key Type\"",
+      "\"Key alias ${newKeyAlias} already exists for team with ID ${newKeyTeamId}, please provide another key alias\"",
       "\"LLM API\"",
       "\"Learn more about advanced settings in our\"",
       "\"Logging Settings\"",
       "\"MCP Settings\"",
+      "\"Making API Call\"",
       "\"Management\"",
       "\"Max Budget (USD)\"",
       "\"Maximum amount in USD this key can spend. When reached, the key will be blocked from making further requests\"",
@@ -6784,6 +6858,8 @@
       "\"Tokens per minute Limit (TPM)\"",
       "\"Type email to search for users\"",
       "\"User ID\"",
+      "\"Virtual Key Created\"",
+      "\"Virtual Key copied to clipboard\"",
       "\"When enabled, this key will bypass any guardrails configured to run on every request (global guardrails)\"",
       "\"Yes\"",
       "\"You\"",
@@ -6801,6 +6877,45 @@
     "hooks": [
       {
         "line": 139,
+        "content": "const t = useTranslate();"
+      }
+    ]
+  },
+  "components/organisms/regenerate_key_modal.tsx": {
+    "t_calls": [
+      "\"Cancel\"",
+      "\"Close\"",
+      "\"Copy Virtual Key\"",
+      "\"Current expiry: \"",
+      "\"Expire Key (eg: 30s, 30h, 30d)\"",
+      "\"Key Alias\"",
+      "\"Max Budget (USD)\"",
+      "\"Never\"",
+      "\"New Virtual Key\"",
+      "\"New expiry: \"",
+      "\"No alias set\"",
+      "\"Please replace your old key with the new key generated. For security reasons, \"",
+      "\"RPM Limit\"",
+      "\"Regenerate Virtual Key\"",
+      "\"Regenerate\"",
+      "\"Regenerated Key\"",
+      "\"Regenerating...\"",
+      "\"TPM Limit\"",
+      "\"Virtual Key copied to clipboard\"",
+      "\"Virtual Key regenerated successfully\"",
+      "\"through your LiteLLM account. If you lose this secret key, you will need to generate a new one.\"",
+      "\"you will not be able to view it again\""
+    ],
+    "T_components": [],
+    "imports": [
+      {
+        "line": 2,
+        "content": "import { useTranslate } from \"@/i18n\";"
+      }
+    ],
+    "hooks": [
+      {
+        "line": 20,
         "content": "const t = useTranslate();"
       }
     ]

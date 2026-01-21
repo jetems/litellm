@@ -85,7 +85,7 @@ export default function KeyInfoView({
     return (
       <div className="p-4">
         <Button icon={ArrowLeftIcon} variant="light" onClick={onClose} className="mb-4">
-          {backButtonText}
+          {t(backButtonText)}
         </Button>
         <Text>{t("Key not found")}</Text>
       </div>
@@ -316,7 +316,7 @@ export default function KeyInfoView({
       <div className="flex justify-between items-center mb-6">
         <div>
           <Button icon={ArrowLeftIcon} variant="light" onClick={onClose} className="mb-4">
-            {backButtonText}
+            {t(backButtonText)}
           </Button>
           <Title>{currentKeyData.key_alias || "Virtual Key"}</Title>
 

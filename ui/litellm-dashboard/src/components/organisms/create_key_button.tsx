@@ -251,11 +251,14 @@ const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey }) => {
 
       if (existingKeyAliases.includes(newKeyAlias)) {
         throw new Error(
-          `Key alias ${newKeyAlias} already exists for team with ID ${newKeyTeamId}, please provide another key alias`,
+          t("Key alias ${newKeyAlias} already exists for team with ID ${newKeyTeamId}, please provide another key alias", {
+            newKeyAlias: newKeyAlias,
+            newKeyTeamId: String(newKeyTeamId),
+          }),
         );
       }
 
-      NotificationsManager.info("Making API Call");
+      NotificationsManager.info(t("Making API Call"));
       setIsModalVisible(true);
 
       if (keyOwner === "you") {
@@ -396,17 +399,17 @@ const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey }) => {
 
       setApiKey(response["key"]);
       setSoftBudget(response["soft_budget"]);
-      NotificationsManager.success("Virtual Key Created");
+      NotificationsManager.success(t("Virtual Key Created"));
       form.resetFields();
       localStorage.removeItem("userData" + userID);
     } catch (error) {
       console.log("error in create key:", error);
-      NotificationsManager.fromBackend(`Error creating the key: ${error}`);
+      NotificationsManager.fromBackend(t("Error creating the key: ") + error);
     }
   };
 
   const handleCopy = () => {
-    NotificationsManager.success("Virtual Key copied to clipboard");
+    NotificationsManager.success(t("Virtual Key copied to clipboard"));
   };
 
   useEffect(() => {
@@ -451,7 +454,7 @@ const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey }) => {
       setUserOptions(options);
     } catch (error) {
       console.error("Error fetching users:", error);
-      NotificationsManager.fromBackend("Failed to search for users");
+      NotificationsManager.fromBackend(t("Failed to search for users"));
     } finally {
       setUserSearchLoading(false);
     }

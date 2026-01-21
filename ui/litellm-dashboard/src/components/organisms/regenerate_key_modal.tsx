@@ -1,4 +1,5 @@
 import useAuthorized from "@/app/(dashboard)/hooks/useAuthorized";
+import { useTranslate } from "@/i18n";
 import { Button, Col, Grid, Text, TextInput, Title } from "@tremor/react";
 import { Form, InputNumber, Modal } from "antd";
 import { add } from "date-fns";
@@ -16,6 +17,7 @@ interface RegenerateKeyModalProps {
 }
 
 export function RegenerateKeyModal({ selectedToken, visible, onClose, onKeyUpdate }: RegenerateKeyModalProps) {
+  const t = useTranslate();
   const { accessToken } = useAuthorized();
   const [form] = Form.useForm();
   const [regeneratedKey, setRegeneratedKey] = useState<string | null>(null);
@@ -104,7 +106,7 @@ export function RegenerateKeyModal({ selectedToken, visible, onClose, onKeyUpdat
         formValues,
       );
       setRegeneratedKey(response.key);
-      NotificationManager.success("Virtual Key regenerated successfully");
+      NotificationManager.success(t("Virtual Key regenerated successfully"));
 
       console.log("Full regenerate response:", response); // Debug log to see what's returned
 
@@ -147,50 +149,49 @@ export function RegenerateKeyModal({ selectedToken, visible, onClose, onKeyUpdat
 
   return (
     <Modal
-      title="Regenerate Virtual Key"
+      title={t("Regenerate Virtual Key")}
       open={visible}
       onCancel={handleClose}
       footer={
         regeneratedKey
           ? [
-              <Button key="close" onClick={handleClose}>
-                Close
-              </Button>,
-            ]
+            <Button key="close" onClick={handleClose}>
+              {t("Close")}
+            </Button>,
+          ]
           : [
-              <Button key="cancel" onClick={handleClose} className="mr-2">
-                Cancel
-              </Button>,
-              <Button key="regenerate" onClick={handleRegenerateKey} disabled={isRegenerating}>
-                {isRegenerating ? "Regenerating..." : "Regenerate"}
-              </Button>,
-            ]
+            <Button key="cancel" onClick={handleClose} className="mr-2">
+              {t("Cancel")}
+            </Button>,
+            <Button key="regenerate" onClick={handleRegenerateKey} disabled={isRegenerating}>
+              {isRegenerating ? t("Regenerating...") : t("Regenerate")}
+            </Button>,
+          ]
       }
     >
       {regeneratedKey ? (
         <Grid numItems={1} className="gap-2 w-full">
-          <Title>Regenerated Key</Title>
+          <Title>{t("Regenerated Key")}</Title>
           <Col numColSpan={1}>
             <p>
-              Please replace your old key with the new key generated. For security reasons,{" "}
-              <b>you will not be able to view it again</b> through your LiteLLM account. If you lose this secret key,
-              you will need to generate a new one.
+              {t("Please replace your old key with the new key generated. For security reasons, ")}
+              <b>{t("you will not be able to view it again")}</b> {t("through your LiteLLM account. If you lose this secret key, you will need to generate a new one.")}
             </p>
           </Col>
           <Col numColSpan={1}>
-            <Text className="mt-3">Key Alias:</Text>
+            <Text className="mt-3">{t("Key Alias")}:</Text>
             <div className="bg-gray-100 p-2 rounded mb-2">
-              <pre className="break-words whitespace-normal">{selectedToken?.key_alias || "No alias set"}</pre>
+              <pre className="break-words whitespace-normal">{selectedToken?.key_alias || t("No alias set")}</pre>
             </div>
-            <Text className="mt-3">New Virtual Key:</Text>
+            <Text className="mt-3">{t("New Virtual Key")}:</Text>
             <div className="bg-gray-100 p-2 rounded mb-2">
               <pre className="break-words whitespace-normal">{regeneratedKey}</pre>
             </div>
             <CopyToClipboard
               text={regeneratedKey}
-              onCopy={() => NotificationManager.success("Virtual Key copied to clipboard")}
+              onCopy={() => NotificationManager.success(t("Virtual Key copied to clipboard"))}
             >
-              <Button className="mt-3">Copy Virtual Key</Button>
+              <Button className="mt-3">{t("Copy Virtual Key")}</Button>
             </CopyToClipboard>
           </Col>
         </Grid>
@@ -204,25 +205,25 @@ export function RegenerateKeyModal({ selectedToken, visible, onClose, onKeyUpdat
             }
           }}
         >
-          <Form.Item name="key_alias" label="Key Alias">
+          <Form.Item name="key_alias" label={t("Key Alias")}>
             <TextInput disabled={true} />
           </Form.Item>
-          <Form.Item name="max_budget" label="Max Budget (USD)">
+          <Form.Item name="max_budget" label={t("Max Budget (USD)")}>
             <InputNumber step={0.01} precision={2} style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item name="tpm_limit" label="TPM Limit">
+          <Form.Item name="tpm_limit" label={t("TPM Limit")}>
             <InputNumber style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item name="rpm_limit" label="RPM Limit">
+          <Form.Item name="rpm_limit" label={t("RPM Limit")}>
             <InputNumber style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item name="duration" label="Expire Key (eg: 30s, 30h, 30d)" className="mt-8">
+          <Form.Item name="duration" label={t("Expire Key (eg: 30s, 30h, 30d)")} className="mt-8">
             <TextInput placeholder="" />
           </Form.Item>
           <div className="mt-2 text-sm text-gray-500">
-            Current expiry: {selectedToken?.expires ? new Date(selectedToken.expires).toLocaleString() : "Never"}
+            {t("Current expiry: ")} {selectedToken?.expires ? new Date(selectedToken.expires).toLocaleString() : t("Never")}
           </div>
-          {newExpiryTime && <div className="mt-2 text-sm text-green-600">New expiry: {newExpiryTime}</div>}
+          {newExpiryTime && <div className="mt-2 text-sm text-green-600">{t("New expiry: ")} {newExpiryTime}</div>}
         </Form>
       )}
     </Modal>
