@@ -26,7 +26,7 @@ import {
 import type { MenuProps } from "antd";
 import { ConfigProvider, Layout, Menu, Badge } from "antd";
 import { useMemo } from "react";
-import { all_admin_roles, internalUserRoles, isAdminRole, rolesWithWriteAccess } from "../utils/roles";
+import { all_admin_roles, internalUserRoles, rolesWithWriteAccess } from "../utils/roles";
 import type { Organization } from "./networking";
 import NewBadge from "./common_components/NewBadge";
 import { useTranslate } from "@/i18n";

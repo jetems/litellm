@@ -1,0 +1,48 @@
+ARG LITELLM_BUILD_IMAGE=cgr.dev/chainguard/wolfi-base
+ARG LITELLM_RUNTIME_IMAGE=cgr.dev/chainguard/wolfi-base
+
+FROM $LITELLM_BUILD_IMAGE AS builder
+WORKDIR /app
+USER root
+
+RUN apk add --no-cache bash gcc py3-pip python3 python3-dev openssl openssl-dev nodejs npm
+RUN python -m pip install --no-cache-dir build
+
+COPY . .
+
+RUN sed -i 's/\r$//' docker/build_admin_ui.sh && chmod +x docker/build_admin_ui.sh && ./docker/build_admin_ui.sh
+RUN rm -rf dist/* && python -m build
+RUN pip wheel --no-cache-dir --wheel-dir=/wheels/ -r requirements.txt
+
+# Runtime
+FROM $LITELLM_RUNTIME_IMAGE AS runtime
+USER root
+WORKDIR /app
+
+# 只装运行必须的依赖（保守起见仍带 nodejs，用于 prisma generate；先去掉 npm）
+RUN apk add --no-cache bash openssl tzdata nodejs python3 py3-pip supervisor
+
+# 只拷运行需要的文件（不要 COPY . .）
+COPY docker/ /app/docker/
+COPY schema.prisma /app/schema.prisma
+
+COPY --from=builder /app/dist/*.whl /app/
+COPY --from=builder /wheels/ /wheels/
+
+RUN pip install *.whl /wheels/* --no-index --find-links=/wheels/ \
+    && rm -f *.whl \
+    && rm -rf /wheels \
+    && find /usr/lib -type f -path "*/tornado/test/*" -delete \
+    && find /usr/lib -type d -path "*/tornado/test" -delete \
+    && sed -i 's/\r$//' /app/docker/install_auto_router.sh \
+    && chmod +x /app/docker/install_auto_router.sh \
+    && /app/docker/install_auto_router.sh \
+    && prisma generate --schema /app/schema.prisma \
+    && sed -i 's/\r$//' /app/docker/entrypoint.sh /app/docker/prod_entrypoint.sh \
+    && chmod +x /app/docker/entrypoint.sh /app/docker/prod_entrypoint.sh
+
+COPY docker/supervisord.conf /etc/supervisord.conf
+
+EXPOSE 4000/tcp
+ENTRYPOINT ["docker/prod_entrypoint.sh"]
+CMD ["--port", "4000"]

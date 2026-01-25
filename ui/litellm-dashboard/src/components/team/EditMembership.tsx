@@ -2,6 +2,7 @@ import { Text, TextInput } from "@tremor/react";
 import { Button as AntButton, Form, Modal, Select } from "antd";
 import React, { useEffect, useState } from "react";
 import NumericalInput from "../shared/numerical_input";
+import { useTranslate } from "@/i18n";
 
 interface BaseMember {
   user_email?: string;
@@ -47,6 +48,7 @@ const MemberModal = <T extends BaseMember>({
   mode,
   config,
 }: MemberModalProps<T>) => {
+  const t = useTranslate();
   const [form] = Form.useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -131,7 +133,7 @@ const MemberModal = <T extends BaseMember>({
             step={field.step || 1}
             min={field.min || 0}
             style={{ width: "100%" }}
-            placeholder={field.placeholder || "Enter a numerical value"}
+            placeholder={field.placeholder || t("Enter a numerical value")}
           />
         );
       case "select":
@@ -151,7 +153,7 @@ const MemberModal = <T extends BaseMember>({
 
   return (
     <Modal
-      title={config.title || (mode === "add" ? "Add Member" : "Edit Member")}
+      title={config.title || (mode === "add" ? t("Add Member") : t("Edit Member"))}
       open={visible}
       width={1000}
       footer={null}
@@ -160,10 +162,10 @@ const MemberModal = <T extends BaseMember>({
       <Form form={form} onFinish={handleSubmit} labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} labelAlign="left">
         {config.showEmail && (
           <Form.Item
-            label="Email"
+            label={t("Email")}
             name="user_email"
             className="mb-4"
-            rules={[{ type: "email", message: "Please enter a valid email!" }]}
+            rules={[{ type: "email", message: t("Please enter a valid email!") }]}
           >
             <TextInput placeholder="user@example.com" />
           </Form.Item>
@@ -171,12 +173,12 @@ const MemberModal = <T extends BaseMember>({
 
         {config.showEmail && config.showUserId && (
           <div className="text-center mb-4">
-            <Text>OR</Text>
+            <Text>{t("OR")}</Text>
           </div>
         )}
 
         {config.showUserId && (
-          <Form.Item label="User ID" name="user_id" className="mb-4">
+          <Form.Item label={t("User ID")} name="user_id" className="mb-4">
             <TextInput placeholder="user_123" />
           </Form.Item>
         )}
@@ -184,33 +186,33 @@ const MemberModal = <T extends BaseMember>({
         <Form.Item
           label={
             <div className="flex items-center gap-2">
-              <span>Role</span>
+              <span>{t("Role")}</span>
               {mode === "edit" && initialData && (
-                <span className="text-gray-500 text-sm">(Current: {getRoleLabel(initialData.role)})</span>
+                <span className="text-gray-500 text-sm">({t("Current: ")}{getRoleLabel(initialData.role)})</span>
               )}
             </div>
           }
           name="role"
           className="mb-4"
-          rules={[{ required: true, message: "Please select a role!" }]}
+          rules={[{ required: true, message: t("Please select a role!") }]}
         >
           <Select>
             {mode === "edit" && initialData
               ? [
-                  // Current role first
-                  ...config.roleOptions.filter((option) => option.value === initialData.role),
-                  // Then all other roles
-                  ...config.roleOptions.filter((option) => option.value !== initialData.role),
-                ].map((option) => (
-                  <Select.Option key={option.value} value={option.value}>
-                    {option.label}
-                  </Select.Option>
-                ))
+                // Current role first
+                ...config.roleOptions.filter((option) => option.value === initialData.role),
+                // Then all other roles
+                ...config.roleOptions.filter((option) => option.value !== initialData.role),
+              ].map((option) => (
+                <Select.Option key={option.value} value={option.value}>
+                  {option.label}
+                </Select.Option>
+              ))
               : config.roleOptions.map((option) => (
-                  <Select.Option key={option.value} value={option.value}>
-                    {option.label}
-                  </Select.Option>
-                ))}
+                <Select.Option key={option.value} value={option.value}>
+                  {option.label}
+                </Select.Option>
+              ))}
           </Select>
         </Form.Item>
 
@@ -222,16 +224,16 @@ const MemberModal = <T extends BaseMember>({
 
         <div className="text-right mt-6">
           <AntButton onClick={onCancel} className="mr-2" disabled={isSubmitting}>
-            Cancel
+            {t("Cancel")}
           </AntButton>
           <AntButton type="default" htmlType="submit" loading={isSubmitting}>
             {mode === "add"
               ? isSubmitting
-                ? "Adding..."
-                : "Add Member"
+                ? t("Adding...")
+                : t("Add Member")
               : isSubmitting
-                ? "Saving..."
-                : "Save Changes"}
+                ? t("Saving...")
+                : t("Save Changes")}
           </AntButton>
         </div>
       </Form>

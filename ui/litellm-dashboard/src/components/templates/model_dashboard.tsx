@@ -14,8 +14,8 @@ import {
 } from "@tremor/react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { CredentialItem, credentialListCall, CredentialsResponse } from "../networking";
-
 import { handleAddModelSubmit } from "../add_model/handle_add_model_submit";
+import { useTranslate } from "@/i18n";
 
 import CredentialsPanel from "@/components/model_add/credentials";
 import { InfoCircleOutlined } from "@ant-design/icons";
@@ -135,7 +135,7 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
   const [lastRefreshed, setLastRefreshed] = useState("");
 
   const [providerModels, setProviderModels] = useState<Array<string>>([]); // Explicitly typing providerModels as a string array
-
+  const t = useTranslate();
   const [providerSettings, setProviderSettings] = useState<ProviderSettings[]>([]);
   const [selectedProvider, setSelectedProvider] = useState<Providers>(Providers.OpenAI);
   const [healthCheckResponse, setHealthCheckResponse] = useState<any>(null);
@@ -1270,9 +1270,9 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
                               <span className="text-sm text-gray-700">
                                 {filteredData.length > 0
                                   ? `Showing ${pagination.pageIndex * pagination.pageSize + 1} - ${Math.min(
-                                      (pagination.pageIndex + 1) * pagination.pageSize,
-                                      filteredData.length,
-                                    )} of ${filteredData.length} results`
+                                    (pagination.pageIndex + 1) * pagination.pageSize,
+                                    filteredData.length,
+                                  )} of ${filteredData.length} results`
                                   : "Showing 0 results"}
                               </span>
 
@@ -1284,11 +1284,10 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
                                       setPagination((prev) => ({ ...prev, pageIndex: prev.pageIndex - 1 }))
                                     }
                                     disabled={pagination.pageIndex === 0}
-                                    className={`px-3 py-1 text-sm border rounded-md ${
-                                      pagination.pageIndex === 0
+                                    className={`px-3 py-1 text-sm border rounded-md ${pagination.pageIndex === 0
                                         ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                                         : "hover:bg-gray-50"
-                                    }`}
+                                      }`}
                                   >
                                     Previous
                                   </button>
@@ -1300,11 +1299,10 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
                                     disabled={
                                       pagination.pageIndex >= Math.ceil(filteredData.length / pagination.pageSize) - 1
                                     }
-                                    className={`px-3 py-1 text-sm border rounded-md ${
-                                      pagination.pageIndex >= Math.ceil(filteredData.length / pagination.pageSize) - 1
+                                    className={`px-3 py-1 text-sm border rounded-md ${pagination.pageIndex >= Math.ceil(filteredData.length / pagination.pageSize) - 1
                                         ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                                         : "hover:bg-gray-50"
-                                    }`}
+                                      }`}
                                   >
                                     Next
                                   </button>
@@ -1326,6 +1324,7 @@ const OldModelDashboard: React.FC<ModelDashboardProps> = ({
                             handleRefreshClick,
                             expandedRows,
                             setExpandedRows,
+                            t
                           )}
                           data={paginatedData}
                           isLoading={false}

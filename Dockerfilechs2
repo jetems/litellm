@@ -1,0 +1,85 @@
+# syntax=docker/dockerfile:1
+
+########################
+# Stage 1: Builder
+########################
+FROM python:3.13-slim AS builder
+WORKDIR /app
+USER root
+
+# build tools: curl(你 UI 脚本可能要用), node(用于 prisma generate / UI build)
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends curl ca-certificates nodejs npm; \
+    rm -rf /var/lib/apt/lists/*
+
+COPY . .
+
+# Build Admin UI
+WORKDIR /app/ui/litellm-dashboard
+RUN set -eux; chmod +x build_ui.sh; ./build_ui.sh
+
+# Build Wheels + Prisma generate (在 build 之前生成，确保打进 wheel)
+WORKDIR /app
+RUN set -eux; \
+    pip install --no-cache-dir build prisma==0.11.0; \
+    rm -rf dist/* && python -m build
+
+WORKDIR /app/enterprise
+RUN set -eux; rm -rf dist/* && python -m build
+
+WORKDIR /app/litellm-proxy-extras
+RUN set -eux; rm -rf dist/* && python -m build
+
+
+########################
+# Stage 2: Runtime
+########################
+FROM python:3.13-slim AS runtime
+WORKDIR /app
+USER root
+
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends nodejs npm; \
+    rm -rf /var/lib/apt/lists/*
+
+COPY docker /app/docker/
+
+# Copy requirements/schema + built wheels
+COPY --from=builder \
+    /app/requirements.txt \
+    /app/schema.prisma \
+    /app/dist/*.whl \
+    /app/enterprise/dist/*.whl \
+    /app/litellm-proxy-extras/dist/*.whl \
+    /app/
+
+# 安装依赖 + wheels + 清理（尽量合成一层）
+RUN set -eux; \
+    grep -vE '^\s*(litellm-enterprise|litellm-proxy-extras)(\s*==.*)?\s*$' requirements.txt > /tmp/requirements.filtered.txt; \
+    pip install -r /tmp/requirements.filtered.txt; \
+    rm -f /tmp/requirements.filtered.txt requirements.txt; \
+    pip install *.whl; \
+    rm -f *.whl; \
+    # ensure PyJWT is used, not jwt（不要失败）
+    pip uninstall -y jwt PyJWT || true; \
+    pip install PyJWT==2.9.0 prisma==0.11.0; \
+    prisma generate; \
+    # scripts
+    sed -i 's/\r$//' docker/install_auto_router.sh; \
+    chmod +x docker/install_auto_router.sh docker/entrypoint.sh docker/prod_entrypoint.sh; \
+    ./docker/install_auto_router.sh; \
+    # 清理 pycache（可省一点点）
+    find /usr/local -type d -name '__pycache__' -prune -exec rm -rf {} +; \
+    find /usr/local -type f -name '*.pyc' -delete
+
+COPY docker/supervisord.conf /etc/supervisord.conf
+
+EXPOSE 4000
+ENTRYPOINT ["docker/prod_entrypoint.sh"]
+CMD ["--port", "4000"]

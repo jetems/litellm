@@ -23,7 +23,7 @@ import {
 import { Card, Text, TextInput, Title, Button as TremorButton } from "@tremor/react";
 import { Button, Input, Modal, Popover, Select, Spin, Tooltip, Typography, Upload } from "antd";
 import React, { useEffect, useRef, useState } from "react";
-import { useTranslate, T } from "@/i18n";
+import { useTranslate } from "@/i18n";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { coy } from "react-syntax-highlighter/dist/esm/styles/prism";

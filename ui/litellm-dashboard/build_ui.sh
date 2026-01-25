@@ -3,7 +3,7 @@
 # Check if nvm is not installed
 if ! command -v nvm &> /dev/null; then
   # Install nvm
-  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
 
   # Source nvm script in the current session
   export NVM_DIR="$HOME/.nvm"
@@ -11,6 +11,7 @@ if ! command -v nvm &> /dev/null; then
 fi
 
 # Use nvm to set the required Node.js version
+nvm install v20
 nvm use v20
 
 # Check if nvm use was successful
@@ -45,7 +46,9 @@ if [ $? -eq 0 ]; then
 
   rm -rf ./out
 
-  echo "Deployment completed."
+  echo "Deployment completed. Verifying files in $destination_dir:"
+  ls -F "$destination_dir"
+  echo "Total files/dirs in destination: $(ls -1 "$destination_dir" | wc -l)"
 else
   echo "Build failed. Deployment aborted."
 fi

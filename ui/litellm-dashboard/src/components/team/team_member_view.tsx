@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslate } from "@/i18n";
 import { Member } from "@/components/networking";
 import {
   Card,
@@ -35,6 +36,7 @@ const TeamMembersComponent: React.FC<TeamMembersComponentProps> = ({
   setIsEditMemberModalVisible,
   setIsAddMemberModalVisible,
 }) => {
+  const t = useTranslate();
   // Helper function to convert scientific notation to normal decimal format
   const formatNumber = (value: number | null): string => {
     if (value === null || value === undefined) return "0";
@@ -75,7 +77,7 @@ const TeamMembersComponent: React.FC<TeamMembersComponentProps> = ({
 
   // Helper function to get rate limits for a user
   const getUserRateLimits = (userId: string | null): string => {
-    if (!userId) return "No Limits";
+    if (!userId) return t("No Limits");
     const membership = teamData.team_memberships.find((tm) => tm.user_id === userId);
     const rpmLimit = membership?.litellm_budget_table?.rpm_limit;
     const tpmLimit = membership?.litellm_budget_table?.tpm_limit;
@@ -84,7 +86,7 @@ const TeamMembersComponent: React.FC<TeamMembersComponentProps> = ({
     const tpmText = tpmLimit ? `${formatNumber(tpmLimit)} TPM` : null;
 
     const limits = [rpmText, tpmText].filter(Boolean);
-    return limits.length > 0 ? limits.join(" / ") : "No Limits";
+    return limits.length > 0 ? limits.join(" / ") : t("No Limits");
   };
 
   return (
@@ -94,24 +96,24 @@ const TeamMembersComponent: React.FC<TeamMembersComponentProps> = ({
           <Table className="min-w-full">
             <TableHead>
               <TableRow>
-                <TableHeaderCell>User ID</TableHeaderCell>
-                <TableHeaderCell>User Email</TableHeaderCell>
-                <TableHeaderCell>Role</TableHeaderCell>
+                <TableHeaderCell>{t("User ID")}</TableHeaderCell>
+                <TableHeaderCell>{t("User Email")}</TableHeaderCell>
+                <TableHeaderCell>{t("Role")}</TableHeaderCell>
                 <TableHeaderCell>
-                  Team Member Spend (USD){" "}
-                  <Tooltip title="This is the amount spent by a user in the team.">
+                  {t("Team Member Spend (USD)")}{" "}
+                  <Tooltip title={t("This is the amount spent by a user in the team.")}>
                     <InfoCircleOutlined />
                   </Tooltip>
                 </TableHeaderCell>
-                <TableHeaderCell>Team Member Budget (USD)</TableHeaderCell>
+                <TableHeaderCell>{t("Team Member Budget (USD)")}</TableHeaderCell>
                 <TableHeaderCell>
-                  Team Member Rate Limits{" "}
-                  <Tooltip title="Rate limits for this member's usage within this team.">
+                  {t("Team Member Rate Limits")}{" "}
+                  <Tooltip title={t("Rate limits for this member's usage within this team.")}>
                     <InfoCircleOutlined />
                   </Tooltip>
                 </TableHeaderCell>
                 <TableHeaderCell className="sticky right-0 bg-white z-10 border-l border-gray-200">
-                  Actions
+                  {t("Actions")}
                 </TableHeaderCell>
               </TableRow>
             </TableHead>
@@ -123,7 +125,7 @@ const TeamMembersComponent: React.FC<TeamMembersComponentProps> = ({
                     <Text className="font-mono">{member.user_id}</Text>
                   </TableCell>
                   <TableCell>
-                    <Text className="font-mono">{member.user_email ? member.user_email : "No Email"}</Text>
+                    <Text className="font-mono">{member.user_email ? member.user_email : t("No Email")}</Text>
                   </TableCell>
                   <TableCell>
                     <Text className="font-mono">{member.role}</Text>
@@ -135,7 +137,7 @@ const TeamMembersComponent: React.FC<TeamMembersComponentProps> = ({
                     <Text className="font-mono">
                       {getUserBudget(member.user_id)
                         ? `$${formatNumberWithCommas(Number(getUserBudget(member.user_id)), 4)}`
-                        : "No Limit"}
+                        : t("No Limit")}
                     </Text>
                   </TableCell>
                   <TableCell>
@@ -176,7 +178,7 @@ const TeamMembersComponent: React.FC<TeamMembersComponentProps> = ({
           </Table>
         </div>
       </Card>
-      <TremorButton onClick={() => setIsAddMemberModalVisible(true)}>Add Member</TremorButton>
+      <TremorButton onClick={() => setIsAddMemberModalVisible(true)}>{t("Add Member")}</TremorButton>
     </div>
   );
 };

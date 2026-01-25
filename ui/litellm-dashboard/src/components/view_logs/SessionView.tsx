@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { LogEntry } from "./columns";
+import { LogEntry, getColumns } from "./columns";
 import { DataTable } from "./table";
-import { columns } from "./columns";
 import { Card, Title, Text, Metric, Button as TremorButton } from "@tremor/react";
+import { useTranslate } from "@/i18n";
 import { RequestViewer } from "./index";
 import { formatNumberWithCommas } from "@/utils/dataUtils";
 import { ArrowLeftIcon } from "@heroicons/react/outline";
@@ -18,6 +18,8 @@ interface SessionViewProps {
 }
 
 export const SessionView: React.FC<SessionViewProps> = ({ sessionId, logs, onBack }) => {
+  const t = useTranslate();
+  const columns = getColumns(t);
   // Track which log row is expanded
   const [expandedRequestId, setExpandedRequestId] = useState<string | null>(null);
   const [copiedStates, setCopiedStates] = useState<Record<string, boolean>>({});
@@ -79,11 +81,10 @@ export const SessionView: React.FC<SessionViewProps> = ({ sessionId, logs, onBac
                 size="small"
                 icon={copiedStates["session-id"] ? <CheckIcon size={12} /> : <CopyIcon size={12} />}
                 onClick={() => copyToClipboard(sessionId, "session-id")}
-                className={`left-2 z-10 transition-all duration-200 ${
-                  copiedStates["session-id"]
-                    ? "text-green-600 bg-green-50 border-green-200"
-                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-                }`}
+                className={`left-2 z-10 transition-all duration-200 ${copiedStates["session-id"]
+                  ? "text-green-600 bg-green-50 border-green-200"
+                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                  }`}
               />
             </div>
             <a
