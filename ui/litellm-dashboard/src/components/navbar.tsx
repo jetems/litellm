@@ -11,21 +11,18 @@ import {
 import { fetchProxySettings } from "@/utils/proxyUtils";
 import {
   CrownOutlined,
-  GithubOutlined,
   LogoutOutlined,
   MailOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   SafetyOutlined,
-  SlackOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { Button, Dropdown, Switch, Tooltip } from "antd";
+import { Dropdown, Switch, Tooltip } from "antd";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { useI18n, useTranslate, type Locale } from "@/i18n";
-import { T } from "@/i18n";
+import { T, useI18n, useTranslate, type Locale } from "@/i18n";
 import UsageIndicator from "@/components/usage_indicator";
 import { isAdminRole } from "@/utils/roles";
 
@@ -200,13 +197,13 @@ const Navbar: React.FC<NavbarProps> = ({
               <Link href={baseUrl ? baseUrl : "/"} className="flex items-center">
                 <div className="relative">
                   <img src={imageUrl} alt="LiteLLM Brand" className="h-10 w-auto" />
-                  <span
+                  {/* <span
                     className="absolute -top-1 -right-2 text-lg animate-bounce"
                     style={{ animationDuration: "2s" }}
                     title={t("Happy Holidays!")}
                   >
                     🎄
-                  </span>
+                  </span> */}
                 </div>
               </Link>
               {version && (
@@ -228,32 +225,6 @@ const Navbar: React.FC<NavbarProps> = ({
               <UsageIndicator accessToken={accessToken} />
             )}
 
-            <Button
-              href="https://www.litellm.ai/support"
-              target="_blank"
-              rel="noopener noreferrer"
-              icon={<SlackOutlined />}
-              className="shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/50 transition-shadow"
-            >
-              Join Slack
-            </Button>
-            <Button
-              href="https://github.com/BerriAI/litellm"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/50 transition-shadow"
-              icon={<GithubOutlined />}
-            >
-              Star us on GitHub
-            </Button>
-            <a
-              href="https://docs.litellm.ai/docs/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              <T>Docs</T>
-            </a>
 
             {/* Language Switcher */}
             <Dropdown
