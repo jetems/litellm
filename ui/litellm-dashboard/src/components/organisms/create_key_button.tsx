@@ -1,7 +1,9 @@
 "use client";
+import { keyKeys } from "@/app/(dashboard)/hooks/keys/useKeys";
 import useAuthorized from "@/app/(dashboard)/hooks/useAuthorized";
 import { formatNumberWithCommas } from "@/utils/dataUtils";
 import { InfoCircleOutlined } from "@ant-design/icons";
+import { useQueryClient } from "@tanstack/react-query";
 import { Accordion, AccordionBody, AccordionHeader, Button, Col, Grid, Text, TextInput, Title } from "@tremor/react";
 import { Button as Button2, Form, Input, Modal, Radio, Select, Switch, Tooltip } from "antd";
 import debounce from "lodash/debounce";
@@ -37,6 +39,7 @@ import {
 import NumericalInput from "../shared/numerical_input";
 import VectorStoreSelector from "../vector_store_management/VectorStoreSelector";
 import { useTranslate } from "@/i18n";
+import { simplifyKeyGenerateError } from "./utils";
 
 const { Option } = Select;
 
@@ -138,6 +141,7 @@ export const fetchUserModels = async (
 const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey }) => {
   const t = useTranslate();
   const { accessToken, userId: userID, userRole, premiumUser } = useAuthorized();
+  const queryClient = useQueryClient();
   const [form] = Form.useForm();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [apiKey, setApiKey] = useState(null);
@@ -397,6 +401,10 @@ const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey }) => {
       // Also directly update the keys list in VirtualKeysTable without an API call
       addKey(response);
 
+      // Invalidate and refetch all keys list queries to update the table
+      // This will trigger a refetch of all key list queries regardless of pagination
+      queryClient.invalidateQueries({ queryKey: keyKeys.lists() });
+
       setApiKey(response["key"]);
       setSoftBudget(response["soft_budget"]);
       NotificationsManager.success(t("Virtual Key Created"));
@@ -404,7 +412,8 @@ const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey }) => {
       localStorage.removeItem("userData" + userID);
     } catch (error) {
       console.log("error in create key:", error);
-      NotificationsManager.fromBackend(t("Error creating the key: ") + error);
+      const simplifiedError = simplifyKeyGenerateError(error);
+      NotificationsManager.fromBackend(t("Error creating the key: ") + simplifiedError);
     }
   };
 

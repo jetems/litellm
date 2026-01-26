@@ -1,23 +1,25 @@
 import React from "react";
 import { useTranslate } from "@/i18n";
+import { useUISettings } from "@/app/(dashboard)/hooks/uiSettings/useUISettings";
+import useAuthorized from "@/app/(dashboard)/hooks/useAuthorized";
 import { Member } from "@/components/networking";
+import { formatNumberWithCommas } from "@/utils/dataUtils";
+import { isProxyAdminRole, isUserTeamAdminForSingleTeam } from "@/utils/roles";
+import { InfoCircleOutlined } from "@ant-design/icons";
 import {
   Card,
   Table,
-  TableHead,
-  TableRow,
-  TableHeaderCell,
   TableBody,
   TableCell,
+  TableHead,
+  TableHeaderCell,
+  TableRow,
   Text,
-  Icon,
   Button as TremorButton,
 } from "@tremor/react";
-import { InfoCircleOutlined } from "@ant-design/icons";
 import { Tooltip } from "antd";
+import TableIconActionButton from "../common_components/IconActionButton/TableIconActionButtons/TableIconActionButton";
 import { TeamData } from "./team_info";
-import { PencilAltIcon, TrashIcon } from "@heroicons/react/outline";
-import { formatNumberWithCommas } from "@/utils/dataUtils";
 
 interface TeamMembersComponentProps {
   teamData: TeamData;
@@ -37,6 +39,7 @@ const TeamMembersComponent: React.FC<TeamMembersComponentProps> = ({
   setIsAddMemberModalVisible,
 }) => {
   const t = useTranslate();
+  console.log("Team data", teamData);
   // Helper function to convert scientific notation to normal decimal format
   const formatNumber = (value: number | null): string => {
     if (value === null || value === undefined) return "0";
@@ -88,6 +91,12 @@ const TeamMembersComponent: React.FC<TeamMembersComponentProps> = ({
     const limits = [rpmText, tpmText].filter(Boolean);
     return limits.length > 0 ? limits.join(" / ") : t("No Limits");
   };
+
+  const { data: uiSettingsData } = useUISettings();
+  const { userId, userRole } = useAuthorized();
+  const disableTeamAdminDeleteTeamUser = Boolean(uiSettingsData?.values?.disable_team_admin_delete_team_user);
+  const isUserTeamAdmin = isUserTeamAdminForSingleTeam(teamData.team_info.members_with_roles, userId || "");
+  const isProxyAdmin = isProxyAdminRole(userRole || "");
 
   return (
     <div className="space-y-4">
@@ -146,9 +155,9 @@ const TeamMembersComponent: React.FC<TeamMembersComponentProps> = ({
                   <TableCell className="sticky right-0 bg-white z-10 border-l border-gray-200">
                     {canEditTeam && (
                       <div className="flex gap-2">
-                        <Icon
-                          icon={PencilAltIcon}
-                          size="sm"
+                        <TableIconActionButton
+                          variant="Edit"
+                          tooltipText="Edit member"
                           onClick={() => {
                             // Get budget and rate limit data from team membership
                             const membership = teamData.team_memberships.find((tm) => tm.user_id === member.user_id);
@@ -161,14 +170,14 @@ const TeamMembersComponent: React.FC<TeamMembersComponentProps> = ({
                             setSelectedEditMember(enhancedMember);
                             setIsEditMemberModalVisible(true);
                           }}
-                          className="cursor-pointer hover:text-blue-600"
                         />
-                        <Icon
-                          icon={TrashIcon}
-                          size="sm"
-                          onClick={() => handleMemberDelete(member)}
-                          className="cursor-pointer hover:text-red-600"
-                        />
+                        {(isProxyAdmin || (isUserTeamAdmin && !disableTeamAdminDeleteTeamUser)) && (
+                          <TableIconActionButton
+                            variant="Delete"
+                            tooltipText="Delete member"
+                            onClick={() => handleMemberDelete(member)}
+                          />
+                        )}
                       </div>
                     )}
                   </TableCell>

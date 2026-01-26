@@ -1,12 +1,12 @@
 import { formatNumberWithCommas } from "@/utils/dataUtils";
+import { resolveTeamAliasFromTeamID } from "@/utils/teamUtils";
 import { AreaChart, BarChart, Card, Grid, Text, Title } from "@tremor/react";
 import { Collapse } from "antd";
 import React from "react";
 import { CustomLegend, CustomTooltip } from "./common_components/chartUtils";
+import { Team } from "./key_team_helpers/key_list";
 import { DailyData, KeyMetricWithMetadata, ModelActivityData, TopApiKeyData } from "./UsagePage/types";
 import { valueFormatter } from "./UsagePage/utils/value_formatters";
-import { Team } from "./key_team_helpers/key_list";
-import { resolveTeamAliasFromTeamID } from "@/utils/teamUtils";
 import { useTranslate } from "@/i18n";
 
 interface ActivityMetricsProps {
@@ -298,7 +298,13 @@ export const ActivityMetrics: React.FC<ActivityMetricsProps> = ({ modelMetrics, 
             />
           </Card>
           <Card>
-            <Title>{t("Total Requests Over Time")}</Title>
+            <div className="flex justify-between items-center">
+              <Title>{t("Total Requests Over Time")}</Title>
+              <CustomLegend
+                categories={["metrics.successful_requests", "metrics.failed_requests"]}
+                colors={["emerald", "red"]}
+              />
+            </div>
             <AreaChart
               className="mt-4"
               data={sortedDailyData}
@@ -306,7 +312,6 @@ export const ActivityMetrics: React.FC<ActivityMetricsProps> = ({ modelMetrics, 
               categories={["metrics.successful_requests", "metrics.failed_requests"]}
               colors={["emerald", "red"]}
               valueFormatter={(number: number) => number.toLocaleString()}
-              stack
               customTooltip={CustomTooltip}
               showLegend={false}
             />

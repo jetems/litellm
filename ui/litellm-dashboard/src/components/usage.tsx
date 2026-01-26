@@ -612,7 +612,7 @@ const UsagePage: React.FC<UsagePageProps> = ({ accessToken, token, userRole, use
                     <Col numColSpan={1}>
                       <Card className="h-full">
                         <Title>{t("Top Virtual Keys")}</Title>
-                        <TopKeyView topKeys={topKeys} teams={null} />
+                        <TopKeyView topKeys={topKeys} teams={null} topKeysLimit={5} setTopKeysLimit={() => { }} />
                       </Card>
                     </Col>
                     <Col numColSpan={1}>

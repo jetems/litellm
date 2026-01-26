@@ -29,6 +29,9 @@ import { getTimeRangeDisplay } from "./logs_utils";
 import { formatNumberWithCommas } from "@/utils/dataUtils";
 import { truncateString } from "@/utils/textUtils";
 import { useTranslate } from "@/i18n";
+import DeletedKeysPage from "../DeletedKeysPage/DeletedKeysPage";
+import DeletedTeamsPage from "../DeletedTeamsPage/DeletedTeamsPage";
+import NewBadge from "../common_components/NewBadge";
 
 interface SpendLogsTableProps {
   accessToken: string | null;
@@ -508,6 +511,8 @@ export default function SpendLogsTable({
         <TabList>
           <Tab>{t("Request Logs")}</Tab>
           <Tab>{t("Audit Logs")}</Tab>
+          <Tab><>{t("Deleted Keys")} <NewBadge /></></Tab>
+          <Tab><>{t("Deleted Teams")} <NewBadge /></></Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
@@ -753,6 +758,8 @@ export default function SpendLogsTable({
               allTeams={allTeams}
             />
           </TabPanel>
+          <TabPanel><DeletedKeysPage /></TabPanel>
+          <TabPanel><DeletedTeamsPage /></TabPanel>
         </TabPanels>
       </TabGroup>
     </div>
@@ -937,7 +944,7 @@ export function RequestViewer({ row }: { row: Row<LogEntry> }) {
             <div className="flex">
               <span className="font-medium w-1/3">{t("Status")}:</span>
               <span
-                className={`px-2 py-1 rounded-md text-xs font-medium inline-block text-center w-16 ${(row.original.metadata?.status || t("Success")).toLowerCase() !== "failure"
+                className={`px-2 py-1 rounded-md text-xs font-medium inline-block text-center w-16 ${(row.original.metadata?.status || "Success").toLowerCase() !== "failure"
                   ? "bg-green-100 text-green-800"
                   : "bg-red-100 text-red-800"
                   }`}

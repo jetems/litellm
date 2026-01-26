@@ -166,7 +166,11 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, defaultSelectedKey, collapse
         {
           key: "logs",
           page: "logs",
-          label: t("Logs"),
+          label: (
+            <span className="flex items-center gap-4">
+              {t("Logs")} <NewBadge />
+            </span>
+          ),
           icon: <LineChartOutlined />,
         },
       ],

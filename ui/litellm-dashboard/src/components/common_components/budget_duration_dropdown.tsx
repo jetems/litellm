@@ -25,6 +25,7 @@ const BudgetDurationDropdown: React.FC<BudgetDurationDropdownProps> = ({
       onChange={onChange}
       className={className}
       placeholder="n/a"
+      allowClear
     >
       <Option value="24h">{t("daily")}</Option>
       <Option value="7d">{t("weekly")}</Option>

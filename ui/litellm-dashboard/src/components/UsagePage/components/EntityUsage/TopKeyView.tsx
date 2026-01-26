@@ -1,24 +1,25 @@
-import React, { useState } from "react";
-import { BarChart } from "@tremor/react";
-import KeyInfoView from "../../../templates/key_info_view";
-import { keyInfoV1Call } from "../../../networking";
-import { transformKeyInfo } from "../../../key_team_helpers/transform_key_info";
-import { DataTable } from "../../../view_logs/table";
-import { Tooltip } from "antd";
-import { Button } from "@tremor/react";
-import { formatNumberWithCommas } from "../../../../utils/dataUtils";
-import { TagUsage } from "../../types";
-import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/outline";
 import useAuthorized from "@/app/(dashboard)/hooks/useAuthorized";
 import { useTranslate } from "@/i18n";
+import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/outline";
+import { BarChart, Button } from "@tremor/react";
+import { Segmented, Tooltip } from "antd";
+import React, { useState } from "react";
+import { formatNumberWithCommas } from "../../../../utils/dataUtils";
+import { transformKeyInfo } from "../../../key_team_helpers/transform_key_info";
+import { keyInfoV1Call } from "../../../networking";
+import KeyInfoView from "../../../templates/key_info_view";
+import { DataTable } from "../../../view_logs/table";
+import { TagUsage } from "../../types";
 
 interface TopKeyViewProps {
   topKeys: any[];
   teams: any[] | null;
   showTags?: boolean;
+  topKeysLimit: number;
+  setTopKeysLimit: (limit: number) => void;
 }
 
-const TopKeyView: React.FC<TopKeyViewProps> = ({ topKeys, teams, showTags = false }) => {
+const TopKeyView: React.FC<TopKeyViewProps> = ({ topKeys, teams, showTags = false, topKeysLimit, setTopKeysLimit }) => {
   const t = useTranslate();
   const { accessToken, userRole, userId: userID, premiumUser } = useAuthorized();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -180,7 +181,17 @@ const TopKeyView: React.FC<TopKeyViewProps> = ({ topKeys, teams, showTags = fals
 
   return (
     <>
-      <div className="mb-4 flex justify-end items-center">
+      <div className="mb-4 flex justify-between items-center">
+        <Segmented
+          options={[
+            { label: "5", value: 5 },
+            { label: "10", value: 10 },
+            { label: "25", value: 25 },
+            { label: "50", value: 50 },
+          ]}
+          value={topKeysLimit}
+          onChange={(value) => setTopKeysLimit(value as number)}
+        />
         <div className="flex space-x-2">
           <button
             onClick={() => setViewMode("table")}
@@ -198,9 +209,10 @@ const TopKeyView: React.FC<TopKeyViewProps> = ({ topKeys, teams, showTags = fals
       </div>
 
       {viewMode === "chart" ? (
-        <div className="relative">
+        <div className="relative max-h-[600px] overflow-y-auto">
           <BarChart
-            className="mt-4 h-40 cursor-pointer hover:opacity-90"
+            className="mt-4 cursor-pointer hover:opacity-90"
+            style={{ height: Math.min(processedTopKeys.length, topKeysLimit) * 52 }}
             data={processedTopKeys}
             index="display_key_alias"
             categories={["spend"]}
@@ -236,7 +248,7 @@ const TopKeyView: React.FC<TopKeyViewProps> = ({ topKeys, teams, showTags = fals
           />
         </div>
       ) : (
-        <div className="border rounded-lg overflow-hidden">
+        <div className="border rounded-lg overflow-hidden max-h-[600px] overflow-y-auto">
           <DataTable
             columns={columns}
             data={topKeys}

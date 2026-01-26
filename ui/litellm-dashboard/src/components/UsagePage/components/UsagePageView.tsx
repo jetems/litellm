@@ -27,15 +27,17 @@ import {
   Text,
   Title,
 } from "@tremor/react";
-import { Alert } from "antd";
+import { Alert, Segmented } from "antd";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslate } from "@/i18n";
 
 import { useAgents } from "@/app/(dashboard)/hooks/agents/useAgents";
 import { useCustomers } from "@/app/(dashboard)/hooks/customers/useCustomers";
 import useAuthorized from "@/app/(dashboard)/hooks/useAuthorized";
+import { useCurrentUser } from "@/app/(dashboard)/hooks/users/useCurrentUser";
 import { formatNumberWithCommas } from "@/utils/dataUtils";
 import { Button } from "@tremor/react";
+import NewBadge from "@/components/common_components/NewBadge";
 import { all_admin_roles } from "../../../utils/roles";
 import { ActivityMetrics, processActivityData } from "../../activity_metrics";
 import CloudZeroExportModal from "../../cloudzero_export_modal";
@@ -50,12 +52,10 @@ import UserAgentActivity from "../../user_agent_activity";
 import ViewUserSpend from "../../view_user_spend";
 import { DailyData, KeyMetricWithMetadata, MetricWithMetadata } from "../types";
 import { valueFormatterSpend } from "../utils/value_formatters";
+import EndpointUsage from "./EndpointUsage/EndpointUsage";
 import EntityUsage, { EntityList } from "./EntityUsage/EntityUsage";
 import TopKeyView from "./EntityUsage/TopKeyView";
 import { UsageOption, UsageViewSelect } from "./UsageViewSelect/UsageViewSelect";
-import { useCurrentUser } from "@/app/(dashboard)/hooks/users/useCurrentUser";
-import EndpointUsage from "./EndpointUsage/EndpointUsage";
-import NewBadge from "../../common_components/NewBadge";
 
 interface UsagePageProps {
   teams: Team[];
@@ -97,6 +97,8 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
   const [showCustomerBanner, setShowCustomerBanner] = useState(true);
   const [usageView, setUsageView] = useState<UsageOption>("global");
   const [showAgentBanner, setShowAgentBanner] = useState(true);
+  const [topKeysLimit, setTopKeysLimit] = useState<number>(5);
+  const [topModelsLimit, setTopModelsLimit] = useState<number>(5);
   const getAllTags = async () => {
     if (!accessToken) {
       return;
@@ -118,7 +120,7 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
   const totalSpend = userSpendData.metadata?.total_spend || 0;
 
   // Calculate top models from the breakdown data
-  const getTopModels = () => {
+  const getTopModels = (limit: number = 5) => {
     const modelSpend: { [key: string]: MetricWithMetadata } = {};
     userSpendData.results.forEach((day) => {
       Object.entries(day.breakdown.models || {}).forEach(([model, metrics]) => {
@@ -161,10 +163,10 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
         tokens: metrics.metrics.total_tokens,
       }))
       .sort((a, b) => b.spend - a.spend)
-      .slice(0, 5);
+      .slice(0, limit);
   };
 
-  const getTopModelGroups = () => {
+  const getTopModelGroups = (limit: number = 5) => {
     const modelGroupSpend: { [key: string]: MetricWithMetadata } = {};
     userSpendData.results.forEach((day) => {
       Object.entries(day.breakdown.model_groups || {}).forEach(([modelGroup, metrics]) => {
@@ -208,7 +210,7 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
         tokens: metrics.metrics.total_tokens,
       }))
       .sort((a, b) => b.spend - a.spend)
-      .slice(0, 5);
+      .slice(0, limit);
   };
 
   // Calculate provider spend from the breakdown data
@@ -256,7 +258,7 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
   };
 
   // Calculate top API keys from the breakdown data
-  const getTopKeys = () => {
+  const getTopKeys = (limit: number = 5) => {
     const keySpend: { [key: string]: KeyMetricWithMetadata } = {};
     userSpendData.results.forEach((day) => {
       Object.entries(day.breakdown.api_keys || {}).forEach(([key, metrics]) => {
@@ -302,7 +304,7 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
         spend: metrics.metrics.spend,
       }))
       .sort((a, b) => b.spend - a.spend)
-      .slice(0, 5);
+      .slice(0, limit);
   };
 
   const fetchUserSpendData = useCallback(async () => {
@@ -438,6 +440,7 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
           {usageView === "global" && (
             <TabGroup>
               <div className="flex justify-between items-center">
+
                 <NewBadge>
                   <TabList variant="solid" className="mt-1">
                     <Tab>{t("Cost")}</Tab>
@@ -462,7 +465,7 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
                 >
                   {t("Export Data")}
                 </Button>
-              </div>
+              </div >
               <TabPanels>
                 {/* Cost Panel */}
                 <TabPanel>
@@ -578,15 +581,31 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
                     <Col numColSpan={1}>
                       <Card className="h-full">
                         <Title>{t("Top Virtual Keys")}</Title>
-                        <TopKeyView topKeys={getTopKeys()} teams={null} />
+                        <TopKeyView
+                          topKeys={getTopKeys(topKeysLimit)}
+                          teams={null}
+                          topKeysLimit={topKeysLimit}
+                          setTopKeysLimit={setTopKeysLimit}
+                        />
                       </Card>
                     </Col>
 
                     {/* Top Models */}
                     <Col numColSpan={1}>
                       <Card className="h-full">
+                        <Title>{modelViewType === "groups" ? t("Top Public Model Names") : t("Top Litellm Models")}</Title>
                         <div className="flex justify-between items-center mb-4">
-                          <Title>{modelViewType === "groups" ? t("Top Public Model Names") : t("Top Litellm Models")}</Title>
+
+                          <Segmented
+                            options={[
+                              { label: "5", value: 5 },
+                              { label: "10", value: 10 },
+                              { label: "25", value: 25 },
+                              { label: "50", value: 50 },
+                            ]}
+                            value={topModelsLimit}
+                            onChange={(value) => setTopModelsLimit(value as number)}
+                          />
                           <div className="flex bg-gray-100 rounded-lg p-1">
                             <button
                               className={`px-3 py-1 text-sm rounded-md transition-colors ${modelViewType === "groups"
@@ -607,43 +626,59 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
                               {t("Litellm Model Name")}
                             </button>
                           </div>
-                        </div>
-                        {loading ? (
-                          <ChartLoader isDateChanging={isDateChanging} />
-                        ) : (
-                          <BarChart
-                            className="mt-4 h-40"
-                            data={modelViewType === "groups" ? getTopModelGroups() : getTopModels()}
-                            index="key"
-                            categories={["spend"]}
-                            colors={["cyan"]}
-                            valueFormatter={valueFormatterSpend}
-                            layout="vertical"
-                            yAxisWidth={200}
-                            showLegend={false}
-                            customTooltip={({ payload, active }) => {
-                              if (!active || !payload?.[0]) return null;
-                              const data = payload[0].payload;
-                              return (
-                                <div className="bg-white p-4 shadow-lg rounded-lg border">
-                                  <p className="font-bold">{data.key}</p>
-                                  <p className="text-cyan-500">Spend: ${formatNumberWithCommas(data.spend, 2)}</p>
-                                  <p className="text-gray-600">Total Requests: {data.requests.toLocaleString()}</p>
-                                  <p className="text-green-600">
-                                    Successful: {data.successful_requests.toLocaleString()}
-                                  </p>
-                                  <p className="text-red-600">Failed: {data.failed_requests.toLocaleString()}</p>
-                                  <p className="text-gray-600">Tokens: {data.tokens.toLocaleString()}</p>
-                                </div>
-                              );
-                            }}
-                          />
-                        )}
-                      </Card>
-                    </Col>
+                        </div >
+                        {
+                          loading ? (
+                            <ChartLoader isDateChanging={isDateChanging} />
+                          ) : (
+                            <div className="relative max-h-[600px] overflow-y-auto">
+                              {(() => {
+                                const modelData =
+                                  modelViewType === "groups"
+                                    ? getTopModelGroups(topModelsLimit)
+                                    : getTopModels(topModelsLimit);
+                                return (
+                                  <BarChart
+                                    className="mt-4"
+                                    style={{
+                                      height: Math.min(modelData.length, topModelsLimit) * 52
+                                    }}
+                                    data={modelData}
+                                    index="key"
+                                    categories={["spend"]}
+                                    colors={["cyan"]}
+                                    valueFormatter={valueFormatterSpend}
+                                    layout="vertical"
+                                    yAxisWidth={200}
+                                    showLegend={false}
+                                    customTooltip={({ payload, active }) => {
+                                      if (!active || !payload?.[0]) return null;
+                                      const data = payload[0].payload;
+                                      return (
+                                        <div className="bg-white p-4 shadow-lg rounded-lg border">
+                                          <p className="font-bold">{data.key}</p>
+                                          <p className="text-cyan-500">Spend: ${formatNumberWithCommas(data.spend, 2)}</p>
+                                          <p className="text-gray-600">
+                                            Total Requests: {data.requests.toLocaleString()}
+                                          </p>
+                                          <p className="text-green-600">
+                                            Successful: {data.successful_requests.toLocaleString()}
+                                          </p>
+                                          <p className="text-red-600">Failed: {data.failed_requests.toLocaleString()}</p>
+                                          <p className="text-gray-600">Tokens: {data.tokens.toLocaleString()}</p>
+                                        </div>
+                                      );
+                                    }}
+                                  />
+                                );
+                              })()}
+                            </div >
+                          )}
+                      </Card >
+                    </Col >
 
                     {/* Spend by Provider */}
-                    <Col numColSpan={2}>
+                    < Col numColSpan={2} >
                       <Card className="h-full">
                         <div className="flex justify-between items-center mb-4">
                           <Title>{t("Spend by Provider")}</Title>
@@ -717,16 +752,16 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
                           </Grid>
                         )}
                       </Card>
-                    </Col>
+                    </Col >
 
                     {/* Usage Metrics */}
-                  </Grid>
-                </TabPanel>
+                  </Grid >
+                </TabPanel >
 
                 {/* Activity Panel */}
-                <TabPanel>
+                < TabPanel >
                   <ActivityMetrics modelMetrics={modelMetrics} />
-                </TabPanel>
+                </TabPanel >
                 <TabPanel>
                   <ActivityMetrics modelMetrics={keyMetrics} />
                 </TabPanel>
@@ -736,143 +771,155 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
                 <TabPanel>
                   <EndpointUsage userSpendData={userSpendData} />
                 </TabPanel>
-              </TabPanels>
-            </TabGroup>
+              </TabPanels >
+            </TabGroup >
           )}
           {/* Organization Usage Panel */}
 
-          {usageView === "organization" && (
-            <>
-              {showOrganizationBanner && (
-                <Alert
-                  banner
-                  type="info"
-                  message={t("Organization usage is a new feature.")}
-                  description={t("Spend is tracked from feature launch and previous data isn't backfilled, so only future usage appears here.")}
-                  closable
-                  onClose={() => setShowOrganizationBanner(false)}
-                  className="mb-5"
+          {
+            usageView === "organization" && (
+              <>
+                {showOrganizationBanner && (
+                  <Alert
+                    banner
+                    type="info"
+                    message={t("Organization usage is a new feature.")}
+                    description={t("Spend is tracked from feature launch and previous data isn't backfilled, so only future usage appears here.")}
+                    closable
+                    onClose={() => setShowOrganizationBanner(false)}
+                    className="mb-5"
+                  />
+                )}
+                <EntityUsage
+                  accessToken={accessToken}
+                  entityType="organization"
+                  userID={userID}
+                  userRole={userRole}
+                  dateValue={dateValue}
+                  entityList={
+                    organizations?.map((organization) => ({
+                      label: organization.organization_alias,
+                      value: organization.organization_id,
+                    })) || null
+                  }
+                  premiumUser={premiumUser}
                 />
-              )}
-              <EntityUsage
-                accessToken={accessToken}
-                entityType="organization"
-                userID={userID}
-                userRole={userRole}
-                dateValue={dateValue}
-                entityList={
-                  organizations?.map((organization) => ({
-                    label: organization.organization_alias,
-                    value: organization.organization_id,
-                  })) || null
-                }
-                premiumUser={premiumUser}
-              />
-            </>
-          )}
+              </>
+            )
+          }
 
           {/* Team Usage Panel */}
-          {usageView === "team" && (
-            <EntityUsage
-              accessToken={accessToken}
-              entityType="team"
-              userID={userID}
-              userRole={userRole}
-              entityList={
-                teams?.map((team) => ({
-                  label: team.team_alias,
-                  value: team.team_id,
-                })) || null
-              }
-              premiumUser={premiumUser}
-              dateValue={dateValue}
-            />
-          )}
-
-          {/* Customer Usage Panel */}
-          {usageView === "customer" && (
-            <>
-              {showCustomerBanner && (
-                <Alert
-                  banner
-                  type="info"
-                  message={t("Customer usage is a new feature.")}
-                  description={t("Spend is tracked from feature launch and previous data isn't backfilled, so only future usage appears here.")}
-                  closable
-                  onClose={() => setShowCustomerBanner(false)}
-                  className="mb-5"
-                />
-              )}
+          {
+            usageView === "team" && (
               <EntityUsage
                 accessToken={accessToken}
-                entityType="customer"
+                entityType="team"
                 userID={userID}
                 userRole={userRole}
                 entityList={
-                  customers?.map((customer) => ({
-                    label: customer.alias || customer.user_id,
-                    value: customer.user_id,
+                  teams?.map((team) => ({
+                    label: team.team_alias,
+                    value: team.team_id,
                   })) || null
                 }
                 premiumUser={premiumUser}
                 dateValue={dateValue}
               />
-            </>
-          )}
-          {/* Tag Usage Panel */}
-          {usageView === "tag" && (
-            <EntityUsage
-              accessToken={accessToken}
-              entityType="tag"
-              userID={userID}
-              userRole={userRole}
-              entityList={allTags}
-              premiumUser={premiumUser}
-              dateValue={dateValue}
-            />
-          )}
-          {usageView === "agent" && (
-            <>
-              {showAgentBanner && (
-                <Alert
-                  banner
-                  type="info"
-                  message="Agent usage (A2A) is a new feature."
-                  description="Spend is tracked from feature launch and previous data isn't backfilled, so only future usage appears here."
-                  closable
-                  onClose={() => setShowAgentBanner(false)}
-                  className="mb-5"
+            )
+          }
+
+          {/* Customer Usage Panel */}
+          {
+            usageView === "customer" && (
+              <>
+                {showCustomerBanner && (
+                  <Alert
+                    banner
+                    type="info"
+                    message={t("Customer usage is a new feature.")}
+                    description={t("Spend is tracked from feature launch and previous data isn't backfilled, so only future usage appears here.")}
+                    closable
+                    onClose={() => setShowCustomerBanner(false)}
+                    className="mb-5"
+                  />
+                )}
+                <EntityUsage
+                  accessToken={accessToken}
+                  entityType="customer"
+                  userID={userID}
+                  userRole={userRole}
+                  entityList={
+                    customers?.map((customer) => ({
+                      label: customer.alias || customer.user_id,
+                      value: customer.user_id,
+                    })) || null
+                  }
+                  premiumUser={premiumUser}
+                  dateValue={dateValue}
                 />
-              )}
+              </>
+            )
+          }
+          {/* Tag Usage Panel */}
+          {
+            usageView === "tag" && (
               <EntityUsage
                 accessToken={accessToken}
-                entityType="agent"
+                entityType="tag"
                 userID={userID}
                 userRole={userRole}
-                entityList={
-                  agentsResponse?.agents?.map((agent) => ({ label: agent.agent_name, value: agent.agent_id })) || null
-                }
+                entityList={allTags}
                 premiumUser={premiumUser}
                 dateValue={dateValue}
-              />{" "}
-            </>
-          )}
+              />
+            )
+          }
+          {
+            usageView === "agent" && (
+              <>
+                {showAgentBanner && (
+                  <Alert
+                    banner
+                    type="info"
+                    message="Agent usage (A2A) is a new feature."
+                    description="Spend is tracked from feature launch and previous data isn't backfilled, so only future usage appears here."
+                    closable
+                    onClose={() => setShowAgentBanner(false)}
+                    className="mb-5"
+                  />
+                )}
+                <EntityUsage
+                  accessToken={accessToken}
+                  entityType="agent"
+                  userID={userID}
+                  userRole={userRole}
+                  entityList={
+                    agentsResponse?.agents?.map((agent) => ({ label: agent.agent_name, value: agent.agent_id })) || null
+                  }
+                  premiumUser={premiumUser}
+                  dateValue={dateValue}
+                />{" "}
+              </>
+            )
+          }
           {/* User Agent Activity Panel */}
-          {usageView === "user-agent-activity" && (
-            <UserAgentActivity accessToken={accessToken} userRole={userRole} dateValue={dateValue} />
-          )}
-        </div>
-      </div>
+          {
+            usageView === "user-agent-activity" && (
+              <UserAgentActivity accessToken={accessToken} userRole={userRole} dateValue={dateValue} />
+            )
+          }
+        </div >
+      </div >
 
       {/* CloudZero Export Modal */}
-      <CloudZeroExportModal
+      < CloudZeroExportModal
         isOpen={isCloudZeroModalOpen}
         onClose={() => setIsCloudZeroModalOpen(false)}
         accessToken={accessToken}
       />
 
       {/* Global Usage Export Modal */}
-      <EntityUsageExportModal
+      < EntityUsageExportModal
         isOpen={isGlobalExportModalOpen}
         onClose={() => setIsGlobalExportModalOpen(false)}
         entityType="team"
@@ -884,7 +931,7 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
         selectedFilters={[]}
         customTitle={t("Export Usage Data")}
       />
-    </div>
+    </div >
   );
 };
 

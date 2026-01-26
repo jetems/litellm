@@ -535,6 +535,7 @@ export function VirtualKeysTable({ teams, organizations, onSortChange, currentSo
           onClose={() => setSelectedKey(null)}
           keyData={selectedKey}
           teams={allTeams}
+          onDelete={refetch}
         />
       ) : (
         <div className="border-b py-4 flex-1 overflow-hidden">
